@@ -51,7 +51,7 @@ public class CTrustworthiness extends CMainFactor{
 		return result;
 	}
 	
-	private boolean confirm(MFeatureVersion featureVersion) {
+	public boolean confirm(MFeatureVersion featureVersion) {
 		boolean result = true;
 		
 			//TODO: Implement CONFIRMATION logic
@@ -59,7 +59,7 @@ public class CTrustworthiness extends CMainFactor{
 		return result;
 	}
 
-	private void updateUserReputation(MFeatureVersion featureVersion) {
+	public void updateUserReputation(MFeatureVersion featureVersion) {
 		
 		//TODO: implement user reputation calculation
 		
