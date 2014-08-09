@@ -50,7 +50,7 @@ public class CTrustworthinessCalculus {
 		UDebug.print("\nEnter into buildFeatureMap()\n", 2);
 		this.buildFeatureMap();
 		UDebug.print("\nExit from buildFeatureMap()\n", 2);
-//		this.buildFeatureVersionMap();
+
 		UDebug.print("\nEnter into buildFeatureversionByDateMap()\n", 2);
 		this.buildFeatureVersionByDateMap();
 		UDebug.print("\nExit from buildFeatureversionByDateMap()\n", 2);
