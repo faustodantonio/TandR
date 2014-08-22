@@ -11,6 +11,10 @@ public abstract class MFFactor {
 		this.value = 0.0;
 	}
 
+	public MFFactor (Double value)	{
+		this.setValue(value);
+	}
+	
 	//	public abstract double calculate();
 	public abstract double calculate(MFeatureVersion featureVersion);
 	

@@ -1,16 +1,12 @@
 package controller;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import model.MAuthor;
 import model.MEdit;
 import model.MFeature;
 import model.MFeatureVersion;
-import modules.tandr.model.MFAspect;
-import modules.tandr.model.MFDependent;
-import modules.tandr.model.MFEffect;
+import modules.tandr.controller.CTrustworthiness;
 import utility.UConfig;
 import utility.UDebug;
 
@@ -26,6 +22,7 @@ import foundation.FFoundationFacade;
 
 public class CTest {
 	
+	private String graphUri = "<http://parliament.semwebcentral.org/parliament#hvgi>";
 	
 	@SuppressWarnings("deprecation")
 	public void printAllAuthorURIs()
@@ -41,11 +38,11 @@ public class CTest {
 	{
 		FFoundationFacade ffactory = new FFoundationFacade();
 		
-		ArrayList<String> uris = ffactory.retrieveAll("MAuthor");
+		ArrayList<String> uris = ffactory.retrieveAll("MAuthor", graphUri);
 		
 		UDebug.print( "Author URI: "+ uris.get(0) +"\n\n" , 2);
 		
-		MAuthor author = (MAuthor) ffactory.retrieveByUri( uris.get(0) ,0,"MAuthor");
+		MAuthor author = (MAuthor) ffactory.retrieveByUri( uris.get(0), graphUri, 0, "MAuthor");
 		
 		UDebug.print(author.toString(""),1);    	  
 	}
@@ -57,7 +54,7 @@ public class CTest {
 		
 		UDebug.print( "Edit ID: "+ uris.get(0) +"\n\n" , 2);
 		
-		MEdit edit = (MEdit) ffactory.retrieveByUri(uris.get(0),0,"MEdit");
+		MEdit edit = (MEdit) ffactory.retrieveByUri(uris.get(0), graphUri, 0, "MEdit");
 		
 		UDebug.print(edit.toString(""),1);   	  
 	}
@@ -69,7 +66,7 @@ public class CTest {
 		
 		UDebug.print( "Edit URI: "+ id +"\n\n" , 2);
 		
-		MEdit edit = (MEdit) ffactory.retrieveByUri(id,1,"MEdit");
+		MEdit edit = (MEdit) ffactory.retrieveByUri(id, graphUri, 1, "MEdit");
 		
 		UDebug.print(edit.toString(""),1);   	  
 	}
@@ -79,7 +76,7 @@ public class CTest {
 		FFoundationFacade ffactory = new FFoundationFacade();
 		String id = "http://semantic.web/data/hvgi/ways.rdf#way4271855";
 		
-		MFeature feature = (MFeature) ffactory.retrieveByUri(id,0,"MFeature");
+		MFeature feature = (MFeature) ffactory.retrieveByUri(id, graphUri, 0, "MFeature");
 		
 		UDebug.print(feature.toString(""),1);   	  
 	}
@@ -87,33 +84,46 @@ public class CTest {
 	public void printFeatureVersionInfos()
 	{
 		FFoundationFacade ffactory = new FFoundationFacade();
-		String id = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion199732_1";
+//		String id = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion199732_1";
+		String id = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion198467_2";
 		
-		MFeatureVersion fversion = (MFeatureVersion) ffactory.retrieveByUri(id,1,"MFeatureVersion");
+		MFeatureVersion fversion = (MFeatureVersion) ffactory.retrieveByUri(id, graphUri, 1, "MFeatureVersion");
 		
 		UDebug.print(fversion.toString(""),1);   	  
 	}
-
-	public void buildEffectHierarchy() {
+	
+	public void printTrustworthiness()
+	{
+		FFoundationFacade ffactory = new FFoundationFacade();
+		String id = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion198467_2";
 		
-		CTrustworthinessCalculus trust = new CTrustworthinessCalculus();
-		trust.buildEffectHierarchy();
+		MFeatureVersion featureVersion = (MFeatureVersion) ffactory.retrieveByUri(id, graphUri, 1, "MFeatureVersion");
+		UDebug.print(featureVersion.toString(""),3); 
 		
-		Map<MFEffect, Double> effects = trust.getEffects();
-		
-		UDebug.print("Elements: "+effects.size()+"\n", 10);
-		
-		for (Entry<MFEffect, Double> effect : effects.entrySet())	{
-			
-			UDebug.print("Effect: \n\t" + effect.getKey().toString() 
-							+" weighted: "+ effect.getValue()+"\n", 2);
-			
-			if (effect.getKey() instanceof MFDependent)
-				for ( Map.Entry<MFAspect, Double> aspect : ((MFDependent)effect.getKey()).getComponents().entrySet())
-					UDebug.print("\tAspect: \n\t\t" + aspect.getKey().toString() 
-							+" weighted: "+ aspect.getValue()+"\n", 2);
-		}
+		CTrustworthinessCalculusLazy controller = new CTrustworthinessCalculusLazy();
+		controller.computeFVTrustworthiness(featureVersion);
 	}
+
+//	public void buildEffectHierarchy() {
+//		
+//		CTrustworthinessCalculus trust = new CTrustworthinessCalculus();
+//		trust.buildEffectHierarchy();
+//		
+//		Map<MFEffect, Double> effects = trust.getEffects();
+//		
+//		UDebug.print("Elements: "+effects.size()+"\n", 10);
+//		
+//		for (Entry<MFEffect, Double> effect : effects.entrySet())	{
+//			
+//			UDebug.print("Effect: \n\t" + effect.getKey().toString() 
+//							+" weighted: "+ effect.getValue()+"\n", 2);
+//			
+//			if (effect.getKey() instanceof MFDependent)
+//				for ( Map.Entry<MFAspect, Double> aspect : ((MFDependent)effect.getKey()).getComponents().entrySet())
+//					UDebug.print("\tAspect: \n\t\t" + aspect.getKey().toString() 
+//							+" weighted: "+ aspect.getValue()+"\n", 2);
+//		}
+//	}
 	
 //	public void getTrustworthinessCalculation()
 //	{
@@ -126,13 +136,13 @@ public class CTest {
 		FFoundationFacade ffactory = new FFoundationFacade();
 		String id = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion198467_2";
 		
-		MFeatureVersion fversion = (MFeatureVersion) ffactory.retrieveByUri(id,1,"MFeatureVersion");
+		MFeatureVersion fversion = (MFeatureVersion) ffactory.retrieveByUri(id, graphUri, 1, "MFeatureVersion");
 		
 		UDebug.print(fversion.toString(""),2);
 		
 		UDebug.print("\n\nDATA ESTRATTA: " + fversion.getIsValidFromString() + "\n\n",2);  
 		
-		String nextUri = ffactory.retrieveNextFVUri( fversion );
+		String nextUri = ffactory.retrieveNextFVUri( fversion, graphUri );
 		
 		UDebug.print("Prossima feature version: \n\t" + nextUri , 2);
 	}

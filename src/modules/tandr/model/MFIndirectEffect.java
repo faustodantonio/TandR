@@ -8,8 +8,6 @@ public class MFIndirectEffect extends MFEffect{
 	private MFAspect qualitativeAspect;
 	private MFAspect semanticAspect;
 	
-	private double indValue = 0.0;
-	
 	private static double indGeomWeight = 0.33;
 	private static double indQualWeight = 0.33;
 	private static double indSemWeight  = 0.33;
@@ -22,14 +20,46 @@ public class MFIndirectEffect extends MFEffect{
 		
 	}
 	
+	public MFIndirectEffect(Double value) {
+		super(value);
+		
+		this.geometricAspect   = new MFDirectGeomAspect();
+		this.qualitativeAspect = new MFDirectQualAspect();
+		this.semanticAspect    = new MFDirectSemAspect();
+		
+	}
+	
 	@Override
 	public double calculate(MFeatureVersion featureVersion) {
 		
-		this.indValue = this.indValue + (indGeomWeight * this.geometricAspect.calculate(featureVersion));
-		this.indValue = this.indValue + (indQualWeight * this.qualitativeAspect.calculate(featureVersion));
-		this.indValue = this.indValue + (indSemWeight  * this.semanticAspect.calculate(featureVersion));		
+		super.value = super.value + (indGeomWeight * this.geometricAspect.calculate(featureVersion));
+		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculate(featureVersion));
+		super.value = super.value + (indSemWeight  * this.semanticAspect.calculate(featureVersion));		
 		
-		return indValue;
+		return super.value;
 	}
+	
+	public MFAspect getGeometricAspect() {
+		return geometricAspect;
+	}
+	public void setGeometricAspect(MFAspect geometricAspect) {
+		this.geometricAspect = geometricAspect;
+	}
+	public MFAspect getQualitativeAspect() {
+		return qualitativeAspect;
+	}
+	public void setQualitativeAspect(MFAspect qualitativeAspect) {
+		this.qualitativeAspect = qualitativeAspect;
+	}
+	public MFAspect getSemanticAspect() {
+		return semanticAspect;
+	}
+	public void setSemanticAspect(MFAspect semanticAspect) {
+		this.semanticAspect = semanticAspect;
+	}
+	
+	public double getIndValue() {
+		return super.value;
+	}	
 
 }

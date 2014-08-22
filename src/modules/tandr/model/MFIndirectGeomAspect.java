@@ -4,8 +4,10 @@ import model.MFeatureVersion;
 
 public class MFIndirectGeomAspect extends MFAspect {
 
-	public MFIndirectGeomAspect() {
-		// TODO Auto-generated constructor stub
+	public MFIndirectGeomAspect() {	}
+	
+	public MFIndirectGeomAspect(Double value){
+		super(value);
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import model.MFeatureVersion;
 
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
 /**
  * All class methods works only if there exists a pair of class <mclass,fclass> such that
  * mclass belongs to Model package, fclass belongs to Foundation package and 
@@ -17,6 +18,58 @@ public class FFoundationFacade {
 	
 	public FFoundationFacade() {
 		ffactory = new FFoundationFactory();
+	}
+	
+	public String convertToRDF(Object modelObj)
+	{
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.convertToRDF(modelObj);
+	}
+	
+	/*************************
+	 * 
+	 * Graph FUNCTIONS
+	 *
+	 *************************/	
+	
+	public boolean importJenaModel(Model jenaModel){
+		FInstallation finstall = new FInstallation();
+		return finstall.importJenaModel(jenaModel,"");
+	}
+	
+	public boolean importJenaModel(Model jenaModel, String graphName){
+		FInstallation finstall = new FInstallation();
+		return finstall.importJenaModel(jenaModel, graphName);
+	}
+	
+	public boolean createGraph(String graphName, String namespace) {
+		FInstallation finstall = new FInstallation();
+		return finstall.createGraph(graphName, namespace);
+	}
+	
+	public boolean deleteGraph(String graphName, String namespace) {
+		FInstallation finstall = new FInstallation();
+		return finstall.deleteGraph(graphName, namespace);
+	}
+	
+	public boolean createGraph(String graphName) {
+		FInstallation finstall = new FInstallation();
+		return finstall.createGraph(graphName, "");
+	}
+	
+	public boolean deleteGraph(String graphName) {
+		FInstallation finstall = new FInstallation();
+		return finstall.deleteGraph(graphName, "");
+	}
+	
+	public boolean checkGraphExists(String graphName, String namespace) {
+		FInstallation finstall = new FInstallation();
+		return finstall.graphExists(graphName, namespace);
+	}
+	
+	public boolean enableGraphIndexes(String graphName,String namespaceUri){
+		FInstallation finstall = new FInstallation();
+		return finstall.enableGraphIndexes(graphName, namespaceUri);
 	}
 	
 	/*************************
@@ -49,6 +102,18 @@ public class FFoundationFacade {
 	
 	/************* Retrive All *************/
 	
+	public ArrayList<String> retrieveAll(String mclass, String graphUri)
+	{
+		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
+		return ffoundation.retrieveAll(graphUri);
+	}
+	@SuppressWarnings("rawtypes")
+	public ArrayList<String> retrieveAll(Class mclass, String graphUri)
+	{
+		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
+		return ffoundation.retrieveAll(graphUri);
+	}
+	
 	public ArrayList<String> retrieveAll(String mclass)
 	{
 		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
@@ -72,6 +137,15 @@ public class FFoundationFacade {
 	{
 		return this.retrieveByUri(uri, 0, mclass);
 	}
+	public Object retrieveByUri(String uri, String graphUri, String mclass)
+	{		
+		return this.retrieveByUri(uri, graphUri, 0, mclass);
+	}	
+	@SuppressWarnings("rawtypes")
+	public Object retrieveByUri(String uri, String graphUri, Class mclass)
+	{
+		return this.retrieveByUri(uri, graphUri, 0, mclass);
+	}
 	
 	/************* Retrive By URI *************/
 	
@@ -85,6 +159,18 @@ public class FFoundationFacade {
 	{
 		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
 		return ffoundation.retrieveByURI(uri, lazyDepth);
+	}
+	
+	public Object retrieveByUri(String uri, String graphUri, int lazyDepth, String mclass)
+	{
+		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
+		return ffoundation.retrieveByURI(uri, graphUri,lazyDepth);
+	}
+	@SuppressWarnings("rawtypes")
+	public Object retrieveByUri(String uri, String graphUri, int lazyDepth, Class mclass)
+	{
+		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
+		return ffoundation.retrieveByURI(uri, graphUri, lazyDepth);
 	}
 	
 	/*************************
@@ -111,6 +197,24 @@ public class FFoundationFacade {
 		return ffoundation.retrieveNext(fv.getIsValidFromString());
 	}
 	
+	public ArrayList<String> retrieveFVPreviousesNeighbours(MFeatureVersion featureVersion, String graphUri, String fv_wkt_buffered)
+	{
+		FFeatureVersion ffoundation = new FFeatureVersion();
+		return ffoundation.retrievePreviousesNeighbours(featureVersion.getIsValidFromString(), fv_wkt_buffered, graphUri);
+	}
+	
+	public String retrieveFirstFVUri(String graphUri)
+	{
+		FFeatureVersion ffoundation = new FFeatureVersion();
+		return ffoundation.retrieveNext(null,graphUri);
+	}
+	
+	public String retrieveNextFVUri(MFeatureVersion fv, String graphUri)
+	{
+		FFeatureVersion ffoundation = new FFeatureVersion();
+		return ffoundation.retrieveNext(fv.getIsValidFromString(), graphUri);
+	}
+	
 	/*************************
 	 * xxxxxxxxxxxxxxxxxxxxxxx
 	 * x
@@ -130,12 +234,6 @@ public class FFoundationFacade {
 	{
 		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
 		return ffoundation.retrieveAllAsResultSet();
-	}
-	@Deprecated
-	public String retrieveNextFV(String fv_dateFrom)
-	{
-		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveNext(fv_dateFrom);
 	}
 	
 }

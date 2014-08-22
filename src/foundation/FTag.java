@@ -1,7 +1,5 @@
 package foundation;
 
-import java.util.ArrayList;
-import java.util.Map;
 import java.util.TreeMap;
 
 import utility.UDebug;
@@ -15,28 +13,40 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public class FTag extends FFoundationAbstract{
 		
-	public FTag()
-	{
+	public FTag()	{
 		super();
 	}
-	
-	public Map.Entry<String, String> retrieveTagByURI(String tagURI)
-	{
+
+	@Override
+	protected String getClassUri(){
+		return "osp:Tag";
+	}
+
+	@Override
+	public Object retrieveByURI(String uri, String graphUri, int lazyDepth) {
 		TreeMap<String, String> tags = new TreeMap<String, String>();
-				
+		
 		String queryString = ""
 				+ "SELECT ?key ?value \n"
 				+ "\tWHERE \n"
-				+ "\t{\n"
-				+ "\t\tOPTIONAL {<"+tagURI+">" + " osp:hasKey "   + " _:tagKey   .  "
+				+ "\t{\n";
+				
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
+		
+		queryString += ""
+				+ "\t\tOPTIONAL {<"+uri+">" + " osp:hasKey "   + " _:tagKey   .  "
 						+ "		_:tagKey "     + " hvgi:isKey "   + "?key        }\n"
-				+ "\t\tOPTIONAL {<"+tagURI+">" + " osp:hasValue " + " _:tagValue .  "
-						+ "		_:tagValue "   + " hvgi:isValue " + "?value      }\n"
+				+ "\t\tOPTIONAL {<"+uri+">" + " osp:hasValue " + " _:tagValue .  "
+						+ "		_:tagValue "   + " hvgi:isValue " + "?value      }\n";
+						
+		if (!graphUri.equals("")) queryString += "\t}\n";
+				
+		queryString += ""
 				+ "\t}";
 		
 		UDebug.print("SPARQL query: \n\t" + queryString + "\n\n", 6);
 		
-		ResultSet rawResults = triplestore.sparqlSelect(queryString);
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
 		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",7);
@@ -55,48 +65,9 @@ public class FTag extends FFoundationAbstract{
 	}
 
 	@Override
-	public ArrayList<String> retrieveAll() {
-		// TODO Implement Tag's retrieveAll() method
-		return null;
-	}
-
-	@Override
-	public Object retrieveByURI(String uri, int lazyDepth) {
-		// TODO Implement Tag's retrieveByURI() method
-		return null;
-	}
-
-	@Override
-	public ResultSet retrieveAllAsResultSet() {
-		// TODO Implement Tag's retrieveAllAsResultSet() method
-		return null;
-	}
-
-	@Override
 	public String convertToRDF(Object obj) {
 		// TODO Implement Tag's convertToRDF() method
 		return null;
 	}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }

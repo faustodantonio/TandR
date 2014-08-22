@@ -1,30 +1,51 @@
 package foundation;
 
-import com.hp.hpl.jena.query.ResultSet;
+import java.io.IOException;
+import java.util.Map.Entry;
 
-abstract class FTripleStore {
+import org.jdom2.Namespace;
+
+import utility.UConfig;
+
+import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
+
+public abstract class FTripleStore {
 
 	public FTripleStore() {	}
 	
-	public abstract ResultSet sparqlSelect(String selectQueryString);
-	public abstract boolean sparqlUpdate(String updateQueryString);
+	public abstract ResultSet sparqlSelect(String selectQueryString) throws IOException;
+	public abstract boolean sparqlUpdate(String updateQueryString) throws IOException;
+	
+	public abstract ResultSet sparqlSelectHandled(String selectQueryString);
+	public abstract boolean sparqlUpdateHandled(String updateQueryString);
+	
+	public abstract boolean jenaModelInsert(Model jenaModel, String namedGraph);
+	public abstract boolean enableGraphIndexes(String graphName,String namespaceUri);
+	public abstract boolean graphExists(String graphName, String namespaceUri);
 	
 	protected String AddPrefixes(String queryString) {		
 		
-		String prefixes = "\n"
-				+ "PREFIX rdf: "       + "\t\t" +"<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"     + "\n"
-				+ "PREFIX xsd: "       + "\t\t" +"<http://www.w3.org/2001/XMLSchema#>"               + "\n"
-				+ "PREFIX dcterms: "   + "\t"   +"<http://purl.org/dc/terms/>" 						 + "\n"
-		  		+ "PREFIX foaf: "      + "\t\t" +"<http://xmlns.com/foaf/0.1/>" 					 + "\n"
-		  		+ "PREFIX geosparql: " + "\t"   +"<http://www.opengis.net/ont/geosparql#>" 			 + "\n"
-		  		+ "PREFIX geof: "      + "\t\t" +"<http://www.opengis.net/def/function/geosparql/>"  + "\n"
-		  		+ "PREFIX sf: "        + "\t\t" +"<http://www.opengis.net/ont/sf#>" 				 + "\n"
-		  		+ "PREFIX units: "     + "\t\t" +"<http://www.opengis.net/def/uom/OGC/1.0/>" 		 + "\n"		  		
-		  		+ "PREFIX hvgi: "      + "\t\t" +"<http://semantic.web/vocabs/history_vgi/hvgi#>" 	 + "\n"
-		  		+ "PREFIX osp: "       + "\t\t" +"<http://semantic.web/vocabs/osm_provenance/osp#> " + "\n"
-		  		+ "PREFIX prv: "       + "\t\t" +"<http://purl.org/net/provenance/ns#>" 			 + "\n"
-		  		+ "PREFIX time: "      + "\t\t" +"<http://www.w3.org/2006/time#>" 			  + "\n" + "\n"
-		  		+ "";
+//		String prefixes = "\n"
+//				+ "PREFIX rdf: "       + "\t\t" +"<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"     + "\n"
+//				+ "PREFIX xsd: "       + "\t\t" +"<http://www.w3.org/2001/XMLSchema#>"               + "\n"
+//				+ "PREFIX graphs: "    + "\t\t" +"<http://parliament.semwebcentral.org/parliament#>" + "\n"
+//				+ "PREFIX dcterms: "   + "\t"   +"<http://purl.org/dc/terms/>" 						 + "\n"
+//		  		+ "PREFIX foaf: "      + "\t\t" +"<http://xmlns.com/foaf/0.1/>" 					 + "\n"
+//		  		+ "PREFIX geosparql: " + "\t"   +"<http://www.opengis.net/ont/geosparql#>" 			 + "\n"
+//		  		+ "PREFIX geof: "      + "\t\t" +"<http://www.opengis.net/def/function/geosparql/>"  + "\n"
+//		  		+ "PREFIX sf: "        + "\t\t" +"<http://www.opengis.net/ont/sf#>" 				 + "\n"
+//		  		+ "PREFIX units: "     + "\t\t" +"<http://www.opengis.net/def/uom/OGC/1.0/>" 		 + "\n"		  		
+//		  		+ "PREFIX hvgi: "      + "\t\t" +"<http://semantic.web/vocabs/history_vgi/hvgi#>" 	 + "\n"
+//		  		+ "PREFIX osp: "       + "\t\t" +"<http://semantic.web/vocabs/osm_provenance/osp#> " + "\n"
+//		  		+ "PREFIX prv: "       + "\t\t" +"<http://purl.org/net/provenance/ns#>" 			 + "\n"
+//		  		+ "PREFIX time: "      + "\t\t" +"<http://www.w3.org/2006/time#>" 			  + "\n" + "\n"
+//		  		+ "";
+		
+		String prefixes = "\n";
+		
+		for (Entry<String, Namespace> namespace : UConfig.namespaces.entrySet())
+			prefixes += "PREFIX " + namespace.getKey() + "\t\t<" + namespace.getValue().getURI() +">\n" ;
 		
 		return prefixes + queryString;
 		

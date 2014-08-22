@@ -1,6 +1,5 @@
 package foundation;
 
-import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import model.MEdit;
@@ -21,35 +20,36 @@ public class FEdit extends FFoundationAbstract {
 	}
 
 	@Override
-	@Deprecated
-	public ResultSet retrieveAllAsResultSet()
-	{
-		return super.getURIsOfClassAsResultSet("osp:Edit");
+	protected String getClassUri(){
+		return "osp:Edit";
 	}
 	@Override
-	public ArrayList<String> retrieveAll()
-	{
-		return super.getURIsOfClass("osp:Edit");
-	}
-	@Override
-	public MEdit retrieveByURI(String editURI, int lazyDepth)
+	public MEdit retrieveByURI(String editURI, String graphUri, int lazyDepth)
 	{
 		MEdit edit = new MEdit();
 		
 		String queryString = ""
 				+ "\tSELECT ?author ?changesGeometry ?addtag ?changevalueofkey ?removetag \n"
 				+ "\tWHERE \n"
-				+ "\t{ \n"
+				+ "\t{ \n";
+		
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
+		
+		queryString += ""
 				+ "\t\tOPTIONAL { <"+editURI+">" + " prv:performedBy ?author } \n"
 				+ "\t\tOPTIONAL { <"+editURI+">" + " osp:changesGeometry ?changesGeometry } \n"
 				+ "\t\tOPTIONAL { <"+editURI+">" + " osp:addTags ?addtag } \n"
 				+ "\t\tOPTIONAL { <"+editURI+">" + " osp:changesValuesOfKey ?changevalueofkey } \n"
-				+ "\t\tOPTIONAL { <"+editURI+">" + " osp:removeTags ?removetag } \n"
+				+ "\t\tOPTIONAL { <"+editURI+">" + " osp:removeTags ?removetag } \n";
+		
+		if (!graphUri.equals("")) queryString += "\t}\n";
+				
+		queryString += ""
 				+ "\t}";
 		
 		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 5);
 		
-		ResultSet rawResults = triplestore.sparqlSelect(queryString);
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
 		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
@@ -69,14 +69,15 @@ public class FEdit extends FFoundationAbstract {
 		FAuthor fauthor = new FAuthor();
 		
 		if ( lazyDepth > 0 && performedBy != null)
-			edit.setAuthor(fauthor.retrieveByURI(performedBy.toString(),lazyDepth-1));
+			edit.setAuthor(fauthor.retrieveByURI(performedBy.toString(), graphUri, lazyDepth-1));
 		
-		this.retriveEditTags(edit, queryRawResults);
+		this.retriveEditTags(edit, graphUri, queryRawResults);
 		
 		return edit;
 	}	
 
-	private void retriveEditTags(MEdit edit, ResultSetRewindable rawResults) {
+	@SuppressWarnings("unchecked")
+	private void retriveEditTags(MEdit edit, String graphUri, ResultSetRewindable rawResults) {
 		
 		FTag ftag = new FTag();
 		rawResults.reset();
@@ -89,21 +90,21 @@ public class FEdit extends FFoundationAbstract {
 			if ( generalQuery.getResource("addtag") != null )
 			{
 				String tagUri = generalQuery.getResource("addtag").toString();
-				Entry<String, String> tag = ftag.retrieveTagByURI(tagUri);
+				Entry<String, String> tag = (Entry<String, String>) ftag.retrieveByURI(tagUri, graphUri, 0);
 				if (tag != null && tag.getKey() != null && tag.getValue() != null) 
 					edit.addAddedTag(tag.getKey(), tag.getValue());
 			}
 			if ( generalQuery.getResource("changevalueofkey") != null )
 			{
 				String tagUri = generalQuery.getResource("changevalueofkey").toString();
-				Entry<String, String> tag = ftag.retrieveTagByURI(tagUri);
+				Entry<String, String> tag = (Entry<String, String>) ftag.retrieveByURI(tagUri, graphUri, 0);
 				if (tag != null && tag.getKey() != null && tag.getValue() != null) 
 					edit.addChangedTag(tag.getKey(), tag.getValue());
 			}
 			if ( generalQuery.getResource("removetag") != null )
 			{
 				String tagUri = generalQuery.getResource("removetag").toString();
-				Entry<String, String> tag = ftag.retrieveTagByURI(tagUri);
+				Entry<String, String> tag = (Entry<String, String>) ftag.retrieveByURI(tagUri, graphUri, 0);
 				if (tag != null && tag.getKey() != null && tag.getValue() != null) 
 					edit.addRemovedTag(tag.getKey(), tag.getValue());
 			}
@@ -116,5 +117,4 @@ public class FEdit extends FFoundationAbstract {
 		// TODO Implement Edit's convertToRDF() method
 		return null;
 	}
-
 }

@@ -3,9 +3,13 @@ package modules.tandr.model;
 import model.MFeatureVersion;
 
 public abstract class MFAspect extends MFFactor {
-
-	protected double value;
 	
+	public MFAspect() {	}
+	
+	public MFAspect(Double value) {
+		super(value);
+	}
+
 	public abstract double calculate(MFeatureVersion featureVersion);
 	
 	public String toString()
@@ -13,10 +17,4 @@ public abstract class MFAspect extends MFFactor {
 		return this.getClass().getName();
 	}
 	
-	public double getValue() {
-		return value;
-	}
-	public void setValue(float value) {
-		this.value = value;
-	}	
 }

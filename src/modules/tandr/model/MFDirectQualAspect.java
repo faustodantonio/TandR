@@ -4,8 +4,10 @@ import model.MFeatureVersion;
 
 public class MFDirectQualAspect extends MFAspect {
 
-	public MFDirectQualAspect() {
-		// TODO Auto-generated constructor stub
+	public MFDirectQualAspect() { }
+	
+	public MFDirectQualAspect(Double value){
+		super(value);
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
 
 public class FFuseki extends FTripleStore{
 
@@ -33,6 +34,36 @@ public class FFuseki extends FTripleStore{
 		ResultSet rs = qexec.execSelect() ;
 	      
 	    return rs;
+	}
+
+	@Override
+	public boolean jenaModelInsert(Model jenaModel, String namedGraph) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public ResultSet sparqlSelectHandled(String selectQueryString) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean sparqlUpdateHandled(String updateQueryString) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean enableGraphIndexes(String graphName, String namespaceUri) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean graphExists(String graphName, String namespaceUri) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 }

@@ -16,7 +16,7 @@ public class CTrustworthinessCalculusLazy {
 	{
 		this.ffacade = new FFoundationFacade();
 		
-		String factorClass = "modules." + UConfig.module_trustworthiness_calculus + UConfig.main_trustworthiness_calculus;
+		String factorClass = "modules." + UConfig.module_trustworthiness_calculus +"."+ UConfig.main_trustworthiness_calculus;
 		
 		try {
 			cfactor = (CMainFactor) Class.forName(factorClass).newInstance();

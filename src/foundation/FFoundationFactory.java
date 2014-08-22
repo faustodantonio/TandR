@@ -38,10 +38,12 @@ class FFoundationFactory {
 		try {
 			ffoundation = (FFoundationAbstract) Class.forName(fclass).newInstance();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
+			System.out.print("Unable to get an instance of the class " + mclass + "\n"
+					+fclass + " do not exists \n");
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
+			System.out.print("Unable to access the class " + mclass + "\n"
+					+fclass + " do not exists \n");
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			System.out.print("Unable to load elements of the class " + mclass + "\n"

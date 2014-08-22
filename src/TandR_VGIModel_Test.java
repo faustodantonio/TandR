@@ -5,8 +5,9 @@ import com.hp.hpl.jena.query.ResultSetRewindable;
 
 import utility.UConfig;
 import utility.UDebug;
+import controller.CInstallation;
 import controller.CTest;
-import controller.CTrustworthinessCalculus;
+import controller.CTrustworthinessCalculusLazy;
 import foundation.FFuseki;
 
 
@@ -17,7 +18,8 @@ public class TandR_VGIModel_Test {
 		UConfig.instance();
 		
 		CTest test = new CTest();
-		CTrustworthinessCalculus trust = new CTrustworthinessCalculus();
+		CTrustworthinessCalculusLazy trust = new CTrustworthinessCalculusLazy();
+		CInstallation install = new CInstallation();
 //		test.printAllAuthorURIs();
 //		test.printFirstAuthorInfos();
 //		test.printEditInfos();
@@ -26,7 +28,11 @@ public class TandR_VGIModel_Test {
 //		test.buildEffectHierarchy() ;
 //		test.getTrustworthinessCalculation();
 //		test.retreiveNextFV();
-		test.retreiveSuccNeighboursFVs();
+//		test.retreiveSuccNeighboursFVs();
+		
+		test.printTrustworthiness();
+		
+//		install.install();
 
 //		trust.buildMaps();
 //		UDebug.print( "# di Features in RAM: "+trust.getFeatures().size() +"\n", 2 );

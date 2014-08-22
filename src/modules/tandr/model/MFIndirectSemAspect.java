@@ -4,8 +4,10 @@ import model.MFeatureVersion;
 
 public class MFIndirectSemAspect extends MFAspect{
 
-	public MFIndirectSemAspect() {
-		super();
+	public MFIndirectSemAspect() {	}
+	
+	public MFIndirectSemAspect(Double value){
+		super(value);
 	}
 
 	@Override

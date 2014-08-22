@@ -1,7 +1,5 @@
 package foundation;
 
-import java.util.ArrayList;
-
 import model.MFeature;
 import model.MFeatureVersion;
 import utility.UDebug;
@@ -19,20 +17,12 @@ public class FFeature extends FFoundationAbstract{
 	{
 		super();
 	}
-
 	@Override
-	@Deprecated
-	public ResultSet retrieveAllAsResultSet()
-	{
-		return super.getURIsOfClassAsResultSet("hvgi:VGIFeature");
+	protected String getClassUri(){
+		return"hvgi:VGIFeature";
 	}
 	@Override
-	public ArrayList<String> retrieveAll()
-	{
-		return super.getURIsOfClass("hvgi:VGIFeature");
-	}
-	@Override
-	public MFeature retrieveByURI(String featureURI, int lazyDepth)
+	public MFeature retrieveByURI(String featureURI, String graphUri, int lazyDepth)
 	{
 		MFeature feature = new MFeature();
 		FFeatureVersion ffversion = new FFeatureVersion();
@@ -40,13 +30,21 @@ public class FFeature extends FFoundationAbstract{
 		String queryString = ""
 				+ "\tSELECT ?versionuri \n"
 				+ "\tWHERE \n"
-				+ "\t{ \n"
-				+ "\t\t <"+featureURI+">" + " hvgi:hasVersion ?versionuri \n"
+				+ "\t{ \n";
+				
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
+		
+		queryString += ""
+				+ "\t\t <"+featureURI+">" + " hvgi:hasVersion ?versionuri \n";
+		
+		if (!graphUri.equals("")) queryString += "\t}\n";
+				
+		queryString += ""
 				+ "\t}";
 		
 		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 5);
 		
-		ResultSet rawResults = triplestore.sparqlSelect(queryString);
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
 		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
@@ -61,7 +59,7 @@ public class FFeature extends FFoundationAbstract{
 			MFeatureVersion fversion = null;
 			
 			if ( lazyDepth > 0 )
-				fversion = ffversion.retrieveByURI(fversionuri.toString(), lazyDepth-1);
+				fversion = ffversion.retrieveByURI(fversionuri.toString(), graphUri, lazyDepth-1);
 			
 			feature.addVersion(fversionuri.toString(), fversion);
 		}
