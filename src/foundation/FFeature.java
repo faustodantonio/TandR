@@ -66,10 +66,10 @@ public class FFeature extends FFoundationAbstract{
 		
 		return feature;
 	}
-
+	
 	@Override
-	public String convertToRDF(Object obj) {
-		// TODO Implement Feature's convertToRDF() method
+	public String convertToRDFXML(Object obj) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	

@@ -6,6 +6,8 @@ public class MAuthor {
 	private String accountName;
 	private String accountServerHomepage;
 	
+	private MReputation reputation;
+	
 	public String getUri() {
 		return uri;
 	}
@@ -23,6 +25,12 @@ public class MAuthor {
 	}
 	public void setAccountServerHomepage(String accountServerHomepage) {
 		this.accountServerHomepage = accountServerHomepage;
+	}
+	public MReputation getReputation() {
+		return reputation;
+	}
+	public void setReputation(MReputation reputation) {
+		this.reputation = reputation;
 	}
 	
 	public String toString(String rowPrefix)

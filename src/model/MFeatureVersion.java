@@ -116,6 +116,16 @@ public class MFeatureVersion {
 		return wktGeometryBuffered;
 	}
 	
+	public String getUriID(){
+		String uriID = this.getUri();
+		
+		uriID = uriID.replace("http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion", "");
+		uriID = uriID.replace("http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion", "");
+		uriID = uriID.replace("http://semantic.web/data/hvgi/featureVersions.rdf#featureVersion", "");
+		
+		return uriID;
+	}
+	
 	public String getUri() {
 		return uri;
 	}

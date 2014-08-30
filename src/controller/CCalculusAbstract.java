@@ -2,9 +2,9 @@ package controller;
 
 import model.MFeatureVersion;
 
-public abstract class CMainFactor {
+public abstract class CCalculusAbstract {
 
-	public CMainFactor() {	}
+	public CCalculusAbstract() {	}
 	
 	public abstract boolean computeTW(MFeatureVersion featureVersion);	
 

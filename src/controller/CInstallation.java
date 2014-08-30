@@ -99,13 +99,23 @@ public class CInstallation {
 	}
 
 	private void restoreVGIH() {
-		// TODO Implement the installation modality 4. 
-		
+		boolean hvgiExists  = foundation.checkGraphExists("hvgi" , UConfig.graphURI);
+		UDebug.print("\nDoes hvgi graph exists? ANSWER: "  + hvgiExists  + "\n", 3);
+		if (hvgiExists) 
+			foundation.deleteGraph("hvgi" , "graphs");
+		foundation.createGraph("hvgi" , "graphs");
+		this.importVGIHTriples();
+		this.createSpatialIndexes();
 	}
 
 	private void restoreTandR() {
-		// TODO Implement the installation modality 3.
-		
+		boolean tandrExists = foundation.checkGraphExists("tandr" , UConfig.graphURI);
+		UDebug.print("Does tandr graph exists? ANSWER: " + tandrExists + "\n", 6);
+		if (tandrExists)
+			foundation.deleteGraph("tandr" , "graphs");
+
+		foundation.createGraph("tandr" , "graphs");
+		this.importTandRTriples();
 	}
 	
 	private void importVGIHTriples() {

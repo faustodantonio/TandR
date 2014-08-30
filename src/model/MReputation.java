@@ -7,43 +7,42 @@ import java.util.Date;
 import utility.UConfig;
 import utility.UDebug;
 
-public class MTrustworthiness {
+public class MReputation {
 
 	private String uri;
 	private double value;
 	private Date computedAt;
 	
-	private String featureVersionUri;
-	private MFeatureVersion featureVersion;	
+	private String  authorUri;
+	private MAuthor author;	
 
 	private SimpleDateFormat sdf;
 	
-	public MTrustworthiness() {
+	public MReputation() {
 		this.sdf = UConfig.sdf;
 	}
 	
-	public MTrustworthiness(MFeatureVersion featureVersion) {
+	public MReputation(MAuthor author) {
 		this.sdf = UConfig.sdf;
 		
-		featureVersion.setTrustworthiness(this);
-		this.setFeatureVersion(featureVersion);
+		author.setReputation(this);
+		this.setAuthor(author);
+	}
+	
+	public MReputation(MAuthor author, String computedAt) {
+		this.sdf = UConfig.sdf;
+		
+		author.setReputation(this);
+		this.setAuthor(author);
+		this.setComputedAt(computedAt);
 	}
 	
 	public String toString(String rowPrefix)
 	{
-		String trustworthinessString = "";
-		//TODO: implement conversion from MTrustworthiness to String
-		return trustworthinessString;
+		String reputationString = "";
+		//TODO: implement conversion from MReputation to String
+		return reputationString;
 	}
-	
-	public MFeatureVersion getFeatureVersion() {
-		return featureVersion;
-	}
-	public void setFeatureVersion(MFeatureVersion featureVersion) {
-		this.featureVersion = featureVersion;
-		this.setUri(""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + featureVersion.getUriID());
-		this.setComputedAt(featureVersion.getIsValidFromString());
-	}	
 
 	public double getValue() {
 		return value;
@@ -77,11 +76,19 @@ public class MTrustworthiness {
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
-	public String getFeatureVersionUri() {
-		return featureVersionUri;
+	public MAuthor getAuthor() {
+		return author;
 	}
-	public void setFeatureVersionUri(String featureVersionUri) {
-		this.featureVersionUri = featureVersionUri;
-	}	
+	public void setAuthor(MAuthor author) {
+		this.setUri(""+UConfig.graphURI + "Reputation" + UConfig.module_trustworthiness_calculus + "_" + author.getAccountName());
+		this.author = author;
+	}
+	public String getAuthorUri() {
+		return authorUri;
+	}
+	public void setAuthorUri(String authorUri) {
+		this.authorUri = authorUri;
+	}
+	
 	
 }

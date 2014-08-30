@@ -6,7 +6,6 @@ import model.MAuthor;
 import model.MEdit;
 import model.MFeature;
 import model.MFeatureVersion;
-import modules.tandr.controller.CTrustworthiness;
 import utility.UConfig;
 import utility.UDebug;
 
@@ -100,36 +99,9 @@ public class CTest {
 		MFeatureVersion featureVersion = (MFeatureVersion) ffactory.retrieveByUri(id, graphUri, 1, "MFeatureVersion");
 		UDebug.print(featureVersion.toString(""),3); 
 		
-		CTrustworthinessCalculusLazy controller = new CTrustworthinessCalculusLazy();
-		controller.computeFVTrustworthiness(featureVersion);
+		CTRCalculus controller = new CTRCalculus();
+		controller.compute(featureVersion);
 	}
-
-//	public void buildEffectHierarchy() {
-//		
-//		CTrustworthinessCalculus trust = new CTrustworthinessCalculus();
-//		trust.buildEffectHierarchy();
-//		
-//		Map<MFEffect, Double> effects = trust.getEffects();
-//		
-//		UDebug.print("Elements: "+effects.size()+"\n", 10);
-//		
-//		for (Entry<MFEffect, Double> effect : effects.entrySet())	{
-//			
-//			UDebug.print("Effect: \n\t" + effect.getKey().toString() 
-//							+" weighted: "+ effect.getValue()+"\n", 2);
-//			
-//			if (effect.getKey() instanceof MFDependent)
-//				for ( Map.Entry<MFAspect, Double> aspect : ((MFDependent)effect.getKey()).getComponents().entrySet())
-//					UDebug.print("\tAspect: \n\t\t" + aspect.getKey().toString() 
-//							+" weighted: "+ aspect.getValue()+"\n", 2);
-//		}
-//	}
-	
-//	public void getTrustworthinessCalculation()
-//	{
-//		CTrustworthinessCalculus trust = new CTrustworthinessCalculus();
-//		UDebug.print(trust.computeTrustworthiness()+"",2);
-//	}
 	
 	public void retreiveNextFV()
 	{

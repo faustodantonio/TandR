@@ -14,16 +14,17 @@ import com.hp.hpl.jena.rdf.model.Model;
  */
 public class FFoundationFacade {
 	
-	FFoundationFactory ffactory;
-	
+	protected FFoundationFactory ffactory;
+
 	public FFoundationFacade() {
 		ffactory = new FFoundationFactory();
 	}
 	
-	public String convertToRDF(Object modelObj)
-	{
-		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
-		return foundation.convertToRDF(modelObj);
+	public FFoundationFactory getFfactory() {
+		return ffactory;
+	}
+	public void setFfactory(FFoundationFactory ffactory) {
+		this.ffactory = ffactory;
 	}
 	
 	/*************************
@@ -74,6 +75,51 @@ public class FFoundationFacade {
 	
 	/*************************
 	 * 
+	 * RDF format convert FUNCTIONS
+	 *
+	 *************************/
+	
+	public String convertToRDFXML(Object modelObj, boolean prefixes)
+	{
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.convertToRDFXML(modelObj,prefixes);
+	}	
+	
+	public String convertToRDFTTL(Object modelObj, boolean prefixes) {
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);
+		return foundation.convertToRDFTTL(modelObj,prefixes);
+	}
+	
+	// The other output formats do not have prefixes so there is no need for methods like the above
+	
+	public String convertToRDFXML(Object modelObj)
+	{
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.convertToRDFXML(modelObj);
+	}	
+	
+	public String convertToRDFTTL(Object modelObj) {
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);
+		return foundation.convertToRDFTTL(modelObj);
+	}
+	
+	public String convertToRDFN3(Object modelObj) {
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.convertToRDFN3(modelObj);
+	}
+	
+	public String convertToRDFNT(Object modelObj) {
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.convertToRDFNT(modelObj);
+	}
+	
+	public String convertToRDFJSON(Object modelObj) {
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.convertToRDFJSON(modelObj);
+	}
+	
+	/*************************
+	 * 
 	 * Model CrUD FUNCTIONS
 	 *
 	 *************************/	
@@ -84,9 +130,20 @@ public class FFoundationFacade {
 		return foundation.create(modelObj);
 	}
 	
+	public boolean create(Object modelObj,String graphUri) 
+	{
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.create(modelObj, graphUri);
+	}
+	
 	public boolean update(Object oldModelObj, Object updModelObj) {
 		FFoundationAbstract foundation = ffactory.getFFoundation(updModelObj);
 		return foundation.update(oldModelObj, updModelObj);
+	}
+	
+	public boolean update(Object oldModelObj, Object updModelObj, String graphUri) {
+		FFoundationAbstract foundation = ffactory.getFFoundation(updModelObj);
+		return foundation.update(oldModelObj, updModelObj, graphUri);
 	}
 	
 	public boolean delete(Object modelObj) {
@@ -94,11 +151,26 @@ public class FFoundationFacade {
 		return foundation.delete(modelObj);
 	}
 	
+	public boolean delete(Object modelObj, String graphUri) {
+		FFoundationAbstract foundation = ffactory.getFFoundation(modelObj);		
+		return foundation.delete(modelObj,graphUri);
+	}
+	
 	/*************************
 	 * 
 	 * Model Retriving FUNCTIONS
 	 *
 	 *************************/	
+	
+	public int countClassSubject(String mclass)	{
+		return this.countClassSubject(mclass,"");
+	}
+	
+	public int countClassSubject(String mclass, String graphUri)
+	{
+		FFoundationAbstract ffoundation = this.ffactory.getFFoundation(mclass);
+		return ffoundation.countClassSubject(graphUri);
+	}
 	
 	/************* Retrive All *************/
 	
@@ -215,6 +287,16 @@ public class FFoundationFacade {
 		return ffoundation.retrieveNext(fv.getIsValidFromString(), graphUri);
 	}
 	
+	public ArrayList<String> retrieveDateList(String graphUri)
+	{	
+		FFeatureVersion ffoundation = new FFeatureVersion();
+		return ffoundation.retrieveDateList(graphUri);
+	}
+	
+	public ArrayList<MFeatureVersion> retrieveByDate(String dateFrom, String graphUri, int lazyDepth) {
+		FFeatureVersion ffoundation = new FFeatureVersion();
+		return ffoundation.retrieveByDate(dateFrom, graphUri, lazyDepth);
+	}
 	/*************************
 	 * xxxxxxxxxxxxxxxxxxxxxxx
 	 * x

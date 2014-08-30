@@ -15,7 +15,7 @@ import com.hp.hpl.jena.query.ResultSetRewindable;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.bbn.parliament.jena.joseki.client.RemoteModel;
 
-class FParliament extends FTripleStore{
+public class FParliament extends FTripleStore{
 
 	private RemoteModel parliament;
 	

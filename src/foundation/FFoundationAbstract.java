@@ -1,15 +1,26 @@
 package foundation;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Map;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.Namespace;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import utility.UConfig;
 import utility.UDebug;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
-abstract class FFoundationAbstract {
+public abstract class FFoundationAbstract {
 
 	protected FTripleStore triplestore;
 	protected String classUri;
@@ -41,7 +52,7 @@ abstract class FFoundationAbstract {
 	 *************************/	
 	
 	public    abstract Object retrieveByURI(String uri, String graphUri, int lazyDepth);
-	public    abstract String convertToRDF(Object obj);
+	public    abstract String convertToRDFXML(Object obj);
 	protected abstract String getClassUri();
 	
 	/*************************
@@ -136,7 +147,7 @@ abstract class FFoundationAbstract {
 	boolean create(Object modelObj, String graphUri) 	{
 		boolean creation = false;
 		if (this.checkObjectModel(modelObj)) {
-			String rdfTriples = this.convertToRDF(modelObj);
+			String rdfTriples = this.convertToRDFTTL(modelObj,false);
 			creation = this.create(rdfTriples,graphUri);
 		}
 		// TODO: RAISE EXCEPTION at create(), the object to be "created" is not a Model object.
@@ -164,8 +175,8 @@ abstract class FFoundationAbstract {
 	boolean update(Object oldObj, Object updObj, String graphUri) {
 		boolean update = false;
 		if ( this.checkObjectModel(oldObj) && this.checkObjectModel(updObj) ) {
-			String oldRdfTriples =  this.convertToRDF(oldObj);
-			String updatedRdfTriples = this.convertToRDF(updObj);
+			String oldRdfTriples =  this.convertToRDFTTL(oldObj);
+			String updatedRdfTriples = this.convertToRDFTTL(updObj);
 			update = this.update(oldRdfTriples, updatedRdfTriples, graphUri);
 		}
 		// TODO: RAISE EXCEPTION at update(), the object to be "updated" is not a Model object.
@@ -196,7 +207,7 @@ abstract class FFoundationAbstract {
 	boolean delete(Object modelObj, String graphUri) {
 		boolean deletion = false;
 		if (this.checkObjectModel(modelObj)) {
-			String rdfTriples = this.convertToRDF(modelObj);
+			String rdfTriples = this.convertToRDFTTL(modelObj);
 			deletion = this.delete(rdfTriples, graphUri);
 		}
 		// TODO: RAISE EXCEPTION at delete(), the object to be "deleted" is not a Model object.
@@ -205,17 +216,134 @@ abstract class FFoundationAbstract {
 	
 	/*************************
 	 * 
+	 * RDF format convert FUNCTIONS
+	 *
+	 *************************/
+	
+	public String convertToRDFTTL(Object modelObj, boolean prefixes) {
+		String outputTriples = this.convertToRDF(modelObj, "TURTLE");
+		
+		if (!prefixes)
+			outputTriples = outputTriples.replaceAll("(?m)^@prefix.*?[\r\n]", "");
+		
+		return outputTriples;
+	}
+	
+	// The other output formats do not have prefixes so there is no need for methods like the above
+	
+	public String convertToRDFTTL(Object modelObj) {	
+		return this.convertToRDF(modelObj, "TURTLE");
+	}
+
+	public String convertToRDFN3(Object modelObj) {
+		return this.convertToRDF(modelObj, "N3");
+	}
+	
+	public String convertToRDFNT(Object modelObj) {
+		return this.convertToRDF(modelObj, "N-TRIPLES");
+	}
+	
+	public String convertToRDFJSON(Object modelObj) {
+		return this.convertToRDF(modelObj, "RDF/JSON");
+	}
+	
+	public String convertToRDFXML(Object modelObj, boolean prefixes) {
+		String outputTriples = this.convertToRDFXML(modelObj);
+		
+		//	delete xml header and last empty line 
+		outputTriples = outputTriples.substring( outputTriples.indexOf('\n') + 1 );
+		outputTriples = outputTriples.substring( 0, outputTriples.lastIndexOf('\n') );
+		
+		if (!prefixes){
+			// delete rdf main tag
+			outputTriples = outputTriples.substring( outputTriples.indexOf('\n') + 1 );
+			outputTriples = outputTriples.substring( 0, outputTriples.lastIndexOf('\n') );
+		}
+		
+		return outputTriples;
+	}
+	
+	private String convertToRDF(Object modelObj, String outputFormat) {
+		String outputString = "";
+		
+		if (this.checkObjectModel(modelObj)) {
+		
+			String xmlTriples = this.convertToRDFXML(modelObj, true);
+			StringReader inTriples = new StringReader(xmlTriples);
+			StringWriter outTriples = new StringWriter();
+			
+			Model tripleModel = ModelFactory.createDefaultModel();
+			tripleModel.read(inTriples, null, "RDF/XML");
+			
+			tripleModel.write(outTriples, outputFormat);
+			outputString = outTriples.toString();
+		}
+		// TODO: RAISE EXCEPTION at convertToRDF(), the object to be "converted" is not a Model object.
+		return outputString;
+	}
+	
+	/*************************
+	 * 
 	 * Miscellaneous FUNCTIONS
 	 *
 	 *************************/	
+
+	public int countClassSubject()	{
+		return this.countClassSubject("");
+	}
+	
+	public int countClassSubject(String graphUri)
+	{
+		String queryString = "";
+		if (graphUri.equals("")) 
+			queryString = "SELECT (COUNT(?uri) AS ?count) { ?uri rdf:type "+ this.getClassUri() +" }";
+		else 
+			queryString = "SELECT (COUNT(?uri) AS ?count) { GRAPH "+ graphUri +" {?uri rdf:type "+ this.getClassUri() +" }}"; 
+		
+		int count = 0;
+		
+		ResultSet queryRawResults = this.triplestore.sparqlSelectHandled(queryString);
+		QuerySolution generalQueryResults = queryRawResults.next();
+		
+		RDFNode countNode = generalQueryResults.getLiteral("count");
+		count = Integer.parseInt( countNode.toString().replace("^^http://www.w3.org/2001/XMLSchema#integer", "") );	
+		
+		return count;
+	}
 	
 	@SuppressWarnings("rawtypes")
-	private boolean checkObjectModel(Object obj)	{
+	private boolean checkObjectModel(Object obj) {
 		boolean isModelObject = false;
 		Class objClass = obj.getClass();
 		if (objClass.getPackage().toString().contains("model"))
 			isModelObject = true;
 		return isModelObject;
+	}
+	
+	public Document setHeader(Document doc)	{
+		Element root = doc.getRootElement();
+		
+		for (Map.Entry<String, Namespace> ns : UConfig.namespaces.entrySet())
+			root.addNamespaceDeclaration(ns.getValue());
+
+		return doc;
+	}
+
+	protected String writeRDFXML(Document document)
+	{
+		String output ="";
+	
+		this.setHeader(document);
+		
+		switch ( UConfig.rdf_output_format )
+		{
+			case 0 : output = new XMLOutputter(Format.getRawFormat()    ).outputString(document); break;
+			case 1 : output = new XMLOutputter(Format.getCompactFormat()).outputString(document); break;
+			case 2 : output = new XMLOutputter(Format.getPrettyFormat() ).outputString(document); break;
+			default: output = new XMLOutputter(Format.getRawFormat()    ).outputString(document); break;
+		}
+		
+		return output;	
 	}
 	
 }

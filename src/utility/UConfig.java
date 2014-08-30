@@ -35,15 +35,19 @@ public class UConfig {
 	/**
 	 * the referenced class has to extend controller.CMainFactor class
 	 */
-	public static String main_trustworthiness_calculus = "controller.CTrustworthiness";
+	public static String main_trustworthiness_calculus = "controller.CTandR";
+	/**
+	 * the referenced class has to implement foundaiton.FTrustworthinessExport interface
+	 */
+	public static String trustworthiness_export = "foundation.FTrustworthinessTandr";
+	/**
+	 * the referenced class has to implement foundaiton.FReputationExport interface
+	 */
+	public static String reputation_export = "foundation.FReputationTandr";
 	/**
 	 * the referenced class has to extend foundaiton.FTrustworthinessExport class
 	 */
-	public static String trustworthiness_export = "foundation.FTrustworthiness";
-	/**
-	 * the referenced class has to extend foundaiton.FTrustworthinessExport class
-	 */
-	public static String tandr_import = "foundation.FTandr";
+	public static String tandr_import = "foundation.FTandR";
 	
 	/*************************
 	 * 
@@ -58,7 +62,7 @@ public class UConfig {
 	 * 3 -> Leave previous dataset, but deletes the computed T and R values *|*
 	 * 4 -> Restore dataset, leaving the computed T and R values            *|*
 	 */
-	public static int installation_mode = 2;
+	public static int installation_mode = 3;
 	
 	public static boolean graph_usage = true;
 	
@@ -118,6 +122,15 @@ public class UConfig {
 		UConfig.sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
 	
+	public static String getVGIHGraphURI(){
+		// return "graphs:" + UConfig.hvgiGraph;
+		return "<" + UConfig.graphURI + UConfig.hvgiGraph + ">";
+	}
+	public static String getTANDRGraphURI(){
+		// return "graphs:" + UConfig.tandrGraph;
+		return "<" + UConfig.graphURI + UConfig.tandrGraph + ">";
+	}
+	
 	private void initNamespaces()
 	{
 		namespaces = new HashMap<String, Namespace>();
@@ -128,10 +141,13 @@ public class UConfig {
 		Namespace foaf      = Namespace.getNamespace("foaf",      "http://xmlns.com/foaf/0.1/"                         );
 		Namespace time      = Namespace.getNamespace("time",      "http://www.w3.org/2006/time#"                       );		
 		Namespace geosparql = Namespace.getNamespace("geosparql", "http://www.opengis.net/ont/geosparql#"              );
+		Namespace sf        = Namespace.getNamespace("sf",        "http://www.opengis.net/ont/sf#"                     );
+		Namespace units     = Namespace.getNamespace("units",     "http://www.opengis.net/def/uom/OGC/1.0/"            );
 		Namespace prv       = Namespace.getNamespace("prv",       "http://purl.org/net/provenance/ns#"                 );
 		Namespace osp       = Namespace.getNamespace("osp",       "http://semantic.web/vocabs/osm_provenance/osp#"     );
 		Namespace hvgi      = Namespace.getNamespace("hvgi",      "http://semantic.web/vocabs/history_vgi/hvgi#"       );
 		Namespace tandr     = Namespace.getNamespace("tandr",     "http://semantic.web/vocabs/tandr_assessment/tandr#" );
+		Namespace graphs    = Namespace.getNamespace("graphs",    "http://parliament.semwebcentral.org/parliament#"    );
 				
 		namespaces.put(rdf.getPrefix()       , rdf       );
 		namespaces.put(xsd.getPrefix()       , xsd       );
@@ -139,10 +155,13 @@ public class UConfig {
 		namespaces.put(foaf.getPrefix()      , foaf      );
 		namespaces.put(time.getPrefix()      , time      );
 		namespaces.put(geosparql.getPrefix() , geosparql );
+		namespaces.put(sf.getPrefix()        , sf        );
+		namespaces.put(units.getPrefix()     , units     );
 		namespaces.put(prv.getPrefix()       , prv       );		
 		namespaces.put(osp.getPrefix()       , osp       );
 		namespaces.put(hvgi.getPrefix()      , hvgi      );
 		namespaces.put(tandr.getPrefix()     , tandr     );
+		namespaces.put(graphs.getPrefix()    , graphs    );
 	}
 	
 	private void initEffectsHierarchy()

@@ -18,6 +18,8 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 
 class FFeatureVersion extends FFoundationAbstract{
 	
+	int dbgLevel = 4;
+	
 	public FFeatureVersion()	{
 		super();
 	}
@@ -29,7 +31,7 @@ class FFeatureVersion extends FFoundationAbstract{
 	
 	@Override
 	public MFeatureVersion retrieveByURI(String fversionURI, String graphUri, int lazyDepth)
-	{		
+	{	
 		String queryString = ""
 				+ "\tSELECT * \n"
 				+ "\tWHERE \n"
@@ -39,40 +41,42 @@ class FFeatureVersion extends FFoundationAbstract{
 		
 		queryString += ""
 				+ "\t\tOPTIONAL { <"+fversionURI+">" + " hvgi:isVersionOf      ?isVersionOf } \n"
-				+ "\t\tOPTIONAL { <"+fversionURI+">" + " hvgi:hasVersion       _:ver           ."
-						+ "  		_:ver      hvgi:versionNo     ?versionNo                } \n"
+				+ "\t\tOPTIONAL { <"+fversionURI+">" + " hvgi:hasVersion       _:ver         .\n"
+				+ "\t\t          		_:ver      hvgi:versionNo     ?versionNo                } \n"
 				+ "\t\tOPTIONAL { <"+fversionURI+">" + " prv:precededBy        ?precededBy  } \n"
 				+ "\t\tOPTIONAL { <"+fversionURI+">" + " osp:createdBy         ?createdBy   } \n"
 				+ "\t\tOPTIONAL { <"+fversionURI+">" + " dcterms:contributor   ?contributor } \n"
-				+ "\t\tOPTIONAL { <"+fversionURI+">" + " hvgi:valid            _:valid        ."
-						+ "			_:valid    hvgi:validFrom     _:timeFrom                  ."
-						+ "			_:valid    hvgi:validTo       _:timeTo                    ."
-						+ "			_:timeFrom time:inXSDDateTime ?validFrom                  ."
-						+ "			_:timeTo   time:inXSDDateTime ?validTo		   	        } \n"
+				+ "\t\tOPTIONAL { <"+fversionURI+">" + " hvgi:valid            ?valid       .\n"
+				+ "\t\t\tOPTIONAL { 	?valid     hvgi:validFrom     _:timeFrom                 .\n"
+				+ "\t		        	_:timeFrom time:inXSDDateTime ?validFrom                 }\n"
+				+ "\t\t\tOPTIONAL {     ?valid     hvgi:validTo       _:timeTo                   .\n"
+				+ "\t			        _:timeTo   time:inXSDDateTime ?validTo		   	         }\n"
+				+ "\t\t         }\n"
 				+ "\t\tOPTIONAL { <"+fversionURI+">" + " hvgi:isDeleted        ?isDeleted   } \n"
 				+ "\t\tOPTIONAL { <"+fversionURI+">" + " osp:hasTag            ?hasTag      } \n"
-				+ "\t\tOPTIONAL { <"+fversionURI+">" + " geosparql:hasGeometry _:geom         . "
-						+ "       _:geom       geosparql:asWKT    ?wktGeom                  } \n";
+				+ "\t\tOPTIONAL { <"+fversionURI+">" + " geosparql:hasGeometry _:geom        .\n"
+				+ "\t\t\t                 _:geom       geosparql:asWKT    ?wktGeom                } \n";
 		
-		if (!graphUri.equals("")) queryString += "\t}\n";
+		if (!graphUri.equals("")) queryString += "\t\t}\n";
 		
 		queryString += ""
 				+ "\t}";	
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 5);
+		UDebug.print("Retriving feature version: "+ fversionURI +" \n", dbgLevel);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
 		
 		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
 		queryRawResults.reset();
 	
 		return this.setFVAttributes(queryRawResults, fversionURI, graphUri, lazyDepth);
 	}
 	
 	@Override
-	public String convertToRDF(Object obj) {
-		// TODO Implement FeatureVersion's convertToRDF() method
+	public String convertToRDFXML(Object obj) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 	
@@ -95,7 +99,7 @@ class FFeatureVersion extends FFoundationAbstract{
 				+ "\tWHERE \n"
 				+ "\t{ \n";
 				
-		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
 		
 		queryString += ""
 				+ "\t\tOPTIONAL { ?uri      rdf:type             osp:FeatureState } \n"
@@ -106,7 +110,7 @@ class FFeatureVersion extends FFoundationAbstract{
 		if (fv_dateFrom != null)
 			queryString += "\t\tFILTER( ?dateFrom > \"" + fv_dateFrom + "\"^^xsd:dateTime )  \n";
 		
-		if (!graphUri.equals("")) queryString += "\t}\n";
+		if (!graphUri.equals("")) queryString += "\t }\n";
 		
 		queryString += ""
 				+ "\t}																\n"
@@ -114,12 +118,13 @@ class FFeatureVersion extends FFoundationAbstract{
 				+ "\tLIMIT 1 \n\n"
 				;
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n",4);
+		UDebug.print("Retriving the next feature version wrt date: "+ fv_dateFrom +" \n", dbgLevel);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+1);
 		
 		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",3);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2 );
 		queryRawResults.reset();
 		
 		QuerySolution generalQueryResults = queryRawResults.next();
@@ -170,12 +175,13 @@ class FFeatureVersion extends FFoundationAbstract{
 //				+ "\tLIMIT 10 										                         \n"
 				;
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n",3);
+		UDebug.print("Retriving features valid at " +fv_dateFrom+" in "+ fv_wkt_buffered +" \n", dbgLevel+1);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+2);
 		
 		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",2);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+3);
 		queryRawResults.reset();
 		
 		while ( queryRawResults.hasNext() )
@@ -267,4 +273,98 @@ class FFeatureVersion extends FFoundationAbstract{
 		
 		return fversion;
 	}
+	
+	public ArrayList<String> retrieveDateList(String graphUri)
+	{	
+		ArrayList<String> dates = new ArrayList<String>();
+		String queryString = ""
+				+ "\tSELECT DISTINCT ?dateFrom\n"
+				+ "\tWHERE \n"
+				+ "\t{ \n";
+				
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
+		
+		queryString += ""
+				+ "\t\t?uri      rdf:type             osp:FeatureState . \n"
+				+ "\t\t?uri      hvgi:valid           _:valid          . \n"
+				+ "\t\t_:valid   hvgi:validFrom       _:time           . \n"
+				+ "\t\t_:time    time:inXSDDateTime   ?dateFrom          \n";
+		
+		if (!graphUri.equals("")) queryString += "\t }\n";
+		
+		queryString += ""
+				+ "\t}																\n"
+				+ "\tORDER BY ASC(?dateFrom) 										\n"
+				;
+		
+		UDebug.print("Retriving date List \n", dbgLevel);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1 );
+		
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
+		
+		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
+		queryRawResults.reset();
+		
+		while (queryRawResults.hasNext()){
+			QuerySolution generalQueryResults = queryRawResults.next();
+			RDFNode date = generalQueryResults.getLiteral("dateFrom");
+			dates.add(date.toString().replace("^^http://www.w3.org/2001/XMLSchema#dateTime", ""));
+		}
+
+		return dates;
+	}
+	
+	public ArrayList<String> retrieveURIByDate(String dateFrom, String graphUri)
+	{	
+		ArrayList<String> uris = new ArrayList<String>();
+		String queryString = ""
+				+ "\tSELECT ?uri\n"
+				+ "\tWHERE \n"
+				+ "\t{ \n";
+				
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
+		
+		queryString += ""
+				+ "\t\t ?uri      rdf:type             osp:FeatureState                  . \n"
+				+ "\t\t ?uri      hvgi:valid           _:valid                           . \n"
+				+ "\t\t _:valid   hvgi:validFrom       _:time                            . \n"
+				+ "\t\t _:time    time:inXSDDateTime   \""+ dateFrom +"\"^^xsd:dateTime    \n";
+		
+		if (!graphUri.equals("")) queryString += "\t }\n";
+		
+		queryString += ""
+				+ "\t}																\n"
+				+ "\tORDER BY ASC(?dateFrom) 										\n"
+				;
+		
+		UDebug.print("Retriving features versions start in date: "+ dateFrom +" \n", dbgLevel+1);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+2);
+		
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
+		
+		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+3);
+		queryRawResults.reset();
+		
+		while (queryRawResults.hasNext()){
+			QuerySolution generalQueryResults = queryRawResults.next();
+			RDFNode uri = generalQueryResults.getResource("uri");
+			uris.add(uri.toString());
+		}
+
+		return uris;
+	}
+	
+	public ArrayList<MFeatureVersion> retrieveByDate(String dateFrom, String graphUri, int lazyDepth) {	
+		ArrayList<MFeatureVersion> fvs = new ArrayList<MFeatureVersion>();
+		ArrayList<String> uris = new ArrayList<String>();
+		uris = this.retrieveURIByDate(dateFrom, graphUri);
+		
+		for (String fversionURI : uris)
+			fvs.add( this.retrieveByURI(fversionURI, graphUri, lazyDepth) );
+		
+		return fvs;
+	}
+	
 }

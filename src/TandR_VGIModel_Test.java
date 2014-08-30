@@ -7,7 +7,7 @@ import utility.UConfig;
 import utility.UDebug;
 import controller.CInstallation;
 import controller.CTest;
-import controller.CTrustworthinessCalculusLazy;
+import controller.CTRCalculus;
 import foundation.FFuseki;
 
 
@@ -18,19 +18,20 @@ public class TandR_VGIModel_Test {
 		UConfig.instance();
 		
 		CTest test = new CTest();
-		CTrustworthinessCalculusLazy trust = new CTrustworthinessCalculusLazy();
+		CTRCalculus trust = new CTRCalculus();
 		CInstallation install = new CInstallation();
+		
 //		test.printAllAuthorURIs();
 //		test.printFirstAuthorInfos();
 //		test.printEditInfos();
 //		test.printFeatureInfos();
-//		test.printFeatureVersionInfos();
+		test.printFeatureVersionInfos();
 //		test.buildEffectHierarchy() ;
 //		test.getTrustworthinessCalculation();
 //		test.retreiveNextFV();
 //		test.retreiveSuccNeighboursFVs();
 		
-		test.printTrustworthiness();
+//		test.printTrustworthiness();
 		
 //		install.install();
 

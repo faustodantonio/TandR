@@ -3,40 +3,42 @@ package modules.tandr.model;
 import java.util.Map;
 
 import foundation.FFoundationFacade;
+import model.MAuthor;
 import model.MFeatureVersion;
+import model.MReputation;
 import model.MTrustworthiness;
 import modules.tandr.foundation.FTrustworthinessTandr;
 
-public class MTrustworthinessTandr extends MTrustworthiness{
+public class MReputationTandr extends MReputation {
 
-	private FFoundationFacade ffacade;
+private FFoundationFacade ffacade;
 	
 	private MFDirectEffect direct;
 	private MFIndirectEffect indirect;
 	private MFTemporalEffect temporal;
 	
-	public MTrustworthinessTandr() {
+	public MReputationTandr() {
 		ffacade = new FFoundationFacade();
 		direct = new MFDirectEffect();
 		indirect = new MFIndirectEffect();
 		temporal = new MFTemporalEffect();
 	}
 	
-	public MTrustworthinessTandr(MTrustworthiness trust) {
-		FTrustworthinessTandr ftrustworthiness = new FTrustworthinessTandr();
-		Map<String, MFEffect> effects = ftrustworthiness.retrieveTrustworthinessEffectList(trust);
-		MFeatureVersion featureVersion;
+	public MReputationTandr(MReputation reputation) {
+		FReputationTandr freputation = new FReputationTandr();
+		Map<String, MFEffect> effects = freputation.retrieveReputationEffectList(reputation);
+		MAuthor author;
 
-		// manage if feature version has not yet been loaded 
-		if (trust.getFeatureVersion() == null)
-			featureVersion = (MFeatureVersion) ffacade.retrieveByUri(trust.getFeatureVersionUri(), 1, MFeatureVersion.class);
-		else featureVersion = trust.getFeatureVersion();
+		// manage if author has not yet been loaded 
+		if (reputation.getAuthor() == null)
+			author = (MAuthor) ffacade.retrieveByUri(reputation.getAuthorUri(), 1, MAuthor.class);
+		else author = reputation.getAuthor();
 		
-		super.setUri(trust.getUri());
-		super.setComputedAt(trust.getComputedAt());
-		super.setFeatureVersionUri(trust.getFeatureVersionUri());
-		super.setFeatureVersion(featureVersion);
-		super.setValue(trust.getValue());
+		super.setUri(reputation.getUri());
+		super.setComputedAt( reputation.getComputedAt() );
+		super.setAuthorUri(reputation.getAuthorUri());
+		super.setAuthor(reputation.getAuthor());
+		super.setValue(reputation.getValue());
 		
 		if (effects.get("direct").equals("") || effects.get("direct") == null)
 				direct = (MFDirectEffect) effects.get("direct");
@@ -51,21 +53,21 @@ public class MTrustworthinessTandr extends MTrustworthiness{
 		else temporal = new MFTemporalEffect();	
 	}
 	
-	public MTrustworthinessTandr(MTrustworthiness trust,String effectGraphUri) {
-		FTrustworthinessTandr ftrustworthiness = new FTrustworthinessTandr();
-		Map<String, MFEffect> effects = ftrustworthiness.retrieveTrustworthinessEffectList(trust,effectGraphUri);
-		MFeatureVersion featureVersion;
+	public MReputationTandr(MReputation reputation,String effectGraphUri) {
+		FReputationTandr freputation = new FReputationTandr();
+		Map<String, MFEffect> effects = freputation.retrieveReputationEffectList(reputation);
+		MAuthor author;
 
-		// manage if feature version has not yet been loaded 
-		if (trust.getFeatureVersion() == null)
-			featureVersion = (MFeatureVersion) ffacade.retrieveByUri(trust.getFeatureVersionUri(), 1, MFeatureVersion.class);
-		else featureVersion = trust.getFeatureVersion();
+		// manage if author has not yet been loaded 
+		if (reputation.getAuthor() == null)
+			author = (MAuthor) ffacade.retrieveByUri(reputation.getAuthorUri(), 1, MAuthor.class);
+		else author = reputation.getAuthor();
 			
-		super.setUri(trust.getUri());
-		super.setComputedAt(trust.getComputedAt());
-		super.setFeatureVersionUri(trust.getFeatureVersionUri());
-		super.setFeatureVersion(featureVersion);
-		super.setValue(trust.getValue());
+		super.setUri(reputation.getUri());
+		super.setComputedAt( reputation.getComputedAt() );
+		super.setAuthorUri(reputation.getAuthorUri());
+		super.setAuthor(reputation.getAuthor());
+		super.setValue(reputation.getValue());
 		
 		if (effects.get("direct").equals("") || effects.get("direct") == null)
 				direct = (MFDirectEffect) effects.get("direct");

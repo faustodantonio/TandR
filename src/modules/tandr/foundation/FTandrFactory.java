@@ -1,4 +1,7 @@
-package foundation;
+package modules.tandr.foundation;
+
+import foundation.FFoundationAbstract;
+import foundation.FFoundationFactory;
 
 /**
  * All class methods works only if there exists a pair of class <mclass,fclass> such that
@@ -6,23 +9,21 @@ package foundation;
  * the names of the two classes differs only for the first letter.
  * @author fausto
  */
-public class FFoundationFactory {
-
-	protected FFoundationAbstract ffoundation;
+class FTandrFactory extends FFoundationFactory{
 	
-	public FFoundationFactory() {
+	public FTandrFactory() {
 		this.ffoundation = null;
 	}
 	
 	protected FFoundationAbstract getFFoundation(String mclass)
 	{
-		String fclass = "foundation.F" + mclass.substring(1);
+		String fclass = "modules.tandr.foundation.F" + mclass.substring(1);
 		return this.getFFoundation(fclass, mclass);
 	}
 	
 	@SuppressWarnings("rawtypes")
 	protected FFoundationAbstract getFFoundation(Class mclass)
-	{		
+	{
 		String mclassStr = mclass.getSimpleName();;
 		return this.getFFoundation(mclassStr);
 	}
@@ -34,21 +35,15 @@ public class FFoundationFactory {
 	}
 	
 	protected FFoundationAbstract getFFoundation(String fclass,String mclass)
-	{		
+	{
 		try {
 			ffoundation = (FFoundationAbstract) Class.forName(fclass).newInstance();
 		} catch (InstantiationException e) {
-			System.out.print("Unable to get an instance of the class " + mclass + "\n"
-					+fclass + " do not exists \n");
-			e.printStackTrace();
+			super.getFFoundation(mclass);
 		} catch (IllegalAccessException e) {
-			System.out.print("Unable to access the class " + mclass + "\n"
-					+fclass + " do not exists \n");
-			e.printStackTrace();
+			super.getFFoundation(mclass);
 		} catch (ClassNotFoundException e) {
-			System.out.print("Unable to load elements of the class " + mclass + "\n"
-					+fclass + " do not exists \n");
-			e.printStackTrace();
+			super.getFFoundation(mclass);
 		}
 		return ffoundation;
 	}

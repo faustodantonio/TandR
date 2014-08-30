@@ -1,26 +1,34 @@
 package modules.tandr.foundation;
 
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 
-import org.jdom2.Attribute;
+import modules.tandr.foundation.RDFconverter.xml.FTrustworthinessEffect2XML;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.Namespace;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+
 import utility.UConfig;
+import foundation.FInstallation;
 import foundation.FTandRImport;
 
-public class FTandR extends FTandRImport{
+public class FTandR extends FInstallation implements FTandRImport {
 	
 	private Document factors;
 	private HashMap<String, Namespace> namespaces;
-	private FEffect feffect;
+	private FTrustworthinessEffect2XML feffect;
 	
-	public FTandR() {	
+	public FTandR() {
+		super();
 		this.namespaces = UConfig.namespaces;
-		feffect = new FEffect();
+		feffect = new FTrustworthinessEffect2XML();
 	}
 
 	@Override
@@ -28,6 +36,8 @@ public class FTandR extends FTandRImport{
 
 		boolean result = true;
 		factors = new Document();
+		
+		Element root = new  Element("RDF",namespaces.get("rdf"));
 		
 		Element directEffect  = null, indirectEffect = null, temporalEffect = null,
 				dirGeomAspect = null, dirQualAspect  = null, dirSemAspect   = null, 
@@ -45,34 +55,36 @@ public class FTandR extends FTandRImport{
 		indQualAspect = feffect.createAspectDescriptionElement("Qualitative Indirect Aspect", "qualInd", "Qualitative Aspect for Indirect Effect");
 		indSemAspect  = feffect.createAspectDescriptionElement("Semantic Indirect Aspect", "semInd", "Semantic Aspect for Indirect Effect");
 
-		factors.addContent(directEffect);
-		factors.addContent(indirectEffect);
-		factors.addContent(temporalEffect);
+		root.addContent(directEffect);
+		root.addContent(indirectEffect);
+		root.addContent(temporalEffect);
 		
-		factors.addContent(dirGeomAspect);
-		factors.addContent(dirQualAspect);
-		factors.addContent(dirSemAspect);
+		root.addContent(dirGeomAspect);
+		root.addContent(dirQualAspect);
+		root.addContent(dirSemAspect);
 		
-		factors.addContent(indGeomAspect);
-		factors.addContent(indQualAspect);
-		factors.addContent(indSemAspect);
+		root.addContent(indGeomAspect);
+		root.addContent(indQualAspect);
+		root.addContent(indSemAspect);
+		
+		factors.addContent(root);
 		
 		String rdfTriples = this.writeDocument(factors);
-		String graphUri = UConfig.graphURI + UConfig.tandrGraph;
+		String graphUri = "<" + UConfig.graphURI + UConfig.tandrGraph + ">";
 		
 		result = this.importTriples(rdfTriples, graphUri);
 		
 		return result;
 	}
 	
-
 	
 	private boolean importTriples(String rdfTriples, String graphUri) {
 		String updateQueryString;
+		rdfTriples = this.convertToRDFTTL(rdfTriples, false);
 		if (graphUri.equals(""))
 			updateQueryString = "INSERT DATA { "+ rdfTriples +" }";
 		else
-			updateQueryString = "INSERT DATA { GRAPH "+ graphUri +" {"+ rdfTriples +" } }";
+			updateQueryString = "INSERT DATA { GRAPH "+ graphUri +" {"+ rdfTriples +" } \n}";
 		boolean result = this.triplestore.sparqlUpdateHandled(updateQueryString);
 		
 		return result;
@@ -96,4 +108,28 @@ public class FTandR extends FTandRImport{
 		return output;	
 	}
 	
+	public String convertToRDFTTL(String xmlTriples, boolean prefixes) {
+		String outputTriples = this.convertToRDF(xmlTriples, "TURTLE");
+		
+		if (!prefixes)
+			outputTriples = outputTriples.replaceAll("(?m)^@prefix.*?[\r\n]", "");
+		
+		return outputTriples;
+	}
+	
+	private String convertToRDF(String xmlTriples, String outputFormat) {
+		String outputString = "";
+		
+		StringReader inTriples = new StringReader(xmlTriples);
+		StringWriter outTriples = new StringWriter();
+		
+		Model tripleModel = ModelFactory.createDefaultModel();
+		tripleModel.read(inTriples, null, "RDF/XML");
+		
+		tripleModel.write(outTriples, outputFormat);
+		outputString = outTriples.toString();
+			
+		return outputString;
+	}
+
 }

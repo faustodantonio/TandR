@@ -113,8 +113,8 @@ public class FEdit extends FFoundationAbstract {
 	}
 
 	@Override
-	public String convertToRDF(Object obj) {
-		// TODO Implement Edit's convertToRDF() method
+	public String convertToRDFXML(Object obj) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

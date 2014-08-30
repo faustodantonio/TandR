@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import org.jdom2.Namespace;
 
 import utility.UConfig;
+import utility.UDebug;
 
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -45,9 +46,11 @@ public abstract class FTripleStore {
 		String prefixes = "\n";
 		
 		for (Entry<String, Namespace> namespace : UConfig.namespaces.entrySet())
-			prefixes += "PREFIX " + namespace.getKey() + "\t\t<" + namespace.getValue().getURI() +">\n" ;
+			prefixes += "PREFIX " + namespace.getKey() + ": \t\t <" + namespace.getValue().getURI() +">\n" ;
 		
-		return prefixes + queryString;
+		UDebug.print(prefixes, 6);
+		
+		return prefixes + "\n" + queryString;
 		
 //PREFIX rdf: 		<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 //PREFIX xsd: 		<http://www.w3.org/2001/XMLSchema#>
