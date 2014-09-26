@@ -23,6 +23,7 @@ public class MEdit {
 		this.removeTags = new HashMap<String, String>();
 	}
 	public String getUri() {
+		if (this.uri == null) this.uri = "";
 		return uri;
 	}
 	public void setUri(String uri) {

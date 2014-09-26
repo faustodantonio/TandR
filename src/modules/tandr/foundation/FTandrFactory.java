@@ -17,7 +17,7 @@ class FTandrFactory extends FFoundationFactory{
 	
 	protected FFoundationAbstract getFFoundation(String mclass)
 	{
-		String fclass = "modules.tandr.foundation.F" + mclass.substring(1);
+		String fclass = this.generateGeneralFClassString(mclass);
 		return this.getFFoundation(fclass, mclass);
 	}
 	
@@ -34,16 +34,24 @@ class FTandrFactory extends FFoundationFactory{
 		return this.getFFoundation(mclass);
 	}
 	
+	protected String generateGeneralFClassString(String mclass) {
+		String fclass = "modules.tandr.foundation.F" + mclass.substring(1);
+		return fclass;
+	}
+	
 	protected FFoundationAbstract getFFoundation(String fclass,String mclass)
 	{
 		try {
 			ffoundation = (FFoundationAbstract) Class.forName(fclass).newInstance();
 		} catch (InstantiationException e) {
-			super.getFFoundation(mclass);
+			fclass = super.generateGeneralFClassString(mclass);
+			ffoundation = super.getGeneralFactory(fclass, mclass);
 		} catch (IllegalAccessException e) {
-			super.getFFoundation(mclass);
+			fclass = super.generateGeneralFClassString(mclass);
+			ffoundation = super.getGeneralFactory(fclass, mclass);
 		} catch (ClassNotFoundException e) {
-			super.getFFoundation(mclass);
+			fclass = super.generateGeneralFClassString(mclass);
+			ffoundation = super.getGeneralFactory(fclass, mclass);
 		}
 		return ffoundation;
 	}

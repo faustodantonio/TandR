@@ -102,7 +102,7 @@ public class FParliament extends FTripleStore{
 		Boolean result;
 		String createIndexesQueryString = ""
 				+ "INSERT {} WHERE { " + "\n";
-		if (graphName.equals("") && namespaceUri.equals(""))
+		if (!graphName.equals("") && !namespaceUri.equals(""))
 			createIndexesQueryString = createIndexesQueryString
 						+ "\t" + "<" + namespaceUri + graphName + ">" + "\n";
 		else
@@ -113,7 +113,7 @@ public class FParliament extends FTripleStore{
 					+ "\t" + "\"true\"^^<http://www.w3.org/2001/XMLSchema#boolean> " + "\n"
 				+ "}";
 		
-		UDebug.print("\nSPARQL query: \n" + createIndexesQueryString + "\n\n", 2);
+		UDebug.print("\nSPARQL query: \n" + createIndexesQueryString + "\n\n", 4);
 		
 		try {
 			result = this.sparqlUpdate(createIndexesQueryString);

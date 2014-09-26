@@ -6,32 +6,57 @@ import java.util.Date;
 
 import utility.UConfig;
 import utility.UDebug;
+import model.MAuthor;
 import model.MFeatureVersion;
+import modules.tandr.foundation.FTandrFacade;
 
 public abstract class MFFactor {
 
 	protected double value;
 	protected Date computedAt;
 	
+	protected FTandrFacade foundation;
+	
 	protected SimpleDateFormat sdf;
 	
 	public MFFactor ()	{
-		this.value = 0.0;
+		this.foundation = new FTandrFacade();
 		this.sdf = UConfig.sdf;
-		this.setComputedAt("2005-09-15T21:42:44Z");
+		
+		this.value = 0.0;
+//		this.setComputedAt(UConfig.getMinDateTime());
 	}
 
 	public MFFactor (Double value)	{
+		this.foundation = new FTandrFacade();
+		this.sdf = UConfig.sdf;
+		
 		this.setValue(value);
+//		this.setComputedAt(UConfig.getMinDateTime());
 	}
 	
-	//	public abstract double calculate();
-	public abstract double calculate(MFeatureVersion featureVersion);
+	/**
+	 * Calculate the trustworthiness, this method is invoked only once per feature version.
+	 * It is invoked only when there is no trustworthiness associated to feature version. 
+	 * @param featureVersion the feature version which Trustworthiness needs to bew calculated 
+	 * @return
+	 */
+	public abstract double calculateTrustworthiness(MFeatureVersion featureVersion);
+//	public abstract double calculateConfirmation(MFeatureVersion featureVersion);
+	/**
+	 * Calculate and update the reputation associated to a user
+	 * @param author the author which Reputation needs to be calculated
+	 * @return
+	 */
+	public abstract double calculateReputation(MAuthor author, String untillDate);
 	
 	public String toString()	{
 		return this.getClass().getName();
 	}
 	
+	public String getValueString() {
+		return UConfig.getDoubleAsString(value);
+	}
 	public double getValue() {
 		return value;
 	}

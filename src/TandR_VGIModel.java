@@ -1,6 +1,7 @@
 import controller.CInstallation;
 import controller.CTRCalculus;
 import utility.UConfig;
+import view.VShow;
 
 
 public class TandR_VGIModel {
@@ -11,9 +12,11 @@ public class TandR_VGIModel {
 		
 		CTRCalculus trust   = new CTRCalculus();
 		CInstallation  install = new CInstallation();
+		VShow view = new VShow();
 		
 		install.install();
 		trust.computeAll();
+		view.showAll(trust.getDates());
 	}
 	
 	

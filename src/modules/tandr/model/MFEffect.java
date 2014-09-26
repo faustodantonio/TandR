@@ -1,5 +1,6 @@
 package modules.tandr.model;
 
+import model.MAuthor;
 import model.MFeatureVersion;
 
 public abstract class MFEffect extends MFFactor{
@@ -12,10 +13,12 @@ public abstract class MFEffect extends MFFactor{
 		super(value);
 	}
 
-	public abstract double calculate(MFeatureVersion featureVersion);
+	public abstract double calculateTrustworthiness(MFeatureVersion featureVersion);
+	public abstract double calculateReputation(MAuthor Author,String untilDate);
 	
 	public String toString()	{
 		return this.getClass().getName();
 	}
+
 	
 }

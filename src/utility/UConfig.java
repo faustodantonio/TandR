@@ -1,9 +1,11 @@
 package utility;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.jdom2.Namespace;
 
@@ -37,6 +39,10 @@ public class UConfig {
 	 */
 	public static String main_trustworthiness_calculus = "controller.CTandR";
 	/**
+	 * the referenced class has to extend view.VTrustworthiness class
+	 */
+	public static String view_trustworthiness = "view.VTrustworthinessTandr";	
+	/**
 	 * the referenced class has to implement foundaiton.FTrustworthinessExport interface
 	 */
 	public static String trustworthiness_export = "foundation.FTrustworthinessTandr";
@@ -48,6 +54,15 @@ public class UConfig {
 	 * the referenced class has to extend foundaiton.FTrustworthinessExport class
 	 */
 	public static String tandr_import = "foundation.FTandR";
+	
+	/*************************
+	 * 
+	 * View PARAMETERS
+	 *
+	 *************************/
+	
+	public static String generalOutputFilePath = "./output/test.txt";
+	public static String logFilePath = "./output/log_test_"+ new Date().toGMTString().trim() +".txt";
 	
 	/*************************
 	 * 
@@ -67,8 +82,12 @@ public class UConfig {
 	public static boolean graph_usage = true;
 	
 	public static String graphURI = "http://parliament.semwebcentral.org/parliament#";
-	public static String hvgiGraph = "hvgi";
-	public static String tandrGraph = "tandr";
+	public static String hvgiGraph = "hvgi_test";
+	public static String tandrGraph = "tandr_test";
+//	public static String hvgiGraph = "hvgi_wien";
+//	public static String tandrGraph = "tandr_wien";
+//	public static String hvgiGraph = "hvgi_laquila";
+//	public static String tandrGraph = "tandr_laquila";
 	
 	public static String inputRDFfilesDirectory = "/opt/lampp/htdocs/data/hvgi/";
 	public static String inputRDFfileRegex = ".*.rdf";
@@ -88,6 +107,12 @@ public class UConfig {
 	
 	public static int debugLevel = 3;
 	
+//	private static String minDateTime = "2005-09-15T21:42:44Z";
+//	private static String maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
+	
+	private static String minDateTime = "2012-01-01T00:00:00Z";
+	private static String maxDateTime = "2012-01-01T06:00:00Z"; // the original one is "2012-03-30T03:29:56Z"
+	
 	public static Map< Map.Entry<String, Map<String,Double>>, Double> effects_hierarchy = 
 			new HashMap< Map.Entry<String, Map<String,Double>>, Double>();
 	
@@ -98,7 +123,8 @@ public class UConfig {
 	 *************************/
 	
 	public static SimpleDateFormat sdf;
-	public static String epsg_crs = "900913";
+//	public static String epsg_crs = "900913";
+	public static String epsg_crs = "4326";
 	public static double featureInfluenceRadius = 50;
 	
 	public static HashMap<String, Namespace> namespaces;
@@ -117,7 +143,7 @@ public class UConfig {
 	
 	private UConfig()
 	{
-		initEffectsHierarchy();
+//		initEffectsHierarchy();
 		initNamespaces();
 		UConfig.sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 	}
@@ -131,6 +157,45 @@ public class UConfig {
 		return "<" + UConfig.graphURI + UConfig.tandrGraph + ">";
 	}
 	
+	public static String getMinDateTimeAsString(){
+		return minDateTime;
+	}
+	public static String getMaxDateTimeAsString(){
+    	return maxDateTime;
+	}
+	public static Date getMinDateTime(){
+		Date minDate = new Date();
+		try {
+			minDate = sdf.parse(minDateTime);
+		} catch (ParseException e) {
+			UDebug.print("\n *** ERROR: minDateTime field not formatted\n",5);
+			e.printStackTrace();	}
+    	return minDate;
+	}
+	public static Date getMaxDateTime(){
+		Date maxDate = new Date();
+		try {
+			maxDate = sdf.parse(maxDateTime);
+		} catch (ParseException e) {
+			UDebug.print("\n *** ERROR: minDateTime field not formatted\n",5);
+			e.printStackTrace();	}
+    	return maxDate;
+	}
+	
+	public static String getDoubleAsString(double decimal) {
+		
+		int startIndex = 0;
+		int endIndex = 9;
+		
+		BigDecimal Decimal = new BigDecimal(decimal);
+		String value = Decimal.toPlainString();
+		
+		if ( value.length() < endIndex)
+			endIndex = value.length();
+		
+		return value.substring(startIndex, endIndex);
+	}
+	
 	private void initNamespaces()
 	{
 		namespaces = new HashMap<String, Namespace>();
@@ -141,6 +206,7 @@ public class UConfig {
 		Namespace foaf      = Namespace.getNamespace("foaf",      "http://xmlns.com/foaf/0.1/"                         );
 		Namespace time      = Namespace.getNamespace("time",      "http://www.w3.org/2006/time#"                       );		
 		Namespace geosparql = Namespace.getNamespace("geosparql", "http://www.opengis.net/ont/geosparql#"              );
+		Namespace geof      = Namespace.getNamespace("geof",      "http://www.opengis.net/def/function/geosparql/"     );
 		Namespace sf        = Namespace.getNamespace("sf",        "http://www.opengis.net/ont/sf#"                     );
 		Namespace units     = Namespace.getNamespace("units",     "http://www.opengis.net/def/uom/OGC/1.0/"            );
 		Namespace prv       = Namespace.getNamespace("prv",       "http://purl.org/net/provenance/ns#"                 );
@@ -155,6 +221,7 @@ public class UConfig {
 		namespaces.put(foaf.getPrefix()      , foaf      );
 		namespaces.put(time.getPrefix()      , time      );
 		namespaces.put(geosparql.getPrefix() , geosparql );
+		namespaces.put(geof.getPrefix()      , geof );
 		namespaces.put(sf.getPrefix()        , sf        );
 		namespaces.put(units.getPrefix()     , units     );
 		namespaces.put(prv.getPrefix()       , prv       );		
@@ -162,33 +229,6 @@ public class UConfig {
 		namespaces.put(hvgi.getPrefix()      , hvgi      );
 		namespaces.put(tandr.getPrefix()     , tandr     );
 		namespaces.put(graphs.getPrefix()    , graphs    );
-	}
-	
-	private void initEffectsHierarchy()
-	{
-		TreeMap<String,Double> component_X_direct = new TreeMap<String,Double>();
-		component_X_direct.put("MFCompGeomDir", 0.33);
-		component_X_direct.put("MFCompQualDir", 0.33);
-		component_X_direct.put("MFCompSemDir" , 0.33);
-		
-		TreeMap<String,Double> component_X_indirect = new TreeMap<String,Double>();
-		component_X_indirect.put("MFCompGeomInd", 0.33);
-		component_X_indirect.put("MFCompQualInd", 0.33);
-		component_X_indirect.put("MFCompSemInd" , 0.33);
-		
-		TreeMap<String,Double> component_X_temporal = null;
-		
-		TreeMap< String, Map<String,Double> > factor_direct   = new TreeMap<String, Map<String,Double>>();
-		TreeMap< String, Map<String,Double> > factor_indirect = new TreeMap<String, Map<String,Double>>();
-		TreeMap< String, Map<String,Double> > factor_temporal = new TreeMap<String, Map<String,Double>>();
-		
-		factor_direct.put("MFDepDirect" , component_X_direct);
-		factor_indirect.put("MFDepIndirect" , component_X_indirect);
-		factor_temporal.put("MFIndTemporal" , component_X_temporal);
-		
-		UConfig.effects_hierarchy.put(factor_direct.firstEntry(), 0.33);
-		UConfig.effects_hierarchy.put(factor_indirect.firstEntry(), 0.33);
-		UConfig.effects_hierarchy.put(factor_temporal.firstEntry(), 0.33);
 	}
 	
 }

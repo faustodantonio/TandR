@@ -28,6 +28,7 @@ import foundation.FFoundationFacade;
 
 public class FTrustworthinessTandr extends FFoundationAbstract implements FTrustworthinessExport {
 
+	private int dbgLevel = 4;
 	private FTrustworthinessEffect feffect;
 	
 	public FTrustworthinessTandr() {
@@ -49,13 +50,12 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 	public String convertToRDFXML(MTrustworthiness trust) {
 		
 		FTrustworthiness2XML trustXML = new FTrustworthiness2XML(triplestore);
-		Document trustworthinessDoc = trustXML.convertToRDFXML(trust);
+		Document trustworthinessDoc = trustXML.convertToRDFXML((MTrustworthinessTandr)trust);
 		
 		String trustworthinessTriples = this.writeRDFXML(trustworthinessDoc);
 		return trustworthinessTriples;
 	}
 	
-	@Override 	//TODO: correct value subgraph
 	public MTrustworthiness retrieveByURI(String trustworthinessUri, String graphUri, int lazyDepth) {
 		
 		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr();
@@ -68,9 +68,11 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
 		
 		queryString = ""
-				+ "\t\tOPTIONAL { <"+trustworthinessUri+">" + " tandr:refersToFeatureState    ?featureVersionUri }    \n"
-				+ "\t\tOPTIONAL { <"+trustworthinessUri+">" + " tandr:hasTrustworhtinessValue ?trustworthinessValue } \n"
-				+ "\t\tOPTIONAL { <"+trustworthinessUri+">" + " tandr:computedAt              ?coumputedAt }          \n" ;
+				+ "\t\tOPTIONAL { <"+trustworthinessUri+">" + " tandr:refersToFeatureState    ?featureVersionUri    }\n"
+				+ "\t\tOPTIONAL { <"+trustworthinessUri+">" + " tandr:hasTrustworthinessValue ?value                .\n"
+				+ "\t\t           ?value                        tandr:trustworthinessValueIs  ?trustworthinessValue .\n"
+				+ "\t\t           ?value                        tandr:computedAt              ?coumputedAt          }\n" 
+				;
 						
 		if (!graphUri.equals("")) queryString += "\t}\n";
 				
@@ -91,6 +93,41 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 		trustworthiness = this.setTrustworthinessEffects(trustworthiness, graphUri);
 		
 		return trustworthiness;
+	}
+	
+	public String retrieveTrustworthinessUri(String versionUri,String graphUri)
+	{	
+		String queryString = ""
+				+ "\tSELECT ?trustworthinessUri\n"
+				+ "\tWHERE \n"
+				+ "\t{ \n";
+				
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
+		
+		queryString = ""
+				+ "\t\tOPTIONAL { ?trustworthinessUri    tandr:refersToFeatureState    <"+versionUri+">     }\n"
+				;
+		
+		if (!graphUri.equals("")) queryString += "\t }\n";
+		
+		queryString += ""
+				+ "\t}																\n"
+				;
+		
+		UDebug.print("Retriving date List \n", dbgLevel);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1 );
+		
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
+		
+		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
+		queryRawResults.reset();
+		
+		queryRawResults.hasNext();
+		QuerySolution generalQueryResults = queryRawResults.next();
+		RDFNode trustUri = generalQueryResults.getLiteral("trustworthinessUri");
+
+		return trustUri.toString();
 	}
 	
 	public Map<String,MFEffect> retrieveTrustworthinessEffectList(MTrustworthiness trustworthiness) {
@@ -115,7 +152,7 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 		FFoundationFacade ffacade = new FFoundationFacade();
 		
 		RDFNode refersToFeatureState = generalQueryResults.getResource("featureVersionUri");
-		RDFNode trustworthinessValue   = generalQueryResults.getLiteral("hasTrustworthinessValue");
+		RDFNode trustworthinessValue   = generalQueryResults.getLiteral("trustworthinessValue");
 		RDFNode computedAt  = generalQueryResults.getLiteral("computedAt");
 		
 		if (refersToFeatureState != null){
@@ -132,5 +169,21 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 		
 		return trustworthiness;
 	}
+	
+	public Map<String,Double> getAspectList(String effect, String aspect, String authorUri, String atDateTime, boolean graphUri) {
+		return this.feffect.getAspectList(effect, aspect, authorUri, atDateTime, graphUri);
+	};
+	
+	public Map<String,Double> getAspectList(String effect, String aspect, String authorUri, boolean graphUri) {
+		return this.feffect.getAspectList(effect, aspect, authorUri, graphUri);
+	};
+	
+	public Map<String,Double> getAspectList(String effect, String aspect, String authorUri, String atDateTime) {
+		return this.feffect.getAspectList(effect, aspect, authorUri, atDateTime, false);
+	};
+	
+	public Map<String,Double> getAspectList(String effect, String aspect, String authorUri) {
+		return this.feffect.getAspectList(effect, aspect, authorUri, false);
+	};
 	
 }

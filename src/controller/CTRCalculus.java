@@ -1,19 +1,18 @@
 package controller;
 
-
 import java.util.ArrayList;
 
 import utility.UConfig;
 import utility.UDebug;
 import foundation.FFoundationFacade;
 import model.MFeatureVersion;
-import model.MTrustworthiness;
 
 public class CTRCalculus {
 
 	private FFoundationFacade ffacade;
 	private CCalculusAbstract cfactor;
 //	private HashMap<MFFactor, Double> effects;
+	private ArrayList<String> dates;
 
 	public CTRCalculus()
 	{
@@ -41,6 +40,7 @@ public class CTRCalculus {
 			cfactor = new modules.tandr.controller.CTandR(); 
 		}
 		
+		this.dates = new ArrayList<String>();
 	}
 	
 	/**
@@ -61,45 +61,50 @@ public class CTRCalculus {
 	{
 		String vgihGraphUri = UConfig.getVGIHGraphURI();
 		
-		ArrayList<String> dates = new ArrayList<String>();
-		dates = ffacade.retrieveDateList(vgihGraphUri);
+		this.dates = ffacade.retrieveDateList(vgihGraphUri);
 		
 		int countDate = 1;
 		int countFvs = 0;
-		int totalFvs = ffacade.countClassSubject("MFeatureVersion", "graphs:hvgi");
-		
-		this.debugGeneralInformations(totalFvs, dates.size(), 3);
+//		int totalFvs = ffacade.countClassSubject("MFeatureVersion", "graphs:hvgi");
+		int totalFvs = ffacade.countClassSubject("MFeatureVersion", "graphs:"+UConfig.hvgiGraph);
+		int totalFs = ffacade.countClassSubject("MFeature", "graphs:"+UConfig.hvgiGraph);
+		this.debugGeneralInformations(totalFs, totalFvs, dates.size(), 3);
 		
 		for (String date : dates) {
+			if (countDate % 100 == 0) UDebug.print("Features versions retrieved for " + countDate + " dates of " + dates.size() + ".", 3);
 			UDebug.print("Retriving features versions for date " + date + " (" + countDate + " of " + dates.size() + ").", 3);
 			ArrayList<MFeatureVersion> fvs = new ArrayList<MFeatureVersion>();
-			fvs = ffacade.retrieveByDate(date, vgihGraphUri, 1);
-			for (MFeatureVersion featureVersion : fvs)
+			fvs = ffacade.retrieveFVByDate(date, vgihGraphUri, 1);
+			UDebug.print("\t # features versions retrieved "+fvs.size()+"\n",1);
+			for (MFeatureVersion featureVersion : fvs) {
+				UDebug.print("\t\t # feature version retrieved uri "+ featureVersion.getUri() +"\n",1);
 				this.compute(featureVersion);
+			}
 			countFvs = countFvs + fvs.size();
-			UDebug.print(" # features versions processed "+fvs.size()+" for a total of " + countFvs +"/"+ totalFvs, 3);
-			UDebug.print(".\n", 3);
+			UDebug.print("# features versions processed "+fvs.size()+" for a total of " + countFvs +"/"+ totalFvs, 3);
+			UDebug.print(".\n\n", 3);
 			countDate++;
 		}
 	}
 
-	public MTrustworthiness compute(MFeatureVersion featureVersion)
-	{
-		MTrustworthiness trustworthiness = new MTrustworthiness(featureVersion);
-		
+	public void compute(MFeatureVersion featureVersion)	{		
 		cfactor.computeTW(featureVersion);
-		
-		return trustworthiness;
 	}
 
-	public void debugGeneralInformations(int totalFvs, int totalDates, int dbgLevel) {
-		int totalFs = ffacade.countClassSubject("MFeature", "graphs:hvgi");
+	public void debugGeneralInformations(int totalFs, int totalFvs, int totalDates, int dbgLevel) {
 		
 		UDebug.print("Total number of Features: " + totalFs +".\n", dbgLevel);
 		UDebug.print("Total number of Feature Versions: " + totalFvs +".\n", dbgLevel);
 		UDebug.print("Total number of Dates: " + totalDates +".\n", dbgLevel);
 		UDebug.print("\n", dbgLevel);
 		
+	}
+	
+	public ArrayList<String> getDates() {
+		return dates;
+	}
+	public void setDates(ArrayList<String> dates) {
+		this.dates = dates;
 	}
 
 }

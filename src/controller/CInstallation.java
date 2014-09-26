@@ -67,54 +67,64 @@ public class CInstallation {
 	 */
 	private void checkInstall() {
 		
-		boolean hvgiExists  = foundation.checkGraphExists("hvgi" , UConfig.graphURI);
-		boolean tandrExists = foundation.checkGraphExists("tandr" , UConfig.graphURI);
+		String hvgiGraph = UConfig.hvgiGraph;
+		String tandrGraph = UConfig.tandrGraph;
+		
+		boolean hvgiExists  = foundation.checkGraphExists(hvgiGraph , UConfig.graphURI);
+		boolean tandrExists = foundation.checkGraphExists(tandrGraph , UConfig.graphURI);
 		
 		if (!hvgiExists) {
-			foundation.createGraph("hvgi" , "graphs");
+			foundation.createGraph(hvgiGraph , "graphs");
 			this.importVGIHTriples();
+			this.createSpatialIndexes();
 		}
-		if (!tandrExists)
-			foundation.createGraph("tandr" , "graphs");
+		if (!tandrExists) {
+			foundation.createGraph(tandrGraph , "graphs");
+			this.importTandRTriples();
+		}
 	}
 
-	private void forceInstall() {
-		
-		boolean hvgiExists  = foundation.checkGraphExists("hvgi" , UConfig.graphURI);
-		boolean tandrExists = foundation.checkGraphExists("tandr" , UConfig.graphURI);
-		
-		UDebug.print("\nDoes hvgi graph exists? ANSWER: "  + hvgiExists  + "\n", 3);
-		UDebug.print("Does tandr graph exists? ANSWER: " + tandrExists + "\n\n", 3);
+	private void forceInstall() {		
+		String hvgiGraph = UConfig.hvgiGraph;
+		String tandrGraph = UConfig.tandrGraph;
+		boolean hvgiExists  = foundation.checkGraphExists(hvgiGraph  , UConfig.graphURI);
+		boolean tandrExists = foundation.checkGraphExists(tandrGraph , UConfig.graphURI);
 		
 		if (hvgiExists) 
-			foundation.deleteGraph("hvgi" , "graphs");
+			foundation.deleteGraph(hvgiGraph  , "graphs");
 		if (tandrExists)
-			foundation.deleteGraph("tandr" , "graphs");
+			foundation.deleteGraph(tandrGraph , "graphs");
 
-		foundation.createGraph("hvgi" , "graphs");
-		foundation.createGraph("tandr" , "graphs");
+		foundation.createGraph(hvgiGraph  , "graphs");
+		foundation.createGraph(tandrGraph , "graphs");
 		this.importVGIHTriples();
 		this.importTandRTriples();
 		this.createSpatialIndexes();
 	}
 
 	private void restoreVGIH() {
-		boolean hvgiExists  = foundation.checkGraphExists("hvgi" , UConfig.graphURI);
-		UDebug.print("\nDoes hvgi graph exists? ANSWER: "  + hvgiExists  + "\n", 3);
+		
+		String hvgiGraph = UConfig.hvgiGraph;
+		
+		boolean hvgiExists  = foundation.checkGraphExists(hvgiGraph , UConfig.graphURI);
+		UDebug.print("\nDoes hvgi graph exists? ANSWER: "  + hvgiExists  + "\n", 6);
 		if (hvgiExists) 
-			foundation.deleteGraph("hvgi" , "graphs");
-		foundation.createGraph("hvgi" , "graphs");
+			foundation.deleteGraph(hvgiGraph, "graphs");
+		foundation.createGraph(hvgiGraph , "graphs");
 		this.importVGIHTriples();
 		this.createSpatialIndexes();
 	}
 
 	private void restoreTandR() {
-		boolean tandrExists = foundation.checkGraphExists("tandr" , UConfig.graphURI);
+		
+		String tandrGraph = UConfig.tandrGraph;
+		
+		boolean tandrExists = foundation.checkGraphExists(tandrGraph , UConfig.graphURI);
 		UDebug.print("Does tandr graph exists? ANSWER: " + tandrExists + "\n", 6);
 		if (tandrExists)
-			foundation.deleteGraph("tandr" , "graphs");
+			foundation.deleteGraph(tandrGraph, "graphs");
 
-		foundation.createGraph("tandr" , "graphs");
+		foundation.createGraph(tandrGraph , "graphs");
 		this.importTandRTriples();
 	}
 	
@@ -167,17 +177,13 @@ public class CInstallation {
 		
 		UDebug.print("\nSpatial indexes creation ... \n",3);
 		
-		UDebug.print("\t Indexing " + "urn:x-arq:DefaultGraph" + " ...",3);
-		foundation.enableGraphIndexes("","");
-		UDebug.print("\t\t Ended \t ||\n",3);
-		
 		UDebug.print("\t Indexing " + UConfig.graphURI + UConfig.hvgiGraph + " ...",3);
 		foundation.enableGraphIndexes(UConfig.hvgiGraph, UConfig.graphURI);
-		UDebug.print("\t\t Ended \t ||\n",3);
+		UDebug.print("\t Ended \t ||\n",3);
 		
 		UDebug.print("\t Indexing " + UConfig.graphURI + UConfig.tandrGraph + " ...",3);
 		foundation.enableGraphIndexes(UConfig.tandrGraph, UConfig.graphURI);
-		UDebug.print("\t\t Ended \t ||\n",3);
+		UDebug.print("\t Ended \t ||\n",3);
 		
 		UDebug.print("Indexing ended " +"\n",3);
 	}

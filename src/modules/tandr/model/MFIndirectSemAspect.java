@@ -1,8 +1,6 @@
 package modules.tandr.model;
 
-import model.MFeatureVersion;
-
-public class MFIndirectSemAspect extends MFAspect{
+public class MFIndirectSemAspect extends MFIndirectAspect{
 
 	public MFIndirectSemAspect() {	}
 	
@@ -11,9 +9,17 @@ public class MFIndirectSemAspect extends MFAspect{
 	}
 
 	@Override
-	public double calculate(MFeatureVersion featureVersion) {
-		double t_ind_sem = 1.0;
-		return t_ind_sem;
+	public String getEffectName() {
+		return "Indirect Effect";
 	}
 
+	@Override
+	public String getAspectName() {
+		return "Semantic Indirect Aspect";
+	}
+	
+	@Override
+	public MFAspect fetchAspectFromReputation(MReputationTandr repo) {
+		return repo.getIndirectEffect().getSemanticAspect();
+	}
 }

@@ -1,8 +1,6 @@
 package modules.tandr.model;
 
-import model.MFeatureVersion;
-
-public class MFIndirectQualAspect extends MFAspect {
+public class MFIndirectQualAspect extends MFIndirectAspect {
 
 	public MFIndirectQualAspect() {	}
 	
@@ -11,9 +9,18 @@ public class MFIndirectQualAspect extends MFAspect {
 	}
 
 	@Override
-	public double calculate(MFeatureVersion featureVersion) {
-		double t_ind_qual = 1.0;
-		return t_ind_qual;
+	public String getEffectName() {
+		return "Indirect Effect";
 	}
 
+	@Override
+	public String getAspectName() {
+		return "Qualitative Indirect Aspect";
+	}
+	
+	@Override
+	public MFAspect fetchAspectFromReputation(MReputationTandr repo) {
+		return repo.getIndirectEffect().getQualitativeAspect();
+	}
+	
 }

@@ -6,6 +6,7 @@ import utility.UConfig;
 import utility.UDebug;
 import model.MFeatureVersion;
 import modules.tandr.foundation.FTandrFacade;
+import modules.tandr.model.MReputationTandr;
 import modules.tandr.model.MTrustworthinessTandr;
 import controller.CCalculusAbstract;
 
@@ -30,28 +31,29 @@ public class CTandR extends CCalculusAbstract{
 		String tandrGraphUri = UConfig.getTANDRGraphURI();
 		String vgihGraphUri = UConfig.getVGIHGraphURI();
 		
-		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( featureVersion.getTrustworthiness(), tandrGraphUri );
+		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( featureVersion );
 		
 		double trustValue = 0.0;
-		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().calculate(featureVersion)) ;
-		trustValue = trustValue + (indEffectWeight  * trustworthiness.getIndirectEffect().calculate(featureVersion));
-		trustValue = trustValue + (tempEffectWeight * trustworthiness.getTemporalEffect().calculate(featureVersion));
+		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().calculateTrustworthiness(featureVersion)) ;
+		trustValue = trustValue + (indEffectWeight  * trustworthiness.getIndirectEffect().calculateTrustworthiness(featureVersion));
+		trustValue = trustValue + (tempEffectWeight * trustworthiness.getTemporalEffect().calculateTrustworthiness(featureVersion));
 		trustworthiness.setValue(trustValue);
 		
 		//saveTrustworthiness
 		ffacade.create(trustworthiness, tandrGraphUri);
-		
 		//debug Trustworthiness
 		UDebug.print("\n\n" + ffacade.convertToRDFTTL(trustworthiness),4);
-		
-
-		//expand confirmation
-//		ArrayList<String> neighbours = ffacade.retrieveFVPreviousesNeighbours(featureVersion, featureVersion.getGeometryBuffer());
-//		for ( String neighbour : neighbours)
-//			this.confirm((MFeatureVersion) ffacade.retrieveByUri(neighbour, 1, MFeatureVersion.class),featureVersion);
+		UDebug.log("\nCREATE Trustworthiness (new): " + trustworthiness.getUri() ,4);
 		
 		//update Reputation
-//		this.updateUserReputation(featureVersion);
+		this.updateUserReputation(featureVersion);
+		
+		//expand confirmation
+		ArrayList<String> neighbours = ffacade.retrieveFVPreviousesNeighbours(featureVersion, vgihGraphUri, featureVersion.getGeometryBuffer());
+		System.out.print(neighbours.size());
+		for ( String neighbour : neighbours)
+			this.confirm((MFeatureVersion) ffacade.retrieveByUri(neighbour, UConfig.getVGIHGraphURI(), 1, MFeatureVersion.class),featureVersion)
+			;
 		
 		return result;
 	}
@@ -59,27 +61,47 @@ public class CTandR extends CCalculusAbstract{
 	public boolean confirm(MFeatureVersion fvToConfirm, MFeatureVersion fvConfirmer) {
 		boolean result = true;
 		
-		//TODO: Implement CONFIRMATION logic
-		
-		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( fvToConfirm.getTrustworthiness() );
-		double trustValue = fvToConfirm.getTrustworthiness().getValue();
+		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) fvToConfirm.getTrustworthiness();
+		if (trustworthiness == null)
+			trustworthiness = new MTrustworthinessTandr(fvToConfirm);
+		double trustValue = trustworthiness.getValue();
 		
 		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().getValue()) ;
-		trustValue = trustValue + (indEffectWeight  * trustworthiness.getIndirectEffect().calculate(fvToConfirm));
-		trustValue = trustValue + (tempEffectWeight * trustworthiness.getTemporalEffect().getValue()); // TODO :: update time too
+		trustValue = trustValue + (indEffectWeight  * trustworthiness.getIndirectEffect().confirmTrustworthiness(fvToConfirm,fvConfirmer.getIsValidFromString()) );
+		trustValue = trustValue + (tempEffectWeight * trustworthiness.getTemporalEffect().confirmTrustworthiness(fvToConfirm)); 
 		
 		trustworthiness.setValue(trustValue);
 		trustworthiness.setComputedAt(fvConfirmer.getIsValidFrom());
 		
 		ffacade.create(trustworthiness);
+		UDebug.log("\nCREATE Trustworthiness (cnf): " + trustworthiness.getUri() ,4);
+//		this.updateUserReputation(fvToConfirm);
+		
 		return result;
 	}
 
-	public void updateUserReputation(MFeatureVersion featureVersion) {
+	public boolean updateUserReputation(MFeatureVersion featureVersion) {
+		boolean result = true;
 		
-		//TODO: implement user reputation calculation
+		MReputationTandr reputation = (MReputationTandr) featureVersion.getAuthor().getReputation();
+		if (reputation == null)
+			reputation = new MReputationTandr(featureVersion.getAuthor());
 		
-//		MReputation reputation = featureVersion.getAuthor().getReputation();
+		double repValue = 0.0;
+		
+		repValue = repValue + (dirEffectWeight  * reputation.getDirectEffect().calculateReputation(featureVersion.getAuthor(),featureVersion.getIsValidFromString())) ;
+		repValue = repValue + (indEffectWeight  * reputation.getIndirectEffect().calculateReputation(featureVersion.getAuthor(),featureVersion.getIsValidFromString()));
+		repValue = repValue + (tempEffectWeight * reputation.getTemporalEffect().calculateReputation(featureVersion.getAuthor(),featureVersion.getIsValidFromString())); 
+		
+		reputation.setValue(repValue);
+		reputation.setComputedAt(featureVersion.getIsValidFrom());
+		
+		UDebug.print("\n\n" + ffacade.convertToRDFTTL(reputation),4);
+		
+		ffacade.create(reputation);
+		UDebug.log("\nCREATE Reputation (new): " + reputation.getUri() ,4);
+		
+		return result;
 	}
 
 }

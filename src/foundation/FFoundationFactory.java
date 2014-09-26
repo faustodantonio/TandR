@@ -16,7 +16,7 @@ public class FFoundationFactory {
 	
 	protected FFoundationAbstract getFFoundation(String mclass)
 	{
-		String fclass = "foundation.F" + mclass.substring(1);
+		String fclass = this.generateGeneralFClassString(mclass);
 		return this.getFFoundation(fclass, mclass);
 	}
 	
@@ -33,8 +33,19 @@ public class FFoundationFactory {
 		return this.getFFoundation(mclass);
 	}
 	
+	protected String generateGeneralFClassString(String mclass) {
+		String fclass = "foundation.F" + mclass.substring(1);
+		return fclass;
+	}
+	
 	protected FFoundationAbstract getFFoundation(String fclass,String mclass)
 	{		
+		return this.getGeneralFactory(fclass, mclass);
+	}
+	
+	protected FFoundationAbstract getGeneralFactory(String fclass,String mclass)
+//	protected FFoundationAbstract getFFoundation(String fclass,String mclass)
+	{	
 		try {
 			ffoundation = (FFoundationAbstract) Class.forName(fclass).newInstance();
 		} catch (InstantiationException e) {
@@ -52,5 +63,4 @@ public class FFoundationFactory {
 		}
 		return ffoundation;
 	}
-	
 }

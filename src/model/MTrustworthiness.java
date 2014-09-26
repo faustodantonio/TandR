@@ -4,47 +4,73 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import foundation.FFoundationFacade;
 import utility.UConfig;
 import utility.UDebug;
 
 public class MTrustworthiness {
 
-	private String uri;
-	private double value;
-	private Date computedAt;
+	protected String uri;
+	protected double value;
+	protected Date computedAt;
 	
-	private String featureVersionUri;
-	private MFeatureVersion featureVersion;	
+	protected String featureVersionUri;
+	protected MFeatureVersion featureVersion;	
 
-	private SimpleDateFormat sdf;
+	protected SimpleDateFormat sdf;
+	
+	protected FFoundationFacade foundation;
 	
 	public MTrustworthiness() {
 		this.sdf = UConfig.sdf;
+		this.foundation = new FFoundationFacade();
 	}
 	
 	public MTrustworthiness(MFeatureVersion featureVersion) {
 		this.sdf = UConfig.sdf;
 		
+		this.setUri(this.generateTrustworthinessUri(featureVersion));
+		this.setComputedAt(featureVersion.getIsValidFromString());
+		
 		featureVersion.setTrustworthiness(this);
 		this.setFeatureVersion(featureVersion);
 	}
 	
-	public String toString(String rowPrefix)
-	{
-		String trustworthinessString = "";
-		//TODO: implement conversion from MTrustworthiness to String
-		return trustworthinessString;
+	public String generateTrustworthinessUri() {
+		return ""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + featureVersion.getUriID();
+	}
+	public String generateTrustworthinessUri(MFeatureVersion fVersion) {
+		return ""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + fVersion.getUriID();
 	}
 	
 	public MFeatureVersion getFeatureVersion() {
-		return featureVersion;
+		MFeatureVersion fv = null;
+		if(this.featureVersion == null)
+			if(this.getFeatureVersionUri() == null || this.getFeatureVersionUri().equals(""))
+				UDebug.error("There is no feature version associated!");
+			else
+				this.setFeatureVersion((MFeatureVersion) 
+						foundation.retrieveByUri(this.getFeatureVersionUri(), UConfig.getVGIHGraphURI(), 0, MFeatureVersion.class) );
+		else 
+			fv = this.featureVersion;
+		return fv;
 	}
 	public void setFeatureVersion(MFeatureVersion featureVersion) {
+		this.featureVersionUri = featureVersion.getUri();
 		this.featureVersion = featureVersion;
-		this.setUri(""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + featureVersion.getUriID());
-		this.setComputedAt(featureVersion.getIsValidFromString());
+//		this.setUri(this.generateTrustworthinessUri(featureVersion));
+//		this.setComputedAt(featureVersion.getIsValidFromString());
 	}	
-
+	public String getFeatureVersionUri() {
+		return featureVersionUri;
+	}
+	public void setFeatureVersionUri(String featureVersionUri) {
+		this.featureVersionUri = featureVersionUri;
+	}	
+	
+	public String getValueString() {
+		return UConfig.getDoubleAsString(value);
+	}
 	public double getValue() {
 		return value;
 	}
@@ -62,7 +88,7 @@ public class MTrustworthiness {
     	try {
 			this.computedAt = sdf.parse(isValidFrom);
 		} catch (ParseException e) {
-			UDebug.print("\n *** ERROR: IsValidFrom field not formatted\n",5);
+			UDebug.error("\n *** ERROR: IsValidFrom field not formatted\n");
 			e.printStackTrace();	}
     }
 	public String getComputedAtString(){
@@ -72,16 +98,27 @@ public class MTrustworthiness {
 		return date;
 	}
 	public String getUri() {
-		return uri;
+		
+		if (this.uri == null) {
+			if (this.featureVersion == null) {
+				if (this.featureVersionUri == null || this.featureVersionUri.equals(""))
+					UDebug.error("There is no feature version associated, can't generate uri");
+			}
+			else this.uri = this.generateTrustworthinessUri(this.getFeatureVersion());
+		}
+		
+		return this.uri;
 	}
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
-	public String getFeatureVersionUri() {
-		return featureVersionUri;
-	}
-	public void setFeatureVersionUri(String featureVersionUri) {
-		this.featureVersionUri = featureVersionUri;
-	}	
+
+
 	
+	public String toString(String rowPrefix)
+	{
+		String trustworthinessString = "";
+		//TODO: implement conversion from MTrustworthiness to String
+		return trustworthinessString;
+	}
 }

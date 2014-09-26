@@ -4,26 +4,33 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import foundation.FFoundationFacade;
 import utility.UConfig;
 import utility.UDebug;
 
 public class MReputation {
 
-	private String uri;
-	private double value;
-	private Date computedAt;
+	protected String uri;
+	protected double value;
+	protected Date computedAt;
 	
-	private String  authorUri;
-	private MAuthor author;	
+	protected String  authorUri;
+	protected MAuthor author;	
 
-	private SimpleDateFormat sdf;
+	protected SimpleDateFormat sdf;
+	
+	protected FFoundationFacade foundation;
 	
 	public MReputation() {
 		this.sdf = UConfig.sdf;
+		this.foundation = new FFoundationFacade();
 	}
 	
 	public MReputation(MAuthor author) {
 		this.sdf = UConfig.sdf;
+		this.foundation = new FFoundationFacade();
+		
+		this.setUri(this.generateReputationUri(author));
 		
 		author.setReputation(this);
 		this.setAuthor(author);
@@ -31,19 +38,25 @@ public class MReputation {
 	
 	public MReputation(MAuthor author, String computedAt) {
 		this.sdf = UConfig.sdf;
+		this.foundation = new FFoundationFacade();
+		
+		this.setUri(this.generateReputationUri(author));
+		this.setComputedAt(computedAt);
 		
 		author.setReputation(this);
 		this.setAuthor(author);
-		this.setComputedAt(computedAt);
 	}
 	
-	public String toString(String rowPrefix)
-	{
-		String reputationString = "";
-		//TODO: implement conversion from MReputation to String
-		return reputationString;
+	public String generateReputationUri() {
+		return ""+UConfig.graphURI + "Reputation" + UConfig.module_trustworthiness_calculus + "_" + author.getAccountName();
 	}
-
+	public String generateReputationUri(MAuthor contributor) {
+		return ""+UConfig.graphURI + "Reputation" + UConfig.module_trustworthiness_calculus + "_" + contributor.getAccountName();
+	}
+	
+	public String getValueString() {
+		return UConfig.getDoubleAsString(value);
+	}
 	public double getValue() {
 		return value;
 	}
@@ -61,7 +74,7 @@ public class MReputation {
     	try {
 			this.computedAt = sdf.parse(isValidFrom);
 		} catch (ParseException e) {
-			UDebug.print("\n *** ERROR: IsValidFrom field not formatted\n",5);
+			UDebug.error("\n *** ERROR: IsValidFrom field not formatted\n");
 			e.printStackTrace();	}
     }
 	public String getComputedAtString(){
@@ -71,18 +84,37 @@ public class MReputation {
 		return date;
 	}
 	public String getUri() {
+		if (this.uri == null)
+			if (this.author == null) 
+				if (this.authorUri == null || this.authorUri.equals(""))
+					UDebug.error("There is no author associated, can't generate uri");
+			else
+				this.uri = this.generateReputationUri(this.getAuthor());
 		return uri;
 	}
 	public void setUri(String uri) {
 		this.uri = uri;
 	}
+	
 	public MAuthor getAuthor() {
-		return author;
+		
+		MAuthor contributor = null;
+		if(this.author == null)
+			if(this.getAuthorUri() == null || this.getAuthorUri().equals(""))
+				UDebug.error("There is no author version associated!");
+			else
+				this.setAuthor((MAuthor) 
+						foundation.retrieveByUri(this.getAuthorUri(), UConfig.getVGIHGraphURI(), 0, MAuthor.class) );
+		else 
+			contributor = this.author;
+		return contributor;
 	}
 	public void setAuthor(MAuthor author) {
-		this.setUri(""+UConfig.graphURI + "Reputation" + UConfig.module_trustworthiness_calculus + "_" + author.getAccountName());
 		this.author = author;
+		this.setAuthorUri(author.getUri());
+		this.setUri(this.generateReputationUri());
 	}
+	
 	public String getAuthorUri() {
 		return authorUri;
 	}
@@ -90,5 +122,12 @@ public class MReputation {
 		this.authorUri = authorUri;
 	}
 	
+	public String toString(String rowPrefix)
+	{
+		String reputationString = "";
+		//TODO: implement conversion from MReputation to String
+		return reputationString;
+	}
+		
 	
 }

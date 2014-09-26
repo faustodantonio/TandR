@@ -4,7 +4,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 
-import modules.tandr.foundation.RDFconverter.xml.FTrustworthinessEffect2XML;
+import modules.tandr.foundation.RDFconverter.xml.FEffectDescription2XML;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -23,12 +23,12 @@ public class FTandR extends FInstallation implements FTandRImport {
 	
 	private Document factors;
 	private HashMap<String, Namespace> namespaces;
-	private FTrustworthinessEffect2XML feffect;
+	private FEffectDescription2XML feffect;
 	
 	public FTandR() {
 		super();
 		this.namespaces = UConfig.namespaces;
-		feffect = new FTrustworthinessEffect2XML();
+		feffect = new FEffectDescription2XML();
 	}
 
 	@Override
@@ -43,17 +43,17 @@ public class FTandR extends FInstallation implements FTandRImport {
 				dirGeomAspect = null, dirQualAspect  = null, dirSemAspect   = null, 
 				indGeomAspect = null, indQualAspect  = null, indSemAspect   = null;
 		
-		directEffect   = feffect.createEffectDescriptionElement("Direct Effect", "direct", "This effect take into account the feature version story");
-		indirectEffect = feffect.createEffectDescriptionElement("Indirect Effect", "indirect", "This effect take into account confirmations");
-		temporalEffect = feffect.createEffectDescriptionElement("Temporal Effect", "temporal", "This effect take into account the feature version life time");
+		directEffect   = feffect.createEffectDescriptionElement("Direct Effect"  , "Direct"  , "This effect take into account the feature version story");
+		indirectEffect = feffect.createEffectDescriptionElement("Indirect Effect", "Indirect", "This effect take into account confirmations");
+		temporalEffect = feffect.createEffectDescriptionElement("Temporal Effect", "Temporal", "This effect take into account the feature version life time");
 		
-		dirGeomAspect = feffect.createAspectDescriptionElement("Geometric Direct Aspect", "geomDir", "Geometric Aspect for Direct Effect");
-		dirQualAspect = feffect.createAspectDescriptionElement("Qualitative Direct Aspect", "qualDir", "Qualitative Aspect for Direct Effect");
-		dirSemAspect  = feffect.createAspectDescriptionElement("Semantic Direct Aspect", "semDir", "Semantic Aspect for Direct Effect");
+		dirGeomAspect = feffect.createAspectDescriptionElement("Geometric Direct Aspect"  , "GeomDir", "Geometric Aspect for Direct Effect");
+		dirQualAspect = feffect.createAspectDescriptionElement("Qualitative Direct Aspect", "QualDir", "Qualitative Aspect for Direct Effect");
+		dirSemAspect  = feffect.createAspectDescriptionElement("Semantic Direct Aspect"   , "SemDir" , "Semantic Aspect for Direct Effect");
 		
-		indGeomAspect = feffect.createAspectDescriptionElement("Geometric Indirect Aspect", "geomInd", "Geometric Aspect for Indirect Effect");
-		indQualAspect = feffect.createAspectDescriptionElement("Qualitative Indirect Aspect", "qualInd", "Qualitative Aspect for Indirect Effect");
-		indSemAspect  = feffect.createAspectDescriptionElement("Semantic Indirect Aspect", "semInd", "Semantic Aspect for Indirect Effect");
+		indGeomAspect = feffect.createAspectDescriptionElement("Geometric Indirect Aspect"  , "GeomInd", "Geometric Aspect for Indirect Effect");
+		indQualAspect = feffect.createAspectDescriptionElement("Qualitative Indirect Aspect", "QualInd", "Qualitative Aspect for Indirect Effect");
+		indSemAspect  = feffect.createAspectDescriptionElement("Semantic Indirect Aspect"   , "SemInd" , "Semantic Aspect for Indirect Effect");
 
 		root.addContent(directEffect);
 		root.addContent(indirectEffect);

@@ -25,13 +25,14 @@ public class TandR_VGIModel_Test {
 //		test.printFirstAuthorInfos();
 //		test.printEditInfos();
 //		test.printFeatureInfos();
-		test.printFeatureVersionInfos();
+//		test.printFeatureVersionInfos();
 //		test.buildEffectHierarchy() ;
 //		test.getTrustworthinessCalculation();
 //		test.retreiveNextFV();
 //		test.retreiveSuccNeighboursFVs();
 		
 //		test.printTrustworthiness();
+		test.printQuery_3();
 		
 //		install.install();
 

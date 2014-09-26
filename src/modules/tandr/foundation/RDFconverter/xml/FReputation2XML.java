@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import model.MReputation;
-import model.MTrustworthiness;
 import modules.tandr.model.MReputationTandr;
-import modules.tandr.model.MTrustworthinessTandr;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -29,7 +27,7 @@ public class FReputation2XML {
 	
 	public Document convertToRDFXML(MReputation rep) {
 		
-		MReputationTandr reputation = new MReputationTandr(rep);
+		MReputationTandr reputation = (MReputationTandr) rep;
 		Document reputationDoc = new Document();
 		Element root = new  Element("RDF",namespaces.get("rdf"));
 		ArrayList<Element> effectElementList = new ArrayList<Element>();
@@ -44,7 +42,9 @@ public class FReputation2XML {
 		reputation_type.setAttribute(new Attribute("resource", "http://semantic.web/vocabs/tandr_assessment/tandr#Reputation", namespaces.get("rdf")) );
 		
 		refersToAuthor = new Element("refersToAuthor", this.namespaces.get("tandr"));
-		refersToAuthor.setAttribute(new Attribute("resource", reputation.getAuthorUri(), namespaces.get("rdf")) );
+		if (reputation.getAuthorUri() != null)
+			refersToAuthor.setAttribute(new Attribute("resource", reputation.getAuthorUri(), namespaces.get("rdf")) );
+		else refersToAuthor.setAttribute(new Attribute("resource", "", namespaces.get("rdf")) );
 		
 		hasReputationValue = new Element("hasReputationValue",namespaces.get("tandr"));
 		Element reputationValue = new Element("Description",namespaces.get("rdf"));
@@ -53,9 +53,9 @@ public class FReputation2XML {
 		computedAt.setAttribute(new Attribute("datatype", "http://www.w3.org/2001/XMLSchema#dateTime",this.namespaces.get("rdf")));
 		computedAt.setText(reputation.getComputedAtString());
 		
-		reputationValueIs = new Element("trustworthinessValueIs",namespaces.get("tandr"));
+		reputationValueIs = new Element("reputationValueIs",namespaces.get("tandr"));
 		reputationValueIs.setAttribute(new Attribute("datatype", "http://www.w3.org/2001/XMLSchema#decimal",this.namespaces.get("rdf")));
-		reputationValueIs.setText(reputation.getValue()+"");
+		reputationValueIs.setText( reputation.getValueString() );
 		
 		hasReputationValue.addContent(reputationValue);
 		
@@ -86,7 +86,7 @@ public class FReputation2XML {
 		
 		directEffect   = this.createDirectEffectElement(reputation);
 		indirectEffect = this.createIndirectEffectElement(reputation);
-		temporalEffect = feffectXML.createReputationEffectElement("temporal" , reputation.getTemporalEffect().getValue() + "",reputation.getTemporalEffect().getComputedAtString() + "");
+		temporalEffect = feffectXML.createReputationEffectElement("temporal" , reputation.getTemporalEffect().getValueString() + "",reputation.getTemporalEffect().getComputedAtString() + "");
 		
 		hasDirectEffect   = new Element("hasReputationEffect",this.namespaces.get("tandr"));
 		hasIndirectEffect = new Element("hasReputationEffect",this.namespaces.get("tandr"));
@@ -106,11 +106,11 @@ public class FReputation2XML {
 	private Element createDirectEffectElement(MReputationTandr reputation){
 	Element dirGeomAspect = null, dirQualAspect  = null, dirSemAspect   = null,
 			hasDirGeomAspect = null, hasDirQualAspect  = null, hasDirSemAspect   = null;
-	Element directEffect   = feffectXML.createReputationEffectElement("direct"   , reputation.getDirectEffect().getValue() + "", reputation.getDirectEffect().getComputedAtString() + "");
+	Element directEffect   = feffectXML.createReputationEffectElement("direct"   , reputation.getDirectEffect().getValueString(), reputation.getDirectEffect().getComputedAtString() + "");
 	
-	dirGeomAspect = feffectXML.createReputationAspectElement("geomDir" , reputation.getDirectEffect().getGeometricAspect().getValue()   + "", reputation.getDirectEffect().getGeometricAspect().getComputedAtString()   + "");
-	dirQualAspect = feffectXML.createReputationAspectElement("qualDir" , reputation.getDirectEffect().getQualitativeAspect().getValue() + "", reputation.getDirectEffect().getQualitativeAspect().getComputedAtString() + "");
-	dirSemAspect  = feffectXML.createReputationAspectElement("semDir"  , reputation.getDirectEffect().getSemanticAspect().getValue()    + "", reputation.getDirectEffect().getSemanticAspect().getComputedAtString()    + "");
+	dirGeomAspect = feffectXML.createReputationAspectElement("geomDir" , reputation.getDirectEffect().getGeometricAspect().getValueString(), reputation.getDirectEffect().getGeometricAspect().getComputedAtString()   + "");
+	dirQualAspect = feffectXML.createReputationAspectElement("qualDir" , reputation.getDirectEffect().getQualitativeAspect().getValueString(), reputation.getDirectEffect().getQualitativeAspect().getComputedAtString() + "");
+	dirSemAspect  = feffectXML.createReputationAspectElement("semDir"  , reputation.getDirectEffect().getSemanticAspect().getValueString(), reputation.getDirectEffect().getSemanticAspect().getComputedAtString()    + "");
 
 	hasDirGeomAspect = new Element("hasReputationAspect",this.namespaces.get("tandr"));
 	hasDirQualAspect = new Element("hasReputationAspect",this.namespaces.get("tandr"));
@@ -130,11 +130,11 @@ public class FReputation2XML {
 	private Element createIndirectEffectElement(MReputationTandr reputation){
 		Element indGeomAspect = null, indQualAspect  = null, indSemAspect   = null,
 				hasIndGeomAspect = null, hasIndQualAspect  = null, hasIndSemAspect   = null;
-		Element indirectEffect = feffectXML.createReputationEffectElement("indirect" , reputation.getIndirectEffect().getValue() + "", reputation.getIndirectEffect().getComputedAtString() + "");
+		Element indirectEffect = feffectXML.createReputationEffectElement("indirect" , reputation.getIndirectEffect().getValueString() + "", reputation.getIndirectEffect().getComputedAtString() + "");
 		
-		indGeomAspect = feffectXML.createReputationAspectElement("geomInd" , reputation.getIndirectEffect().getGeometricAspect().getValue()   + "", reputation.getIndirectEffect().getGeometricAspect().getComputedAtString()   + "");
-		indQualAspect = feffectXML.createReputationAspectElement("qualInd" , reputation.getIndirectEffect().getQualitativeAspect().getValue() + "", reputation.getIndirectEffect().getQualitativeAspect().getComputedAtString() + "");
-		indSemAspect  = feffectXML.createReputationAspectElement("semInd"  , reputation.getIndirectEffect().getSemanticAspect().getValue()    + "", reputation.getIndirectEffect().getSemanticAspect().getComputedAtString()    + "");
+		indGeomAspect = feffectXML.createReputationAspectElement("geomInd" , reputation.getIndirectEffect().getGeometricAspect().getValueString()   + "", reputation.getIndirectEffect().getGeometricAspect().getComputedAtString()   + "");
+		indQualAspect = feffectXML.createReputationAspectElement("qualInd" , reputation.getIndirectEffect().getQualitativeAspect().getValueString() + "", reputation.getIndirectEffect().getQualitativeAspect().getComputedAtString() + "");
+		indSemAspect  = feffectXML.createReputationAspectElement("semInd"  , reputation.getIndirectEffect().getSemanticAspect().getValueString()    + "", reputation.getIndirectEffect().getSemanticAspect().getComputedAtString()    + "");
 		
 		hasIndGeomAspect = new Element("hasReputationAspect",this.namespaces.get("tandr"));
 		hasIndQualAspect = new Element("hasReputationAspect",this.namespaces.get("tandr"));

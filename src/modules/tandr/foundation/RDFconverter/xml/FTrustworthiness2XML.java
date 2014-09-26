@@ -27,7 +27,7 @@ public class FTrustworthiness2XML {
 	
 	public Document convertToRDFXML(MTrustworthiness trust) {
 		
-		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr(trust);
+		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) trust;
 		Document trustworthinessDoc = new Document();
 		Element root = new  Element("RDF",namespaces.get("rdf"));
 		ArrayList<Element> effectElementList = new ArrayList<Element>();
@@ -54,7 +54,7 @@ public class FTrustworthiness2XML {
 		
 		trustworthinessValueIs = new Element("trustworthinessValueIs",namespaces.get("tandr"));
 		trustworthinessValueIs.setAttribute(new Attribute("datatype", "http://www.w3.org/2001/XMLSchema#decimal",this.namespaces.get("rdf")));
-		trustworthinessValueIs.setText(trustworthiness.getValue()+"");
+		trustworthinessValueIs.setText(trustworthiness.getValueString());
 		
 		hasTrustworthinessValue.addContent(trustworthinessValue);
 		
@@ -85,7 +85,7 @@ public class FTrustworthiness2XML {
 		
 		directEffect   = this.createDirectEffectElement(trustworthiness);
 		indirectEffect = this.createIndirectEffectElement(trustworthiness);
-		temporalEffect = feffect.createTrustworthinessEffectElement("temporal" , trustworthiness.getTemporalEffect().getValue() + "",trustworthiness.getTemporalEffect().getComputedAtString() + "");
+		temporalEffect = feffect.createTrustworthinessEffectElement("Temporal" , trustworthiness.getTemporalEffect().getValueString() + "",trustworthiness.getTemporalEffect().getComputedAtString() + "");
 		
 		hasDirectEffect   = new Element("hasTrustworthinessEffect",this.namespaces.get("tandr"));
 		hasIndirectEffect = new Element("hasTrustworthinessEffect",this.namespaces.get("tandr"));
@@ -105,11 +105,11 @@ public class FTrustworthiness2XML {
 	private Element createDirectEffectElement(MTrustworthinessTandr trustworthiness){
 	Element dirGeomAspect = null, dirQualAspect  = null, dirSemAspect   = null,
 			hasDirGeomAspect = null, hasDirQualAspect  = null, hasDirSemAspect   = null;
-	Element directEffect   = feffect.createTrustworthinessEffectElement("direct"   , trustworthiness.getDirectEffect().getValue() + "", trustworthiness.getDirectEffect().getComputedAtString() + "");
+	Element directEffect   = feffect.createTrustworthinessEffectElement("Direct"   , trustworthiness.getDirectEffect().getValueString() , trustworthiness.getDirectEffect().getComputedAtString() + "");
 	
-	dirGeomAspect = feffect.createTrustworthinessAspectElement("geomDir" , trustworthiness.getDirectEffect().getGeometricAspect().getValue()   + "", trustworthiness.getDirectEffect().getGeometricAspect().getComputedAtString()   + "");
-	dirQualAspect = feffect.createTrustworthinessAspectElement("qualDir" , trustworthiness.getDirectEffect().getQualitativeAspect().getValue() + "", trustworthiness.getDirectEffect().getQualitativeAspect().getComputedAtString() + "");
-	dirSemAspect  = feffect.createTrustworthinessAspectElement("semDir"  , trustworthiness.getDirectEffect().getSemanticAspect().getValue()    + "", trustworthiness.getDirectEffect().getSemanticAspect().getComputedAtString()    + "");
+	dirGeomAspect = feffect.createTrustworthinessAspectElement("GeomDir" , trustworthiness.getDirectEffect().getGeometricAspect().getValueString()   , trustworthiness.getDirectEffect().getGeometricAspect().getComputedAtString()   + "");
+	dirQualAspect = feffect.createTrustworthinessAspectElement("QualDir" , trustworthiness.getDirectEffect().getQualitativeAspect().getValueString() , trustworthiness.getDirectEffect().getQualitativeAspect().getComputedAtString() + "");
+	dirSemAspect  = feffect.createTrustworthinessAspectElement("SemDir"  , trustworthiness.getDirectEffect().getSemanticAspect().getValueString()    , trustworthiness.getDirectEffect().getSemanticAspect().getComputedAtString()    + "");
 
 	hasDirGeomAspect = new Element("hasTrustworthinessAspect",this.namespaces.get("tandr"));
 	hasDirQualAspect = new Element("hasTrustworthinessAspect",this.namespaces.get("tandr"));
@@ -129,11 +129,11 @@ public class FTrustworthiness2XML {
 	private Element createIndirectEffectElement(MTrustworthinessTandr trustworthiness){
 		Element indGeomAspect = null, indQualAspect  = null, indSemAspect   = null,
 				hasIndGeomAspect = null, hasIndQualAspect  = null, hasIndSemAspect   = null;
-		Element indirectEffect = feffect.createTrustworthinessEffectElement("indirect" , trustworthiness.getIndirectEffect().getValue() + "", trustworthiness.getIndirectEffect().getComputedAtString() + "");
+		Element indirectEffect = feffect.createTrustworthinessEffectElement("Indirect" , trustworthiness.getIndirectEffect().getValueString(), trustworthiness.getIndirectEffect().getComputedAtString() + "");
 		
-		indGeomAspect = feffect.createTrustworthinessAspectElement("geomInd" , trustworthiness.getIndirectEffect().getGeometricAspect().getValue()   + "", trustworthiness.getIndirectEffect().getGeometricAspect().getComputedAtString()   + "");
-		indQualAspect = feffect.createTrustworthinessAspectElement("qualInd" , trustworthiness.getIndirectEffect().getQualitativeAspect().getValue() + "", trustworthiness.getIndirectEffect().getQualitativeAspect().getComputedAtString() + "");
-		indSemAspect  = feffect.createTrustworthinessAspectElement("semInd"  , trustworthiness.getIndirectEffect().getSemanticAspect().getValue()    + "", trustworthiness.getIndirectEffect().getSemanticAspect().getComputedAtString()    + "");
+		indGeomAspect = feffect.createTrustworthinessAspectElement("GeomInd" , trustworthiness.getIndirectEffect().getGeometricAspect().getValueString(), trustworthiness.getIndirectEffect().getGeometricAspect().getComputedAtString()   + "");
+		indQualAspect = feffect.createTrustworthinessAspectElement("QualInd" , trustworthiness.getIndirectEffect().getQualitativeAspect().getValueString(), trustworthiness.getIndirectEffect().getQualitativeAspect().getComputedAtString() + "");
+		indSemAspect  = feffect.createTrustworthinessAspectElement("SemInd"  , trustworthiness.getIndirectEffect().getSemanticAspect().getValueString(), trustworthiness.getIndirectEffect().getSemanticAspect().getComputedAtString()    + "");
 		
 		hasIndGeomAspect = new Element("hasTrustworthinessAspect",this.namespaces.get("tandr"));
 		hasIndQualAspect = new Element("hasTrustworthinessAspect",this.namespaces.get("tandr"));

@@ -9,7 +9,7 @@ public class FReputation extends FFoundationAbstract {
 
 	@Override
 	protected String getClassUri(){
-		return "tandr:Trustworthiness";
+		return "tandr:Reputation";
 	}
 
 	@Override

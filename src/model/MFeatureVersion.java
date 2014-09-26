@@ -14,6 +14,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.io.WKTReader;
 
+import foundation.FFoundationFacade;
+
 public class MFeatureVersion {
 
 	private String uri;
@@ -24,6 +26,7 @@ public class MFeatureVersion {
 	private String prevFVersionUri;
 	private MFeatureVersion prevFVersion;
 	
+	private String trustworthinessUri;
 	private MTrustworthiness trustworthiness;
 	
 	private String  authorUri;
@@ -43,63 +46,18 @@ public class MFeatureVersion {
 	private HashMap<String,String> tags;
 	
 	private SimpleDateFormat sdf;
+	private FFoundationFacade foundation;
 
 	public MFeatureVersion() {
 		super();
 		this.tags = new HashMap<String, String>();
 
 		this.sdf = UConfig.sdf;
+		this.foundation = new FFoundationFacade();
 	}
 	
-	public String toString(String rowPrefix)
+	public String getGeometryBuffer(Double radius)
 	{
-		String fversionString = "";
-		
-		fversionString +=  rowPrefix + "FeatureVersion :" + "\n"
-				+  rowPrefix +         "\t uri               = \""+ this.getUri() +"\"\n";
-		//referenced feature (hvgi:isVersionOf)
-		fversionString +=  rowPrefix + "\t reference feature = \""+ this.getFeatureUri() +"\"\n";
-		if (this.getFeature() != null) 
-			fversionString += rowPrefix + this.getFeature().toString(rowPrefix + "\t "); 
-		else fversionString += rowPrefix + "\t Feature: null" + "\n"; 
-		//geometry
-		fversionString +=  rowPrefix + "\t wkt geometry = \""+ this.getWktGeometry() +"\"\n";
-		if (this.getGeometry() != null) 
-			fversionString += rowPrefix + "\t Geometry: " + this.getGeometry().toString() + "\n"; 
-		else fversionString += rowPrefix + "\t Geometry: null" + "\n"; 
-		//version (versionNo)
-		fversionString +=  rowPrefix + "\t version = \""+ this.getVersionNo() +"\"\n";
-		//precedent fv (prv:precedeedBy)
-		fversionString +=  rowPrefix + "\t previous version = \""+ this.getPrevFVersionUri() +"\"\n";
-		if (this.getPrevFVersion() != null) 
-			fversionString += rowPrefix + this.getPrevFVersion().toString(rowPrefix + "\t "); 
-		else fversionString += rowPrefix + "\t FeatureVersion: null" + "\n"; 
-		//edit (osp:createdBy)
-		fversionString +=  rowPrefix + "\t edit          = \""+ this.getEditUri() +"\"\n";
-		if (this.getEdit() != null) 
-			fversionString += rowPrefix + this.getEdit().toString(rowPrefix + "\t "); 
-		else fversionString += rowPrefix + "\t Edit: null" + "\n"; 		
-		//author (hvgi:hasAuthor)
-		fversionString +=  rowPrefix + "\t author          = \""+ this.getAuthorUri() +"\"\n";
-		if (this.getAuthor() != null) 
-			fversionString += rowPrefix + this.getAuthor().toString(rowPrefix + "\t "); 
-		else fversionString += rowPrefix + "\t Author: null" + "\n"; 
-		//validity
-		fversionString +=  rowPrefix + "\t is valid from = \""+ this.getIsValidFromString() +"\"\n";
-		fversionString +=  rowPrefix + "\t is valid to   = \""+ this.getIsValidToString() +"\"\n";
-		//deleted
-		fversionString +=  rowPrefix + "\t version = \""+ this.getVersionNo() +"\"\n";
-		//tags
-		fversionString += rowPrefix + "\t tags : \n";
-		for (Entry<String, String> tag : tags.entrySet())
-			fversionString += rowPrefix + "\t\t "+ tag.getKey() + " => \"" + tag.getValue() +"\"\n";
-		
-		return fversionString;
-	}
-	
-	public String getGeometryBuffer()
-	{
-		Double radius = UConfig.featureInfluenceRadius;
 		String wktGeometryBuffered = null;
 		
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(  ), Integer.parseInt(UConfig.epsg_crs));
@@ -116,6 +74,12 @@ public class MFeatureVersion {
 		return wktGeometryBuffered;
 	}
 	
+	public String getGeometryBuffer()
+	{
+		Double radius = UConfig.featureInfluenceRadius;
+		return this.getGeometryBuffer(radius);
+	}
+	
 	public String getUriID(){
 		String uriID = this.getUri();
 		
@@ -126,7 +90,17 @@ public class MFeatureVersion {
 		return uriID;
 	}
 	
+	public boolean isFirst() {
+		boolean first = true;
+		
+		if ( this.getFeature().getFirstVersion().getUri().equals(this.uri) ) first = true;
+		else first = false;
+		
+		return first;
+	}
+	
 	public String getUri() {
+		if (this.uri == null) this.uri = "";
 		return uri;
 	}
 	public void setUri(String uri) {
@@ -138,22 +112,44 @@ public class MFeatureVersion {
 	public void setFeatureUri(String featureUri) {
 		this.featureUri = featureUri;
 	}
+	public void setFeatureUri(String featureUri, int lazyDepth) {
+		this.featureUri = featureUri;
+		if (lazyDepth>0)
+			this.setFeature( (MFeature) foundation.retrieveByUri(featureUri, UConfig.getVGIHGraphURI(), lazyDepth - 1, MFeature.class) );
+	}
 	public MFeature getFeature() {
-		return feature;
+		if (this.feature == null) {
+			if (this.getFeatureUri() != null && ! this.getFeatureUri().equals(""))
+				this.setFeature( (MFeature) foundation.retrieveByUri(this.getFeatureUri(), UConfig.getVGIHGraphURI(), 1, MFeature.class) );
+			else this.setFeature(new MFeature());
+		}
+		return this.feature;
 	}
 	public void setFeature(MFeature feature) {
+		this.setFeatureUri( feature.getUri() );
 		this.feature = feature;
 	}
 	public String getPrevFVersionUri() {
 		return prevFVersionUri;
 	}
 	public void setPrevFVersionUri(String prevFVersionUri) {
+		this.setPrevFVersionUri(prevFVersionUri, 0);
+	}
+	public void setPrevFVersionUri(String prevFVersionUri, int lazyDepth) {
 		this.prevFVersionUri = prevFVersionUri;
+		if (lazyDepth>0)
+			this.setPrevFVersion( (MFeatureVersion) foundation.retrieveByUri(prevFVersionUri, UConfig.getVGIHGraphURI(), lazyDepth - 1, MFeatureVersion.class) );
 	}
 	public MFeatureVersion getPrevFVersion() {
-		return prevFVersion;
+		if (this.prevFVersion == null) {
+			if (this.getPrevFVersionUri() != null && !this.getPrevFVersionUri().equals(""))
+				this.setPrevFVersion( (MFeatureVersion) foundation.retrieveByUri(this.getPrevFVersionUri(), UConfig.getVGIHGraphURI(), 0, MFeatureVersion.class) );
+			else this.setPrevFVersion( new MFeatureVersion() );
+		}
+		return this.prevFVersion;
 	}
 	public void setPrevFVersion(MFeatureVersion prevFVersion) {
+		this.setPrevFVersionUri( prevFVersion.getUri() );
 		this.prevFVersion = prevFVersion;
 	}
 	public String getAuthorUri() {
@@ -162,10 +158,21 @@ public class MFeatureVersion {
 	public void setAuthorUri(String authorUri) {
 		this.authorUri = authorUri;
 	}
+	public void setAuthorUri(String authorUri, int lazyDepth) {
+		this.authorUri = authorUri;
+		if (lazyDepth > 0)
+			this.setAuthor( (MAuthor) foundation.retrieveByUri(authorUri, UConfig.getVGIHGraphURI(), lazyDepth - 1, MAuthor.class) );
+	}
 	public MAuthor getAuthor() {
-		return author;
+		if (this.author == null){
+			if (this.getAuthorUri() != null && ! this.getAuthorUri().equals(""))
+				this.setAuthor( (MAuthor) foundation.retrieveByUri(this.getAuthorUri(), UConfig.getVGIHGraphURI(), 0, MAuthor.class) );
+			else this.setAuthor(new MAuthor());
+		}
+		return this.author;
 	}
 	public void setAuthor(MAuthor author) {
+		this.setAuthorUri(author.getUri());
 		this.author = author;
 	}
 	public String getEditUri() {
@@ -174,10 +181,21 @@ public class MFeatureVersion {
 	public void setEditUri(String editUri) {
 		this.editUri = editUri;
 	}
+	public void setEditUri(String editUri, int lazyDepth) {
+		this.editUri = editUri;
+		if (lazyDepth > 0)
+			this.setEdit( (MEdit) foundation.retrieveByUri(editUri, UConfig.getVGIHGraphURI(), lazyDepth - 1, MEdit.class) );
+	}
 	public MEdit getEdit() {
-		return edit;
+		if (this.edit == null) {
+			if (this.getEditUri() != null && ! this.getEditUri().equals(""))
+				this.setEdit( (MEdit) foundation.retrieveByUri(this.getEditUri(), UConfig.getVGIHGraphURI(), 0, MEdit.class) );
+			else this.setEdit(new MEdit());
+		}
+		return this.edit;
 	}
 	public void setEdit(MEdit edit) {
+		this.setEditUri(edit.getUri());
 		this.edit = edit;
 	}
 	public String getVersionNo() {
@@ -221,6 +239,7 @@ public class MFeatureVersion {
 		String date = "";
 		if (this.isValidTo != null)
 			date = this.sdf.format(this.isValidTo);
+		else date = UConfig.getMaxDateTimeAsString();
 		return date;
 	}
     public void setIsValidTo(String isValidTo) {
@@ -237,6 +256,12 @@ public class MFeatureVersion {
 		this.wktGeometry = wktGeometry;
 	}
 	public Geometry getGeometry() {
+		if (this.geometry == null ) {
+			if(this.wktGeometry == null || this.wktGeometry.equals(""))
+				UDebug.error("Can't build geometry. No information available");
+			else this.setGeometry(this.wktGeometry);
+		}
+		
 		return geometry;
 	}
 	public void setGeometry(Geometry the_geom) {
@@ -269,11 +294,76 @@ public class MFeatureVersion {
 	public void addTag(String key, String value)	{
 		this.tags.put(key, value);
 	}
+	
 	public MTrustworthiness getTrustworthiness() {
-		return trustworthiness;
+		if (this.trustworthiness == null) {
+			if (this.getTrustworthinessUri() != null && ! this.getTrustworthinessUri().equals(""))
+				this.setTrustworthiness( (MTrustworthiness) foundation.retrieveByUri(this.getTrustworthinessUri(), UConfig.getTANDRGraphURI(), 0, MTrustworthiness.class) );
+			else this.trustworthiness = null;
+		}
+		return this.trustworthiness;
 	}
 	public void setTrustworthiness(MTrustworthiness trustworthiness) {
 		this.trustworthiness = trustworthiness;
+		this.setTrustworthinessUri(trustworthiness.getUri(), 0);
 	}
+	public String getTrustworthinessUri() {
+		return trustworthinessUri;
+	}
+	public void setTrustworthinessUri(String trustworthinessUri) {
+		this.trustworthinessUri = trustworthinessUri;
+	}
+	public void setTrustworthinessUri(String trustworthinessUri, int lazyDepth) {
+		this.trustworthinessUri = trustworthinessUri;
+		if (lazyDepth > 0)
+			this.setTrustworthiness( (MTrustworthiness) foundation.retrieveByUri(this.getTrustworthinessUri(), UConfig.getTANDRGraphURI(), lazyDepth - 1, MTrustworthiness.class) );
+	}
+
 	
+	public String toString(String rowPrefix)
+	{
+		String fversionString = "";
+		
+		fversionString +=  rowPrefix + "FeatureVersion :" + "\n"
+				+  rowPrefix +         "\t uri               = \""+ this.getUri() +"\"\n";
+		//referenced feature (hvgi:isVersionOf)
+		fversionString +=  rowPrefix + "\t reference feature = \""+ this.getFeatureUri() +"\"\n";
+		if (this.feature != null) 
+			fversionString += rowPrefix + this.getFeature().toString(rowPrefix + "\t "); 
+		else fversionString += rowPrefix + "\t Feature: null" + "\n"; 
+		//geometry
+		if (this.wktGeometry != null) 
+			fversionString +=  rowPrefix + "\t wkt geometry = \""+ this.getWktGeometry() +"\"\n";
+		if (this.geometry != null) 
+			fversionString += rowPrefix + "\t Geometry: " + this.getGeometry().toString() + "\n"; 
+		else fversionString += rowPrefix + "\t Geometry: null" + "\n"; 
+		//version (versionNo)
+		fversionString +=  rowPrefix + "\t version = \""+ this.getVersionNo() +"\"\n";
+		//precedent fv (prv:precedeedBy)
+		fversionString +=  rowPrefix + "\t previous version = \""+ this.getPrevFVersionUri() +"\"\n";
+		if (this.prevFVersion != null) 
+			fversionString += rowPrefix + this.getPrevFVersion().toString(rowPrefix + "\t "); 
+		else fversionString += rowPrefix + "\t FeatureVersion: null" + "\n"; 
+		//edit (osp:createdBy)
+		fversionString +=  rowPrefix + "\t edit          = \""+ this.getEditUri() +"\"\n";
+		if (this.edit != null) 
+			fversionString += rowPrefix + this.getEdit().toString(rowPrefix + "\t "); 
+		else fversionString += rowPrefix + "\t Edit: null" + "\n"; 		
+		//author (hvgi:hasAuthor)
+		fversionString +=  rowPrefix + "\t author          = \""+ this.getAuthorUri() +"\"\n";
+		if (this.author != null) 
+			fversionString += rowPrefix + this.getAuthor().toString(rowPrefix + "\t "); 
+		else fversionString += rowPrefix + "\t Author: null" + "\n"; 
+		//validity
+		fversionString +=  rowPrefix + "\t is valid from = \""+ this.getIsValidFromString() +"\"\n";
+		fversionString +=  rowPrefix + "\t is valid to   = \""+ this.getIsValidToString() +"\"\n";
+		//deleted
+		fversionString +=  rowPrefix + "\t version = \""+ this.getVersionNo() +"\"\n";
+		//tags
+		fversionString += rowPrefix + "\t tags : \n";
+		for (Entry<String, String> tag : tags.entrySet())
+			fversionString += rowPrefix + "\t\t "+ tag.getKey() + " => \"" + tag.getValue() +"\"\n";
+		
+		return fversionString;
+	}
 }

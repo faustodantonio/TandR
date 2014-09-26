@@ -1,7 +1,9 @@
 package foundation;
 
 import java.util.ArrayList;
+import java.util.Map;
 
+import model.MAuthor;
 import model.MFeatureVersion;
 
 import com.hp.hpl.jena.query.ResultSet;
@@ -254,49 +256,61 @@ public class FFoundationFacade {
 	public ArrayList<String> retrieveFVPreviousesNeighbours(MFeatureVersion featureVersion, String fv_wkt_buffered)
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrievePreviousesNeighbours(featureVersion.getIsValidFromString(), fv_wkt_buffered);
+		return ffoundation.retrieveLivingNeighbours(featureVersion.getIsValidFromString(), fv_wkt_buffered);
 	}
-	
 	public String retrieveFirstFVUri()
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveNext(null);
 	}
-	
 	public String retrieveNextFVUri(MFeatureVersion fv)
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveNext(fv.getIsValidFromString());
 	}
-	
 	public ArrayList<String> retrieveFVPreviousesNeighbours(MFeatureVersion featureVersion, String graphUri, String fv_wkt_buffered)
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrievePreviousesNeighbours(featureVersion.getIsValidFromString(), fv_wkt_buffered, graphUri);
+		return ffoundation.retrieveLivingNeighbours(featureVersion.getIsValidFromString(), fv_wkt_buffered, graphUri);
 	}
-	
 	public String retrieveFirstFVUri(String graphUri)
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveNext(null,graphUri);
 	}
-	
 	public String retrieveNextFVUri(MFeatureVersion fv, String graphUri)
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveNext(fv.getIsValidFromString(), graphUri);
 	}
-	
 	public ArrayList<String> retrieveDateList(String graphUri)
 	{	
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveDateList(graphUri);
 	}
-	
-	public ArrayList<MFeatureVersion> retrieveByDate(String dateFrom, String graphUri, int lazyDepth) {
+	public ArrayList<MFeatureVersion> retrieveFVByDate(String dateFrom, String graphUri, int lazyDepth) {
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveByDate(dateFrom, graphUri, lazyDepth);
 	}
+	public Map<String, MFeatureVersion> retrieveVersionsListbyFeature(String featureUri) {
+		return null;
+	}
+	public ArrayList<MFeatureVersion> retriveFVConfirmers(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
+		FFeatureVersion ffoundation = new FFeatureVersion();
+		return ffoundation.retrieveConfirmers(featureVersion, dateTo, graphUri, lazyDepth);
+	}
+	
+	/*************************
+	 * 
+	 * Author FUNCTIONS
+	 *
+	 *************************/	
+	
+	public ArrayList<MAuthor> retriveAuthorConfirmers(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
+		FAuthor ffoundation = new FAuthor();
+		return ffoundation.retrieveConfirmers(featureVersion, dateTo, graphUri, lazyDepth);
+	}
+	
 	/*************************
 	 * xxxxxxxxxxxxxxxxxxxxxxx
 	 * x

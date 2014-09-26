@@ -1,6 +1,11 @@
 package modules.tandr.model;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
+import model.MAuthor;
 import model.MFeatureVersion;
+import modules.tandr.foundation.FTandrFacade;
 
 public abstract class MFAspect extends MFFactor {
 	
@@ -12,10 +17,35 @@ public abstract class MFAspect extends MFFactor {
 		super(value);
 	}
 
-	public abstract double calculate(MFeatureVersion featureVersion);
+	public abstract double calculateTrustworthiness(MFeatureVersion featureVersion);
+	public abstract String getEffectName();
+	public abstract String getAspectName();
+	
+	/**
+	 * get author's features versions
+	 * for eache fv
+	 * 		get the direct effect value
+	 * calculate the average and assign it to Trustworthiness 
+	 */
+	public double calculateReputation(MAuthor author,String untilDate) {
+
+		double repAspect = 0.0;
+		
+		FTandrFacade foundation = new FTandrFacade();
+		Map<String, Double> aspectList = foundation.getAspectList( this.getEffectName(), this.getAspectName(), author.getUri(),true);
+		
+		for (Entry<String, Double> aspect : aspectList.entrySet()) 
+			repAspect += aspect.getValue();
+		
+		if ( ! aspectList.entrySet().isEmpty() )
+			repAspect = repAspect / aspectList.entrySet().size();
+		else repAspect = 0.0;
+		
+		return repAspect;
+	}
 	
 	public String toString()	{
 		return this.getClass().getName();
 	}
-	
+
 }

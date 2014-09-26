@@ -55,8 +55,6 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		return reputationTriples;
 	}
 	
-	
-	@Override 	//TODO: correct value subgraph
 	public MReputation retrieveByURI(String reputationUri, String graphUri, int lazyDepth) {
 		
 		MReputationTandr reputation = new MReputationTandr();
@@ -69,9 +67,11 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
 		
 		queryString = ""
-				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:refersToAuthor     ?authorUri       } \n"
-				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:hasReputationValue ?reputationValue } \n"
-				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:computedAt         ?coumputedAt     } \n" ;
+				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:refersToAuthor     ?authorUri       }\n"
+				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:hasReputationValue ?value           .\n"
+				+ "\t\t           ?value                   tandr:ReputationsValueIs ?reputationValue .\n"
+				+ "\t\t           ?value                   tandr:computedAt         ?coumputedAt     }\n" 
+				;
 						
 		if (!graphUri.equals("")) queryString += "\t}\n";
 				
@@ -94,11 +94,11 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		return reputation;
 	}
 	
-	public Map<String,MFEffect> retrieveTrustworthinessEffectList(MReputation reputation) {
+	public Map<String,MFEffect> retrieveReputationEffectList(MReputation reputation) {
 		return feffect.retrieveReputationEffectList(reputation, "");
 	}
 	
-	public Map<String,MFEffect> retrieveTrustworthinessEffectList(MReputation reputation, String graphUri) {
+	public Map<String,MFEffect> retrieveReputationEffectList(MReputation reputation, String graphUri) {
 		return feffect.retrieveReputationEffectList(reputation, graphUri);
 	}
 	
@@ -116,7 +116,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		FFoundationFacade ffacade = new FFoundationFacade();
 		
 		RDFNode refersToAuthor = generalQueryResults.getResource("authorUri");
-		RDFNode reputationValue   = generalQueryResults.getLiteral("hasRputationValue");
+		RDFNode reputationValue   = generalQueryResults.getLiteral("reputationValue");
 		RDFNode computedAt  = generalQueryResults.getLiteral("computedAt");
 		
 		if (refersToAuthor != null){
