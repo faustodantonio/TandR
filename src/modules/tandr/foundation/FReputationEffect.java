@@ -3,6 +3,7 @@ package modules.tandr.foundation;
 import java.util.HashMap;
 import java.util.Map;
 
+import utility.UConfig;
 import utility.UDebug;
 
 import com.hp.hpl.jena.query.QuerySolution;
@@ -50,7 +51,9 @@ public class FReputationEffect {
 		if (temporalEffectRawResults == null)
 			effects.put("temporal", null );
 		else effects.put("temporal", this.elaborateTemporalEffects(temporalEffectRawResults) );
-			
+		
+//		System.out.print("\n\n Direct Effect Retrieved Value" + effects.get("direct").getValue());
+//		System.out.print(" \t Direct Effect Retrieved Date" + directEffect.getComputedAtString());
 		
 		return effects;
 	}
@@ -70,7 +73,7 @@ public class FReputationEffect {
 				+ "\t{ \n";
 		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
 		queryString += ""
-					+ "\t\t <"+reputationUri+">" + " hvgi:hasReputationEffect       ?effect     .\n"
+					+ "\t\t <"+reputationUri+">" + " tandr:hasReputationEffect       ?effect     .\n"
 				    + "\t\t  		?effect      tandr:hasEffectDescription  <http://parliament.semwebcentral.org/parliament#tandrEffectDirect> .\n"
 					+ "\t\t  		?effect      tandr:hasEffectValue        ?effectValue       .\n"
 					+ "\t\t         ?effectValue tandr:effectValueIs         ?directEffectValue .\n"
@@ -280,11 +283,11 @@ public class FReputationEffect {
 		temporalEffectRawResults.reset();
 		QuerySolution generalQueryResults = null;
 		Double temporalEffectValue = 0.0;
-		String temporalEffectComputed = "2005-09-15T21:42:44Z";
+		String temporalEffectComputed = UConfig.getMinDateTimeAsString();
 		if (temporalEffectRawResults.hasNext()){
 			generalQueryResults = temporalEffectRawResults.next();
 			temporalEffectValue  = Double.parseDouble( generalQueryResults.getLiteral("temporalEffectValue").toString().replace("^^http://www.w3.org/2001/XMLSchema#decimal", "") );
-			temporalEffectComputed  = generalQueryResults.getLiteral("effectComputedAt").toString().replace("^^http://www.w3.org/2001/XMLSchema#dateTime", "");
+			temporalEffectComputed  = generalQueryResults.getLiteral("computedAt").toString().replace("^^http://www.w3.org/2001/XMLSchema#dateTime", "");
 		}
 		
 		MFTemporalEffect temporalEffect = new MFTemporalEffect( temporalEffectValue );

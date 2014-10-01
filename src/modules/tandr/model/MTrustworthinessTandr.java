@@ -32,8 +32,7 @@ public class MTrustworthinessTandr extends MTrustworthiness{
 		FTrustworthinessTandr ftrustworthiness = new FTrustworthinessTandr();
 		Map<String, MFEffect> effects = ftrustworthiness.retrieveTrustworthinessEffectList(this,UConfig.getTANDRGraphURI());
 		
-		// TODO: Retrieving Trustworthiness value: MISS
-		
+		// Retrieving trustworthiness effects
 		if (effects.get("direct").equals("") || effects.get("direct") == null)
 			direct = new MFDirectEffect();
 		else direct = (MFDirectEffect) effects.get("direct");
@@ -46,7 +45,16 @@ public class MTrustworthinessTandr extends MTrustworthiness{
 			temporal = new MFTemporalEffect();
 		else temporal = (MFTemporalEffect) effects.get("temporal");
 		
-		this.setComputedAt(featureVersion.getIsValidFromString());
+		// Retrieving trustworthiness attributes
+		MTrustworthiness trust = ftrustworthiness.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 0); 
+		if (trust != null && trust.getUri() != null) {
+			this.value = trust.getValue();
+			this.setComputedAt( trust.getComputedAt() );
+		}
+		else {
+			this.value = 0.0;
+			this.setComputedAt(featureVersion.getIsValidFromString());
+		}
 	}
 
 	public MFDirectEffect getDirectEffect() {		

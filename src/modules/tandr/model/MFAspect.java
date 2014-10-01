@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import model.MAuthor;
-import model.MFeatureVersion;
 import modules.tandr.foundation.FTandrFacade;
 
 public abstract class MFAspect extends MFFactor {
@@ -17,7 +16,6 @@ public abstract class MFAspect extends MFFactor {
 		super(value);
 	}
 
-	public abstract double calculateTrustworthiness(MFeatureVersion featureVersion);
 	public abstract String getEffectName();
 	public abstract String getAspectName();
 	

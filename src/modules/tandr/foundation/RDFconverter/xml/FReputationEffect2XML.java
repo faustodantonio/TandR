@@ -61,7 +61,7 @@ public class FReputationEffect2XML {
 	private Element setElementAspectDescription(String classAspectUri)
 	{
 		Element hasAspectDescription = new Element("hasAspectDescription",this.namespaces.get("tandr"));
-		hasAspectDescription.setAttribute("resource", "http://parliament.semwebcentral.org/parliament#" + "tandrAspect_" + classAspectUri, namespaces.get("rdf"));
+		hasAspectDescription.setAttribute("resource", "http://parliament.semwebcentral.org/parliament#" + "tandrAspect" + classAspectUri, namespaces.get("rdf"));
 		return hasAspectDescription;
 	}
 	
@@ -92,7 +92,7 @@ public class FReputationEffect2XML {
 	private Element setElementEffectDescription(String classEffectUri)
 	{
 		Element hasEffectDescription = new Element("hasEffectDescription",this.namespaces.get("tandr"));
-		hasEffectDescription.setAttribute("resource", "http://parliament.semwebcentral.org/parliament#" + "tandrEffect_" + classEffectUri, namespaces.get("rdf"));
+		hasEffectDescription.setAttribute("resource", "http://parliament.semwebcentral.org/parliament#" + "tandrEffect" + classEffectUri, namespaces.get("rdf"));
 		return hasEffectDescription;
 	}
 	

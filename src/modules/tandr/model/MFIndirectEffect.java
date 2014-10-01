@@ -37,20 +37,20 @@ public class MFIndirectEffect extends MFEffect{
 		this.setComputedAt(UConfig.getMinDateTime());
 	}
 	
-	@Override
 	public double calculateTrustworthiness(MFeatureVersion featureVersion) {
+		return this.calculateTrustworthiness(featureVersion, null);
+	}
+	
+	public double calculateTrustworthiness(MFeatureVersion featureVersion, Date untilDate) {
 		
-		int dbgLevel = 1;
 		super.value = 0.0;
 		
+		// TODO: update temporal aspect
 		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateTrustworthiness(featureVersion));
 		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateTrustworthiness(featureVersion));
 		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateTrustworthiness(featureVersion));		
 		
-		UDebug.print("\t Indirect Trust : " + super.value, dbgLevel);
-		UDebug.print("(geom->" + this.geometricAspect  .getValue() + "; ", dbgLevel+1);
-		UDebug.print("qual->"  + this.qualitativeAspect.getValue() + "; ", dbgLevel+1);
-		UDebug.print("sem->"   + this.semanticAspect   .getValue() + ")", dbgLevel+1);
+		this.debugTIndirectInfo();
 		
 		return super.value;
 	}
@@ -68,7 +68,6 @@ public class MFIndirectEffect extends MFEffect{
 		return super.value;
 	}
 	
-	@Override
 	public double calculateReputation(MAuthor author, String untilDate) {
 		
 		super.value = 0.0;
@@ -118,4 +117,14 @@ public class MFIndirectEffect extends MFEffect{
 		this.semanticAspect.setComputedAt(isValidFrom);
     }
 
+    private void debugTIndirectInfo() {
+		int dbgLevel = 1;
+		
+		UDebug.print("\t Indirect Trust : " + super.value, dbgLevel);
+		UDebug.print("(geom->" + this.geometricAspect  .getValue() + "; ", dbgLevel+1);
+		UDebug.print("qual->"  + this.qualitativeAspect.getValue() + "; ", dbgLevel+1);
+		UDebug.print("sem->"   + this.semanticAspect   .getValue() + ")", dbgLevel+1);
+		
+    }
+    
 }

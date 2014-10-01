@@ -58,6 +58,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 	public MReputation retrieveByURI(String reputationUri, String graphUri, int lazyDepth) {
 		
 		MReputationTandr reputation = new MReputationTandr();
+		reputation.setUri(reputationUri);
 		
 		String queryString = ""
 				+ "\tSELECT * \n"
@@ -66,7 +67,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 				
 		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
 		
-		queryString = ""
+		queryString += ""
 				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:refersToAuthor     ?authorUri       }\n"
 				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:hasReputationValue ?value           .\n"
 				+ "\t\t           ?value                   tandr:ReputationsValueIs ?reputationValue .\n"
@@ -75,7 +76,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 						
 		if (!graphUri.equals("")) queryString += "\t}\n";
 				
-		queryString = ""
+		queryString += ""
 				+ "\t}";	
 		
 		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 3);
@@ -105,6 +106,9 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 	private MReputationTandr setReputationEffects(MReputationTandr reputation,String graphUri) {
 		Map<String,MFEffect> effects = new HashMap<String,MFEffect>();
 		effects = feffect.retrieveReputationEffectList(reputation,graphUri);
+		
+		System.out.print("\n\n Direct Effect Retrieved Value" + ((MFDirectEffect) effects.get("direct")).getValue() ) ;
+		
 		reputation.setDirectEffect((MFDirectEffect) effects.get("direct"));
 		reputation.setIndirectEffect((MFIndirectEffect) effects.get("indirect"));
 		reputation.setTemporalEffect((MFTemporalEffect) effects.get("temporal"));
@@ -128,7 +132,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		}
 		if (reputationValue != null)
 			reputation.setValue( Double.parseDouble(reputationValue.toString().replace("^^http://www.w3.org/2001/XMLSchema#decimal", "")));
-		if (computedAt != null)
+		if (computedAt != null && ! computedAt.toString().equals(""))
 			reputation.setComputedAt(computedAt.toString().replace("^^http://www.w3.org/2001/XMLSchema#dateTime", ""));		
 		
 		return reputation;

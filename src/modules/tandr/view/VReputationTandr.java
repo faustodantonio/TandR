@@ -18,12 +18,12 @@ public class VReputationTandr extends VReputation{
 //		FTandrFacade ffacade = new FTandrFacade();
 //		UDebug.print("\n\n" + ffacade.convertToRDFTTL(trust),4);
 		
-		MFDirectEffect direct = reputation.getDirectEffect();
+		MFDirectEffect   direct   = reputation.getDirectEffect();
 		MFIndirectEffect indirect = reputation.getIndirectEffect();
 		MFTemporalEffect temporal = reputation.getTemporalEffect();
 		
 		String trustInfo = ""
-				+ "Trustworthiness: " + reputation.getValueString() + " {"
+				+ "Reputation: " + reputation.getValueString() + " {"
 				+ "Direct: " + direct.getValue() + " "
 					+ "[geom->" + direct.getGeometricAspect().getValueString()
 					+ "; qual->" + direct.getQualitativeAspect().getValueString()

@@ -48,10 +48,10 @@ public class MReputation {
 	}
 	
 	public String generateReputationUri() {
-		return ""+UConfig.graphURI + "Reputation" + UConfig.module_trustworthiness_calculus + "_" + author.getAccountName();
+		return ""+UConfig.graphURI + "Reputation_" + UConfig.module_trustworthiness_calculus + "_" + author.getAccountName();
 	}
 	public String generateReputationUri(MAuthor contributor) {
-		return ""+UConfig.graphURI + "Reputation" + UConfig.module_trustworthiness_calculus + "_" + contributor.getAccountName();
+		return ""+UConfig.graphURI + "Reputation_" + UConfig.module_trustworthiness_calculus + "_" + contributor.getAccountName();
 	}
 	
 	public String getValueString() {

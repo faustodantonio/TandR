@@ -24,7 +24,6 @@ public class MFDirectQualAspect extends MFDirectAspect {
 //		this.buildRCCDistancesMap();
 	}
 
-	@Override
 	public double calculateTrustworthiness(ArrayList<MFeatureVersion> featureVersions, MFeatureVersion featureVersion) {
 		double t_dir_qual = 0.0;
 		

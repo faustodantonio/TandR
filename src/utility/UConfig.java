@@ -77,7 +77,7 @@ public class UConfig {
 	 * 3 -> Leave previous dataset, but deletes the computed T and R values *|*
 	 * 4 -> Restore dataset, leaving the computed T and R values            *|*
 	 */
-	public static int installation_mode = 3;
+	public static int installation_mode = 2;
 	
 	public static boolean graph_usage = true;
 	

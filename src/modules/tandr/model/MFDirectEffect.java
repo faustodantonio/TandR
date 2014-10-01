@@ -6,9 +6,7 @@ import java.util.Date;
 import utility.UConfig;
 import utility.UDebug;
 import model.MAuthor;
-import model.MFeature;
 import model.MFeatureVersion;
-import model.MTrustworthiness;
 
 public class MFDirectEffect extends MFEffect{
 
@@ -38,42 +36,24 @@ public class MFDirectEffect extends MFEffect{
 		this.setComputedAt(UConfig.getMinDateTime());
 	}
 	
-	@Override
-	public double calculateTrustworthiness(MFeatureVersion featureVersion) {
+	public double calculateTrustworthiness(ArrayList<MFeatureVersion> versions, MFeatureVersion featureVersion) {
 		
-		int dbgLevel = 1;
 		super.value = 0.0;
 		
 		// get all feature versions
-		MFeature feature = featureVersion.getFeature();
-		ArrayList<MFeatureVersion> versions = feature.getPreviousVersions(featureVersion.getVersionNo(), 0);
+//		MFeature feature = featureVersion.getFeature();
+//		ArrayList<MFeatureVersion> versions = feature.getPreviousVersions(featureVersion.getVersionNo(), 0);
 		
-		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(versions, featureVersion));		
+		this.geometricAspect.calculateAvgs(versions);
+		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(featureVersion));		
 		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(versions, featureVersion));
 		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateTrustworthiness(versions, featureVersion));
 		
-		UDebug.print("\t\t Direct Trust : "+ super.value, dbgLevel);
-		UDebug.print("(geom->" + this.geometricAspect  .getValue() + "; ", dbgLevel+1);
-		UDebug.print("qual->"  + this.qualitativeAspect.getValue() + "; ", dbgLevel+1);
-		UDebug.print("sem->"   + this.semanticAspect   .getValue() + ")", dbgLevel+1);
-		
-		for ( MFeatureVersion fv : versions) {			
-			MTrustworthiness trust;
-			if ( fv.getTrustworthiness() == null && (fv.getTrustworthinessUri() == null || fv.getTrustworthinessUri().equals("")) ) {
-				trust = new MTrustworthinessTandr( fv );
-			}else {
-				trust = fv.getTrustworthiness();
-			}
-			
-			trust.setComputedAt( featureVersion.getIsValidFromString() );
-			foundation.create(trust, UConfig.getTANDRGraphURI());
-			UDebug.log("\nCREATE Trustworthiness (upd): " + trust.getUri() ,4);
-		}
+		this.debugTDirectInfo();
 		
 		return super.value;
 	}
 	
-	@Override
 	public double calculateReputation(MAuthor author, String untilDate) {
 		
 		super.value = 0.0;
@@ -84,8 +64,6 @@ public class MFDirectEffect extends MFEffect{
 		
 		return super.value;
 	}
-
-	
 	
 	public MFDirectGeomAspect getGeometricAspect() {
 		return geometricAspect;
@@ -125,4 +103,14 @@ public class MFDirectEffect extends MFEffect{
 		this.semanticAspect.setComputedAt(isValidFrom);
     }
 
+    private void debugTDirectInfo() {
+		int dbgLevel = 1;
+		
+		UDebug.print("\t\t Direct Trust : "+ super.value, dbgLevel);
+		UDebug.print("(geom->" + this.geometricAspect  .getValue() + "; ", dbgLevel+1);
+		UDebug.print("qual->"  + this.qualitativeAspect.getValue() + "; ", dbgLevel+1);
+		UDebug.print("sem->"   + this.semanticAspect   .getValue() + ")", dbgLevel+1);
+		
+    }
+    
 }

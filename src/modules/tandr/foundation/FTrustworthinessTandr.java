@@ -59,6 +59,7 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 	public MTrustworthiness retrieveByURI(String trustworthinessUri, String graphUri, int lazyDepth) {
 		
 		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr();
+		trustworthiness.setUri(trustworthinessUri);
 		
 		String queryString = ""
 				+ "\tSELECT * \n"
@@ -67,7 +68,7 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 				
 		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
 		
-		queryString = ""
+		queryString += ""
 				+ "\t\tOPTIONAL { <"+trustworthinessUri+">" + " tandr:refersToFeatureState    ?featureVersionUri    }\n"
 				+ "\t\tOPTIONAL { <"+trustworthinessUri+">" + " tandr:hasTrustworthinessValue ?value                .\n"
 				+ "\t\t           ?value                        tandr:trustworthinessValueIs  ?trustworthinessValue .\n"
@@ -76,7 +77,7 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 						
 		if (!graphUri.equals("")) queryString += "\t}\n";
 				
-		queryString = ""
+		queryString += ""
 				+ "\t}";	
 		
 		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 3);
@@ -104,7 +105,7 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 				
 		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
 		
-		queryString = ""
+		queryString += ""
 				+ "\t\tOPTIONAL { ?trustworthinessUri    tandr:refersToFeatureState    <"+versionUri+">     }\n"
 				;
 		
@@ -164,7 +165,7 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 		}
 		if (trustworthinessValue != null)
 			trustworthiness.setValue( Double.parseDouble(trustworthinessValue.toString().replace("^^http://www.w3.org/2001/XMLSchema#decimal", "")));
-		if (computedAt != null)
+		if (computedAt != null && ! computedAt.toString().equals(""))
 			trustworthiness.setComputedAt(computedAt.toString().replace("^^http://www.w3.org/2001/XMLSchema#dateTime", ""));		
 		
 		return trustworthiness;

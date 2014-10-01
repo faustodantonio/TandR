@@ -8,6 +8,7 @@ import utility.UDebug;
 import foundation.FFoundationFacade;
 import model.MAuthor;
 import model.MReputation;
+import model.MTrustworthiness;
 import modules.tandr.foundation.FReputationTandr;
 
 public class MReputationTandr extends MReputation {
@@ -35,19 +36,28 @@ public class MReputationTandr extends MReputation {
 		FReputationTandr freputation = new FReputationTandr();
 		Map<String, MFEffect> effects = freputation.retrieveReputationEffectList(this, UConfig.getTANDRGraphURI());
 		
-		// TODO: Retrieving Reputation value: MISS
-		
 		if (effects.get("direct").equals("") || effects.get("direct") == null)
-		direct = (MFDirectEffect) effects.get("direct");
-		else direct = new MFDirectEffect();
+		direct = new MFDirectEffect();
+		else direct = (MFDirectEffect) effects.get("direct");
 		
 		if (effects.get("indirect").equals("") || effects.get("indirect") == null)
-			indirect = (MFIndirectEffect) effects.get("indirect");
-		else indirect = new MFIndirectEffect();
+		indirect = new MFIndirectEffect();
+		else indirect = (MFIndirectEffect) effects.get("indirect");
 		
 		if (effects.get("temporal").equals("") || effects.get("temporal") == null)
-			temporal = (MFTemporalEffect) effects.get("temporal");
-		else temporal = new MFTemporalEffect();	
+		temporal = new MFTemporalEffect();
+		else	temporal = (MFTemporalEffect) effects.get("temporal");
+		
+		// Retrieving trustworthiness attributes
+		MReputation rep = freputation.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 1); 
+		if (rep != null && rep.getUri() != null) {
+			this.value = rep.getValue();
+			this.setComputedAt( rep.getComputedAt() );
+		}
+		else {
+			this.value = 0.0;
+//			this.setComputedAt( UConfig.getMinDateTime() );
+		}
 	}
 	
 	public MFDirectEffect getDirectEffect() {

@@ -56,15 +56,17 @@ public class FAuthor extends FFoundationAbstract{
 		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
 		queryRawResults.reset();
 		
-		QuerySolution queryResults = queryRawResults.next();
-		
-		RDFNode accountName = queryResults.getLiteral("accountName");
-		RDFNode accountServerHomepage = queryResults.getLiteral("accountServerHomepage");
-		
-		author.setUri( authorURI );
-		author.setAccountName(accountName.toString().replace("^^http://www.w3.org/2001/XMLSchema#string", ""));
-		author.setAccountServerHomepage(accountServerHomepage.toString());
-		
+		if (queryRawResults.hasNext())
+		{
+			QuerySolution queryResults = queryRawResults.next();
+			
+			RDFNode accountName = queryResults.getLiteral("accountName");
+			RDFNode accountServerHomepage = queryResults.getLiteral("accountServerHomepage");
+			
+			author.setUri( authorURI );
+			author.setAccountName(accountName.toString().replace("^^http://www.w3.org/2001/XMLSchema#string", ""));
+			author.setAccountServerHomepage(accountServerHomepage.toString());
+		}
 		return author;
 	}
 
