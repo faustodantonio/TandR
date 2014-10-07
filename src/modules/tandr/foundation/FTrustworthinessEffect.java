@@ -184,6 +184,88 @@ public class FTrustworthinessEffect {
 		return queryRawResults;
 	}
 	
+	public Map<String,Double> getEffectList(String effect, String authorUri, boolean graphUri){
+		return this.getEffectList(effect, authorUri, UConfig.getMaxDateTimeAsString(), graphUri);
+	}
+	
+	public Map<String, Double> getEffectList(String effect, String authorUri, String maxDateTimeAsString, boolean graphUri) {
+		String queryString = ""
+				+ "\tSELECT DISTINCT ?fvUri ?effectValue ?effectComputedAt  \n"
+				+ "\tWHERE \n"
+				+ "\t{ \n";
+		
+		if (graphUri) queryString += "\t GRAPH " + UConfig.getTANDRGraphURI() + "  \n\t {\n";
+		queryString += ""
+					+ "\t\t ?trust tandr:refersToFeatureVersion     ?fvUri  .\n"
+					+ "\t\t ?trust tandr:hasTrustworthinessEffect   ?effect .\n"
+					
+				    + "\t\t ?effect       tandr:hasEffectDescription  ?EDescription                .\n"
+					+ "\t\t ?EDescription tandr:effectNameIs          \""+ effect +"\"^^xsd:string .\n"
+					
+				    + "\t\t ?effect       tandr:hasEffectValue        ?EValue                      .\n"
+					+ "\t\t ?EValue       tandr:effectValueIs         ?effectValue                 .\n"
+					+ "\t\t ?EValue       tandr:computedAt            ?effectComputedAt            .\n"
+					
+					;
+		if (graphUri) queryString += "\t }\n";
+		
+		queryString += ""
+				+ "\t { \n";
+		
+		queryString += this.buildEffectListSubquery(effect, authorUri, maxDateTimeAsString, graphUri); 
+		
+		queryString += ""
+				+ "\t }\n"
+				+ "\t}";
+		
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 4);
+		
+		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
+		
+		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",4);
+		queryRawResults.reset();
+		
+		return this.elaborateEffectList(queryRawResults);
+	}
+	
+	private String buildEffectListSubquery(String effect, String authorUri, String atDateTime, boolean graphUri)
+	{
+		String subqueryString = ""
+				+ "\t  SELECT DISTINCT ?fvUri (MAX(?effectTimeStamp) AS ?effectComputedAt )  \n"
+				+ "\t  WHERE \n"
+				+ "\t  { \n";
+		
+		if (graphUri) subqueryString += "\t   GRAPH " + UConfig.getVGIHGraphURI() + " \n\t   {\n";
+		subqueryString += ""
+				+ "\t\t   ?fvUri dcterms:contributor <"+authorUri+"> .\n";
+		if (graphUri) subqueryString += "\t   }\n";
+		
+		subqueryString += "\t\t \n";
+		
+		if (graphUri) subqueryString += "\t   GRAPH " + UConfig.getTANDRGraphURI() + "  \n\t   {\n";
+		subqueryString += ""
+					+ "\t\t   ?trust        tandr:refersToFeatureVersion     ?fvUri  .\n"
+					+ "\t\t   ?trust        tandr:hasTrustworthinessEffect   ?effect .\n"
+					
+				    + "\t\t   ?effect       tandr:hasEffectDescription  ?EDescription                .\n"
+					+ "\t\t   ?EDescription tandr:effectNameIs          \""+ effect +"\"^^xsd:string .\n"
+					
+				    + "\t\t   ?effect       tandr:hasEffectValue        ?EValue                      .\n"
+					+ "\t\t   ?EValue       tandr:effectValueIs         ?effectValue                 .\n"
+					+ "\t\t   ?EValue       tandr:computedAt            ?effectTimeStamp             .\n"
+					+ "\t\t   FILTER( ?effectTimeStamp  <= \""+atDateTime+"\"^^xsd:dateTime )             \n"
+
+					;
+		if (graphUri) subqueryString += "\t   }\n";
+		subqueryString += ""
+					+ "\t  }\n"
+					+ "\t  GROUP BY ?fvUri \n"
+					;
+		
+		return subqueryString;
+	}
+
 	public Map<String,Double> getAspectList(String effect, String aspect, String authorUri, boolean graphUri){
 		return this.getAspectList(effect, aspect, authorUri, UConfig.getMaxDateTimeAsString(), graphUri);
 	}
@@ -195,49 +277,79 @@ public class FTrustworthinessEffect {
 				+ "\tWHERE \n"
 				+ "\t{ \n";
 		
-		if (graphUri) queryString += "\t GRAPH graphs:hvgi \n\t {\n";
-		queryString += ""
-				+ "\t\t ?fvUri dcterms:contributor <"+authorUri+"> .\n";
-		if (graphUri) queryString += "\t }\n";
-		
-		queryString += "\t\t \n";
-		
-		if (graphUri) queryString += "\t GRAPH graphs:tandr \n\t {\n";
+		if (graphUri) queryString += "\t GRAPH " + UConfig.getTANDRGraphURI() + "  \n\t {\n";
 		queryString += ""
 					+ "\t\t ?trust tandr:refersToFeatureVersion     ?fvUri  .\n"
 					+ "\t\t ?trust tandr:hasTrustworthinessEffect ?effect   .\n"
-				    + "\t\t         ?effect       tandr:hasEffectDescription  ?EDescription                .\n"
-					+ "\t\t         ?EDescription tandr:effectNameIs          \""+ effect +"\"^^xsd:string .\n"
+				    + "\t\t ?effect       tandr:hasEffectDescription  ?EDescription                .\n"
+					+ "\t\t ?EDescription tandr:effectNameIs          \""+ effect +"\"^^xsd:string .\n"
 					+ "\t\t \n"
-					+ "\t\t         ?effect       tandr:hasTrustworthinessAspect ?aspect                      .\n"
-					+ "\t\t         ?aspect       tandr:hasAspectDescription     ?ADescription                .\n"
-					+ "\t\t         ?ADescription tandr:aspectNameIs             \""+ aspect +"\"^^xsd:string .\n"
-					+ "\t\t         ?aspect       tandr:hasAspectValue           ?AValue                      .\n"
-					+ "\t\t         ?AValue       tandr:aspectValueIs            ?aspectValue                 .\n"
-					+ "\t\t         { \n"
-					+ "\t\t             SELECT (MAX(?aspectTimeStamp) AS ?aspectComputedAt)\n"
-					+ "\t\t             WHERE { \n" ;
-					if (graphUri) queryString += "\t\t              GRAPH graphs:tandr {\n";
-		queryString += ""
-					+ "\t\t  		?AValue       tandr:computedAt               ?aspectTimeStamp            .\n";
-					if (graphUri) queryString += "\t\t              }\n";
-		queryString += ""
-					+ "\t\t              FILTER( ?aspectTimeStamp  < \""+atDateTime+"\"^^xsd:dateTime )      \n"
-					+ "\t\t             }\n"
-					+ "\t\t         } \n"
+					+ "\t\t ?effect       tandr:hasTrustworthinessAspect ?aspect                      .\n"
+					+ "\t\t ?aspect       tandr:hasAspectDescription     ?ADescription                .\n"
+					+ "\t\t ?ADescription tandr:aspectNameIs             \""+ aspect +"\"^^xsd:string .\n"
+					+ "\t\t ?aspect       tandr:hasAspectValue           ?AValue                      .\n"
+					+ "\t\t ?AValue       tandr:aspectValueIs            ?aspectValue                 .\n"
+					+ "\t\t ?AValue       tandr:computedAt               ?aspectComputedAt                 .\n"
 					;
 		if (graphUri) queryString += "\t }\n";
+		
 		queryString += ""
-					+ "\t FILTER( !isblank(?aspectComputedAt) ) \n"
-					+ "\t}";
+				+ "\t { \n";
+		
+		queryString += this.buildAspectListSubquery(effect, aspect, authorUri, atDateTime, graphUri); 
+		
+		queryString += ""
+				+ "\t }\n"
+				+ "\t}";
+		
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 4);
 		
 		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",4);
 		queryRawResults.reset();
 		
 		return this.elaborateAspectList(queryRawResults);
+	}
+	
+	private String buildAspectListSubquery(String effect, String aspect, String authorUri, String atDateTime, boolean graphUri)
+	{
+		String subqueryString = ""
+				+ "\t  SELECT DISTINCT ?fvUri (MAX(?aspectTimeStamp) AS ?aspectComputedAt )  \n"
+				+ "\t  WHERE \n"
+				+ "\t  { \n";
+		
+		if (graphUri) subqueryString += "\t   GRAPH " + UConfig.getVGIHGraphURI() + " \n\t   {\n";
+		subqueryString += ""
+				+ "\t\t   ?fvUri dcterms:contributor <"+authorUri+"> .\n";
+		if (graphUri) subqueryString += "\t   }\n";
+		
+		subqueryString += "\t\t \n";
+		
+		if (graphUri) subqueryString += "\t   GRAPH " + UConfig.getTANDRGraphURI() + "  \n\t   {\n";
+		subqueryString += ""
+					+ "\t\t   ?trust tandr:refersToFeatureVersion     ?fvUri  .\n"
+					+ "\t\t   ?trust tandr:hasTrustworthinessEffect ?effect   .\n"
+				    + "\t\t   ?effect       tandr:hasEffectDescription  ?EDescription                .\n"
+					+ "\t\t   ?EDescription tandr:effectNameIs          \""+ effect +"\"^^xsd:string .\n"
+					+ "\t\t \n"
+					+ "\t\t   ?effect       tandr:hasTrustworthinessAspect ?aspect                      .\n"
+					+ "\t\t   ?aspect       tandr:hasAspectDescription     ?ADescription                .\n"
+					+ "\t\t   ?ADescription tandr:aspectNameIs             \""+ aspect +"\"^^xsd:string .\n"
+					+ "\t\t   ?aspect       tandr:hasAspectValue           ?AValue                      .\n"
+					+ "\t\t   ?AValue       tandr:aspectValueIs            ?aspectValue                 .\n"
+					+ "\t\t   ?AValue       tandr:computedAt               ?aspectTimeStamp             .\n"
+					+ "\t\t   FILTER( ?aspectTimeStamp  <= \""+atDateTime+"\"^^xsd:dateTime )             \n"
+
+					;
+		if (graphUri) subqueryString += "\t   }\n";
+		subqueryString += ""
+					+ "\t  }\n"
+					+ "\t  GROUP BY ?fvUri \n"
+					;
+		
+		return subqueryString;
 	}
 	
 	/*************************
@@ -365,5 +477,24 @@ public class FTrustworthinessEffect {
 		
 		return aspectList;
 	}
+	
+	private Map<String,Double> elaborateEffectList(ResultSetRewindable effectRawResults) {
+		
+		Map<String,Double> effectList = new HashMap<String, Double>();
+		
+		effectRawResults.reset();
+		QuerySolution generalQueryResults = null;
+		
+		while (effectRawResults.hasNext()) {
+			generalQueryResults = effectRawResults.next();
+			
+			effectList.put(
+					generalQueryResults.getResource("fvUri").toString() , 
+					Double.parseDouble( generalQueryResults.getLiteral("effectValue").toString().replace("^^http://www.w3.org/2001/XMLSchema#decimal", "") )
+			);
+		}
+		
+		return effectList;
+	}	
 	
 }

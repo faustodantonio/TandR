@@ -2,7 +2,6 @@ package modules.tandr.model;
 
 import java.util.ArrayList;
 
-import model.MAuthor;
 import model.MFeatureVersion;
 
 public class MFDirectSemAspect extends MFDirectAspect {
@@ -30,13 +29,6 @@ public class MFDirectSemAspect extends MFDirectAspect {
 		
 		super.value = t_dir_sem;
 		return t_dir_sem;
-	}
-
-	@Override
-	public double calculateReputation(MAuthor author, String untilDate) {
-		double r_dir_sem = 1.0;
-		super.value = r_dir_sem;
-		return super.value;
 	}
 
 	@Override

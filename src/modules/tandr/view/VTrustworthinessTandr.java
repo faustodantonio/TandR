@@ -12,7 +12,10 @@ public class VTrustworthinessTandr extends VTrustworthiness{
 	@Override
 	public String getTrustworthinessString(MFeatureVersion fv) {
 		
-		MTrustworthinessTandr trust= new MTrustworthinessTandr(fv);
+		MTrustworthinessTandr trust;
+		if ( fv.getTrustworthiness() == null && (fv.getTrustworthinessUri() == null || fv.getTrustworthinessUri().equals("")) ) 
+			trust = new MTrustworthinessTandr( fv );
+		else trust = (MTrustworthinessTandr) fv.getTrustworthiness();
 		
 //		FTandrFacade ffacade = new FTandrFacade();
 //		UDebug.print("\n\n" + ffacade.convertToRDFTTL(trust),4);
@@ -23,17 +26,17 @@ public class VTrustworthinessTandr extends VTrustworthiness{
 		
 		String trustInfo = ""
 				+ "Trustworthiness: " + trust.getValueString() + " {"
-				+ "Direct: " + direct.getValue() + " "
-					+ "[geom->" + direct.getGeometricAspect().getValueString()
+				+ "Direct: "     + direct.getValueString() + " "
+					+ "[geom->"  + direct.getGeometricAspect().getValueString()
 					+ "; qual->" + direct.getQualitativeAspect().getValueString()
-					+ "; sem->" + direct.getSemanticAspect().getValueString()
+					+ "; sem->"  + direct.getSemanticAspect().getValueString()
 					+"] "
-				+ "Indirect: " + indirect.getValueString() + " "
-					+ "[geom->" + indirect.getGeometricAspect().getValueString()
+				+ "Indirect: "   + indirect.getValueString() + " "
+					+ "[geom->"  + indirect.getGeometricAspect().getValueString()
 					+ "; qual->" + indirect.getQualitativeAspect().getValueString()
-					+ "; sem->" + indirect.getSemanticAspect().getValueString()
+					+ "; sem->"  + indirect.getSemanticAspect().getValueString()
 					+"] "
-				+ "Temporal: " + temporal.getValueString() + " "
+				+ "Temporal: "   + temporal.getValueString() + " "
 				+ "}"
 				;
 		

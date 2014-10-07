@@ -22,16 +22,14 @@ public abstract class MFIndirectAspect extends MFAspect {
 	public abstract String getAspectName();
 	public abstract MFAspect fetchAspectFromReputation(MReputationTandr repo);
 
-	public double calculateTrustworthiness(MFeatureVersion featureVersion) {
+	public double calculateTrustworthiness(MReputationTandr authorReputation) {
 		
 		double t_ind_geom = 0.0;
 		
 		// get user reputation wrt indirect geometric aspect at date featureVersion.isValidFrom
-		MReputationTandr authorReputation = new MReputationTandr( featureVersion.getAuthor() );
-		
 		// assign to t_ind_geom the user reputation obtained 
 		//(this is the first time indirect geometric trustworthiness aspect is calculated.)
-		t_ind_geom = this.fetchAspectFromReputation((MReputationTandr) authorReputation).getValue();
+		t_ind_geom = this.fetchAspectFromReputation(authorReputation).getValue();
 		
 		super.value = t_ind_geom;
 		

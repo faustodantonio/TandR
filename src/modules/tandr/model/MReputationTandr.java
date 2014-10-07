@@ -4,11 +4,8 @@ import java.util.Date;
 import java.util.Map;
 
 import utility.UConfig;
-import utility.UDebug;
-import foundation.FFoundationFacade;
 import model.MAuthor;
 import model.MReputation;
-import model.MTrustworthiness;
 import modules.tandr.foundation.FReputationTandr;
 
 public class MReputationTandr extends MReputation {
@@ -27,7 +24,6 @@ public class MReputationTandr extends MReputation {
 	
 	public MReputationTandr(MAuthor author) {
 		this.sdf = UConfig.sdf;
-		this.foundation = new FFoundationFacade();
 		
 		this.setUri(this.generateReputationUri(author));
 		author.setReputation(this);
@@ -48,7 +44,7 @@ public class MReputationTandr extends MReputation {
 		temporal = new MFTemporalEffect();
 		else	temporal = (MFTemporalEffect) effects.get("temporal");
 		
-		// Retrieving trustworthiness attributes
+		// Retrieving reputation attributes
 		MReputation rep = freputation.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 1); 
 		if (rep != null && rep.getUri() != null) {
 			this.value = rep.getValue();
@@ -56,7 +52,7 @@ public class MReputationTandr extends MReputation {
 		}
 		else {
 			this.value = 0.0;
-//			this.setComputedAt( UConfig.getMinDateTime() );
+			this.setComputedAt( UConfig.getMinDateTime() );
 		}
 	}
 	
@@ -95,61 +91,3 @@ public class MReputationTandr extends MReputation {
     }
     
 }
-
-//	public MReputationTandr(MReputation reputation) {
-//		FReputationTandr freputation = new FReputationTandr();
-//		Map<String, MFEffect> effects = freputation.retrieveReputationEffectList(reputation);
-//		MAuthor author;
-//
-//		// manage if author has not yet been loaded 
-//		if (reputation.getAuthor() == null)
-//			author = (MAuthor) ffacade.retrieveByUri(reputation.getAuthorUri(), 1, MAuthor.class);
-//		else author = reputation.getAuthor();
-//		
-//		super.setUri(reputation.getUri());
-//		super.setComputedAt( reputation.getComputedAt() );
-//		super.setAuthorUri(reputation.getAuthorUri());
-//		super.setAuthor(author);
-//		super.setValue(reputation.getValue());
-//		
-//		if (effects.get("direct").equals("") || effects.get("direct") == null)
-//				direct = (MFDirectEffect) effects.get("direct");
-//		else direct = new MFDirectEffect();
-//		
-//		if (effects.get("indirect").equals("") || effects.get("indirect") == null)
-//			indirect = (MFIndirectEffect) effects.get("indirect");
-//		else indirect = new MFIndirectEffect();
-//		
-//		if (effects.get("temporal").equals("") || effects.get("temporal") == null)
-//			temporal = (MFTemporalEffect) effects.get("temporal");
-//		else temporal = new MFTemporalEffect();	
-//	}
-//	
-//	public MReputationTandr(MReputation reputation,String effectGraphUri) {
-//		FReputationTandr freputation = new FReputationTandr();
-//		Map<String, MFEffect> effects = freputation.retrieveReputationEffectList(reputation);
-//		MAuthor author;
-//
-//		// manage if author has not yet been loaded 
-//		if (reputation.getAuthor() == null)
-//			author = (MAuthor) ffacade.retrieveByUri(reputation.getAuthorUri(), 1, MAuthor.class);
-//		else author = reputation.getAuthor();
-//			
-//		super.setUri(reputation.getUri());
-//		super.setComputedAt( reputation.getComputedAt() );
-//		super.setAuthorUri(reputation.getAuthorUri());
-//		super.setAuthor(author);
-//		super.setValue(reputation.getValue());
-//		
-//		if (effects.get("direct").equals("") || effects.get("direct") == null)
-//				direct = (MFDirectEffect) effects.get("direct");
-//		else direct = new MFDirectEffect();
-//		
-//		if (effects.get("indirect").equals("") || effects.get("indirect") == null)
-//			indirect = (MFIndirectEffect) effects.get("indirect");
-//		else indirect = new MFIndirectEffect();
-//		
-//		if (effects.get("temporal").equals("") || effects.get("temporal") == null)
-//			temporal = (MFTemporalEffect) effects.get("temporal");
-//		else temporal = new MFTemporalEffect();		
-//	}

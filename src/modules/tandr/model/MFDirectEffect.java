@@ -14,9 +14,9 @@ public class MFDirectEffect extends MFEffect{
 	private MFDirectQualAspect qualitativeAspect;
 	private MFDirectSemAspect semanticAspect;
 	
-	private static double dirGeomWeight = 0.33;
-	private static double dirQualWeight = 0.33;
-	private static double dirSemWeight  = 0.33;
+	private static double dirGeomWeight = 0.3333333;
+	private static double dirQualWeight = 0.3333333;
+	private static double dirSemWeight  = 0.3333333;
 	
 	public MFDirectEffect() {
 		
@@ -44,12 +44,13 @@ public class MFDirectEffect extends MFEffect{
 //		MFeature feature = featureVersion.getFeature();
 //		ArrayList<MFeatureVersion> versions = feature.getPreviousVersions(featureVersion.getVersionNo(), 0);
 		
-		this.geometricAspect.calculateAvgs(versions);
+//		if ( featureVersion.isFirst() ) 			; // assign Reputation author's value
+		
+//		this.geometricAspect.calculateAvgs(versions);
+		this.geometricAspect.calculateWeightedAvgs(versions);
 		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(featureVersion));		
 		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(versions, featureVersion));
 		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateTrustworthiness(versions, featureVersion));
-		
-		this.debugTDirectInfo();
 		
 		return super.value;
 	}
@@ -103,14 +104,26 @@ public class MFDirectEffect extends MFEffect{
 		this.semanticAspect.setComputedAt(isValidFrom);
     }
 
-    private void debugTDirectInfo() {
-		int dbgLevel = 1;
+    public void debugTDirectInfo(int dbgLevel) {
 		
-		UDebug.print("\t\t Direct Trust : "+ super.value, dbgLevel);
-		UDebug.print("(geom->" + this.geometricAspect  .getValue() + "; ", dbgLevel+1);
-		UDebug.print("qual->"  + this.qualitativeAspect.getValue() + "; ", dbgLevel+1);
-		UDebug.print("sem->"   + this.semanticAspect   .getValue() + ")", dbgLevel+1);
-		
+		UDebug.print("Direct Trust : "+ super.getValueString(), dbgLevel);
+		UDebug.print("(geom->" + this.geometricAspect  .getValueString() + "; ", dbgLevel+1);
+		UDebug.print("qual->"  + this.qualitativeAspect.getValueString() + "; ", dbgLevel+1);
+		UDebug.print("sem->"   + this.semanticAspect   .getValueString() + ")", dbgLevel+1);
+
     }
+    
+    public void debugRDirectInfo(int dbgLevel) {
+
+		UDebug.print("Direct Rep   : "+ super.getValueString(), dbgLevel);
+		UDebug.print("(geom->" + this.geometricAspect  .getValueString() + "; ", dbgLevel+1);
+		UDebug.print("qual->"  + this.qualitativeAspect.getValueString() + "; ", dbgLevel+1);
+		UDebug.print("sem->"   + this.semanticAspect   .getValueString() + ")", dbgLevel+1);
+    }
+
+	@Override
+	public String getEffectName() {
+		return "Direct Effect";
+	}
     
 }

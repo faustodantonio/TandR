@@ -28,6 +28,10 @@ public class FTrustworthiness2XML {
 	public Document convertToRDFXML(MTrustworthiness trust) {
 		
 		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) trust;
+		
+		if (trust.getComputedAtString().equals(""))
+			trust.setComputedAt(UConfig.getMinDateTime());
+		
 		Document trustworthinessDoc = new Document();
 		Element root = new  Element("RDF",namespaces.get("rdf"));
 		ArrayList<Element> effectElementList = new ArrayList<Element>();

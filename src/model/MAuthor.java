@@ -39,15 +39,18 @@ public class MAuthor {
 	}
 	public MReputation getReputation() {
 		if (this.reputation == null) {
-			if (this.getReputationUri() != null && ! this.getReputationUri().equals(""))
-				this.setReputation( (MReputation) foundation.retrieveByUri(this.getReputationUri(), UConfig.getTANDRGraphURI(), 0, MReputation.class) );
-		} else this.reputation = null;
+			MReputation authorRep = (MReputation) foundation.retrieveByUri(this.getReputationUri(), UConfig.getTANDRGraphURI(), 0, MReputation.class) ;
+			authorRep.setAuthor(this);
+			this.setReputation( authorRep );
+		} 
 		return reputation;
 	}
 	public void setReputation(MReputation reputation) {
 		this.reputation = reputation;
 	}
 	public String getReputationUri() {
+		if (reputationUri == null || reputationUri.equals(""))
+			this.setReputationUri(this.generateReputationUri());
 		return reputationUri;
 	}
 	public void setReputationUri(String reputationUri) {
@@ -57,6 +60,9 @@ public class MAuthor {
 		this.reputationUri = reputationUri;
 		if (lazyDepth > 0)
 			this.setReputation( (MReputation) foundation.retrieveByUri(this.getReputationUri(), UConfig.getTANDRGraphURI(), lazyDepth - 1, MReputation.class) );
+	}
+	public String generateReputationUri() {
+		return ""+UConfig.graphURI + "Reputation_" + UConfig.module_trustworthiness_calculus + "_" + this.getAccountName();
 	}
 	
 	public String toString(String rowPrefix)

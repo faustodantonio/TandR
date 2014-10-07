@@ -30,16 +30,18 @@ public abstract class MFAspect extends MFFactor {
 		double repAspect = 0.0;
 		
 		FTandrFacade foundation = new FTandrFacade();
-		Map<String, Double> aspectList = foundation.getAspectList( this.getEffectName(), this.getAspectName(), author.getUri(),true);
+		Map<String, Double> aspectList = foundation.getAspectList( this.getEffectName(), this.getAspectName(), author.getUri(), untilDate, true);
 		
-		for (Entry<String, Double> aspect : aspectList.entrySet()) 
+		for (Entry<String, Double> aspect : aspectList.entrySet())
 			repAspect += aspect.getValue();
 		
 		if ( ! aspectList.entrySet().isEmpty() )
 			repAspect = repAspect / aspectList.entrySet().size();
 		else repAspect = 0.0;
 		
-		return repAspect;
+		this.value = repAspect;
+		
+		return this.value;
 	}
 	
 	public String toString()	{

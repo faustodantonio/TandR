@@ -13,7 +13,10 @@ public class VReputationTandr extends VReputation{
 	@Override
 	public String getReputationString(MAuthor author) {
 		
-		MReputationTandr reputation= new MReputationTandr(author);
+		MReputationTandr reputation;
+		if ( author.getReputation() == null && (author.getReputationUri() == null || author.getReputationUri() .equals("")) ) 
+			reputation = new MReputationTandr( author );
+		else reputation = (MReputationTandr) author.getReputation();
 		
 //		FTandrFacade ffacade = new FTandrFacade();
 //		UDebug.print("\n\n" + ffacade.convertToRDFTTL(trust),4);
@@ -24,17 +27,17 @@ public class VReputationTandr extends VReputation{
 		
 		String trustInfo = ""
 				+ "Reputation: " + reputation.getValueString() + " {"
-				+ "Direct: " + direct.getValue() + " "
-					+ "[geom->" + direct.getGeometricAspect().getValueString()
+				+ "Direct: "     + direct.getValueString() + " "
+					+ "[geom->"  + direct.getGeometricAspect().getValueString()
 					+ "; qual->" + direct.getQualitativeAspect().getValueString()
-					+ "; sem->" + direct.getSemanticAspect().getValueString()
+					+ "; sem->"  + direct.getSemanticAspect().getValueString()
 					+"] "
-				+ "Indirect: " + indirect.getValueString() + " "
-					+ "[geom->" + indirect.getGeometricAspect().getValueString()
+				+ "Indirect: "   + indirect.getValueString() + " "
+					+ "[geom->"  + indirect.getGeometricAspect().getValueString()
 					+ "; qual->" + indirect.getQualitativeAspect().getValueString()
-					+ "; sem->" + indirect.getSemanticAspect().getValueString()
+					+ "; sem->"  + indirect.getSemanticAspect().getValueString()
 					+"] "
-				+ "Temporal: " + temporal.getValueString() + " "
+				+ "Temporal: "   + temporal.getValueString() + " "
 				+ "}"
 				;
 		

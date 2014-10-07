@@ -15,7 +15,7 @@ public class UConfig {
 	
 	/*************************
 	 * 
-	 * Triplestore connection PARAMETERS
+	 * TripleStore connection PARAMETERS
 	 *
 	 *************************/	
 	
@@ -25,13 +25,13 @@ public class UConfig {
 	public static String datasetQueryURI_Fuseki = "http://semantic.net:3030/TandR_Model/query";
 	public static String datasetSPARQLQueryURI_Parliment = "http://semantic.net:8080/parliament/sparql";
 	public static String datasetBULKQueryURI_Parliment = "http://semantic.net:8080/parliament/bulk";
-		
-	/*************************
+	
+	/************************* 
 	 * 
-	 * Module selection PARAMETERS
-	 *
-	 *************************/	
-
+	 * Module selection PARAMETERS 
+	 * 
+	 *************************/ 
+	
 	public static String module_trustworthiness_calculus = "tandr";
 	
 	/**
@@ -43,15 +43,15 @@ public class UConfig {
 	 */
 	public static String view_trustworthiness = "view.VTrustworthinessTandr";	
 	/**
-	 * the referenced class has to implement foundaiton.FTrustworthinessExport interface
+	 * the referenced class has to implement foundation.FTrustworthinessExport interface
 	 */
 	public static String trustworthiness_export = "foundation.FTrustworthinessTandr";
 	/**
-	 * the referenced class has to implement foundaiton.FReputationExport interface
+	 * the referenced class has to implement foundation.FReputationExport interface
 	 */
 	public static String reputation_export = "foundation.FReputationTandr";
 	/**
-	 * the referenced class has to extend foundaiton.FTrustworthinessExport class
+	 * the referenced class has to extend foundation.FTrustworthinessExport class
 	 */
 	public static String tandr_import = "foundation.FTandR";
 	
@@ -62,6 +62,7 @@ public class UConfig {
 	 *************************/
 	
 	public static String generalOutputFilePath = "./output/test.txt";
+	@SuppressWarnings("deprecation")
 	public static String logFilePath = "./output/log_test_"+ new Date().toGMTString().trim() +".txt";
 	
 	/*************************
@@ -77,7 +78,7 @@ public class UConfig {
 	 * 3 -> Leave previous dataset, but deletes the computed T and R values *|*
 	 * 4 -> Restore dataset, leaving the computed T and R values            *|*
 	 */
-	public static int installation_mode = 2;
+	public static int installation_mode = 3;
 	
 	public static boolean graph_usage = true;
 	
@@ -89,7 +90,8 @@ public class UConfig {
 //	public static String hvgiGraph = "hvgi_laquila";
 //	public static String tandrGraph = "tandr_laquila";
 	
-	public static String inputRDFfilesDirectory = "/opt/lampp/htdocs/data/hvgi/";
+//	public static String inputRDFfilesDirectory = "/opt/lampp/htdocs/data/hvgi/";
+	public static String inputRDFfilesDirectory = "./input/test/";
 	public static String inputRDFfileRegex = ".*.rdf";
 	
 	/*************************
@@ -126,6 +128,7 @@ public class UConfig {
 //	public static String epsg_crs = "900913";
 	public static String epsg_crs = "4326";
 	public static double featureInfluenceRadius = 50;
+	public static double temporalCurveSlope = 10000000000.0;
 	
 	public static HashMap<String, Namespace> namespaces;
 

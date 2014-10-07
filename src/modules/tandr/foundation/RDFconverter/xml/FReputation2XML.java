@@ -28,6 +28,10 @@ public class FReputation2XML {
 	public Document convertToRDFXML(MReputation rep) {
 		
 		MReputationTandr reputation = (MReputationTandr) rep;
+		
+		if (rep.getComputedAtString().equals(""))
+			rep.setComputedAt(UConfig.getMinDateTime());
+		
 		Document reputationDoc = new Document();
 		Element root = new  Element("RDF",namespaces.get("rdf"));
 		ArrayList<Element> effectElementList = new ArrayList<Element>();

@@ -14,9 +14,9 @@ public class MFIndirectEffect extends MFEffect{
 	private MFIndirectQualAspect qualitativeAspect;
 	private MFIndirectSemAspect semanticAspect;
 	
-	private static double indGeomWeight = 0.33;
-	private static double indQualWeight = 0.33;
-	private static double indSemWeight  = 0.33;
+	private static double indGeomWeight = 0.3333333;
+	private static double indQualWeight = 0.3333333;
+	private static double indSemWeight  = 0.3333333;
 	
 	public MFIndirectEffect() {
 		
@@ -45,12 +45,12 @@ public class MFIndirectEffect extends MFEffect{
 		
 		super.value = 0.0;
 		
-		// TODO: update temporal aspect
-		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateTrustworthiness(featureVersion));
-		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateTrustworthiness(featureVersion));
-		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateTrustworthiness(featureVersion));		
+		MReputationTandr authorReputation = new MReputationTandr( featureVersion.getAuthor() );
 		
-		this.debugTIndirectInfo();
+		// TODO: update temporal aspect
+		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateTrustworthiness(authorReputation));
+		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateTrustworthiness(authorReputation));
+		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateTrustworthiness(authorReputation));	
 		
 		return super.value;
 	}
@@ -75,7 +75,7 @@ public class MFIndirectEffect extends MFEffect{
 		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
 		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
 		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));		
-		
+
 		return super.value;
 	}
 	
@@ -117,14 +117,27 @@ public class MFIndirectEffect extends MFEffect{
 		this.semanticAspect.setComputedAt(isValidFrom);
     }
 
-    private void debugTIndirectInfo() {
-		int dbgLevel = 1;
+    public void debugTIndirectInfo(int dbgLevel) {
 		
-		UDebug.print("\t Indirect Trust : " + super.value, dbgLevel);
-		UDebug.print("(geom->" + this.geometricAspect  .getValue() + "; ", dbgLevel+1);
-		UDebug.print("qual->"  + this.qualitativeAspect.getValue() + "; ", dbgLevel+1);
-		UDebug.print("sem->"   + this.semanticAspect   .getValue() + ")", dbgLevel+1);
+		UDebug.print("\t Indirect Trust : " + super.getValueString(), dbgLevel);
+		UDebug.print("(geom->" + this.geometricAspect  .getValueString() + "; ", dbgLevel+1);
+		UDebug.print("qual->"  + this.qualitativeAspect.getValueString() + "; ", dbgLevel+1);
+		UDebug.print("sem->"   + this.semanticAspect   .getValueString() + ")", dbgLevel+1);
 		
     }
     
+    public void debugRIndirectInfo(int dbgLevel) {
+		
+		UDebug.print("\t Indirect Rep   : " + super.getValueString(), dbgLevel);
+		UDebug.print("(geom->" + this.geometricAspect  .getValueString() + "; ", dbgLevel+1);
+		UDebug.print("qual->"  + this.qualitativeAspect.getValueString() + "; ", dbgLevel+1);
+		UDebug.print("sem->"   + this.semanticAspect   .getValueString() + ")", dbgLevel+1);
+		
+    }
+    
+	@Override
+	public String getEffectName() {
+		return "Indirect Effect";
+	}
+	
 }

@@ -275,6 +275,8 @@ public abstract class FFoundationAbstract {
 			StringReader inTriples = new StringReader(xmlTriples);
 			StringWriter outTriples = new StringWriter();
 			
+			UDebug.print( "\n\n" + xmlTriples, 10);
+			
 			Model tripleModel = ModelFactory.createDefaultModel();
 			tripleModel.read(inTriples, null, "RDF/XML");
 			

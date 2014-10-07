@@ -61,7 +61,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		reputation.setUri(reputationUri);
 		
 		String queryString = ""
-				+ "\tSELECT * \n"
+				+ "\tSELECT ?authorUri ?reputationValue ?computedAt \n"
 				+ "\tWHERE \n"
 				+ "\t{ \n";
 				
@@ -70,21 +70,23 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		queryString += ""
 				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:refersToAuthor     ?authorUri       }\n"
 				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:hasReputationValue ?value           .\n"
-				+ "\t\t           ?value                   tandr:ReputationsValueIs ?reputationValue .\n"
-				+ "\t\t           ?value                   tandr:computedAt         ?coumputedAt     }\n" 
+				+ "\t\t           ?value                   tandr:reputationValueIs  ?reputationValue .\n"
+				+ "\t\t           ?value                   tandr:computedAt         ?computedAt     }\n" 
 				;
 						
 		if (!graphUri.equals("")) queryString += "\t}\n";
 				
 		queryString += ""
-				+ "\t}";	
+				+ "\t}"
+				+ "\tORDER BY DESC(?computedAt) \n"
+				+ "\tLIMIT 1 \n";	
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 3);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 4);
 		
 		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",4);
 		queryRawResults.reset();
 		
 		QuerySolution generalQueryResults = queryRawResults.next();
@@ -107,7 +109,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		Map<String,MFEffect> effects = new HashMap<String,MFEffect>();
 		effects = feffect.retrieveReputationEffectList(reputation,graphUri);
 		
-		System.out.print("\n\n Direct Effect Retrieved Value" + ((MFDirectEffect) effects.get("direct")).getValue() ) ;
+//		System.out.print("\n\n Direct Effect Retrieved Value" + ((MFDirectEffect) effects.get("direct")).getValue() ) ;
 		
 		reputation.setDirectEffect((MFDirectEffect) effects.get("direct"));
 		reputation.setIndirectEffect((MFIndirectEffect) effects.get("indirect"));
@@ -119,9 +121,9 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		
 		FFoundationFacade ffacade = new FFoundationFacade();
 		
-		RDFNode refersToAuthor = generalQueryResults.getResource("authorUri");
-		RDFNode reputationValue   = generalQueryResults.getLiteral("reputationValue");
-		RDFNode computedAt  = generalQueryResults.getLiteral("computedAt");
+		RDFNode refersToAuthor  = generalQueryResults.getResource("authorUri");
+		RDFNode reputationValue = generalQueryResults.getLiteral("reputationValue");
+		RDFNode computedAt      = generalQueryResults.getLiteral("computedAt");
 		
 		if (refersToAuthor != null){
 			reputation.setAuthorUri(refersToAuthor.toString());

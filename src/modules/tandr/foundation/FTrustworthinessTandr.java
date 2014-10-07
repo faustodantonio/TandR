@@ -78,9 +78,11 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 		if (!graphUri.equals("")) queryString += "\t}\n";
 				
 		queryString += ""
-				+ "\t}";	
+				+ "\t}"
+				+ "\tORDER BY DESC(?computedAt) \n"
+				+ "\tLIMIT 1 \n";		
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 3);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 4);
 		
 		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
 		
@@ -185,6 +187,22 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 	
 	public Map<String,Double> getAspectList(String effect, String aspect, String authorUri) {
 		return this.feffect.getAspectList(effect, aspect, authorUri, false);
+	}
+
+	public Map<String,Double> getEffectList(String effect, String authorUri, String atDateTime, boolean graphUri) {
+		return this.feffect.getEffectList(effect, authorUri, atDateTime, graphUri);
 	};
+	
+	public Map<String,Double> getEffectList(String effect, String authorUri, boolean graphUri) {
+		return this.feffect.getEffectList(effect, authorUri, graphUri);
+	};
+	
+	public Map<String,Double> getEffectList(String effect, String authorUri, String atDateTime) {
+		return this.feffect.getEffectList(effect, authorUri, atDateTime, false);
+	};
+	
+	public Map<String,Double> getEffectList(String effect, String authorUri) {
+		return this.feffect.getEffectList(effect, authorUri, false);
+	}
 	
 }

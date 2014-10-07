@@ -75,9 +75,10 @@ public class CTRCalculus {
 			UDebug.print("Retriving features versions for date " + date + " (" + countDate + " of " + dates.size() + ").", 3);
 			ArrayList<MFeatureVersion> fvs = new ArrayList<MFeatureVersion>();
 			fvs = ffacade.retrieveFVByDate(date, vgihGraphUri, 1);
-			UDebug.print("\t # features versions retrieved "+fvs.size()+"\n",1);
+			UDebug.print("\t\t # features versions retrieved "+fvs.size()+"\n",1);
 			for (MFeatureVersion featureVersion : fvs) {
-				UDebug.print("\t\t # feature version retrieved uri "+ featureVersion.getUri() +"\n",1);
+				UDebug.print("\t * feature version "+ featureVersion.getUriID() +"",1);
+				UDebug.print("\t * author "+ featureVersion.getAuthor().getAccountName() +"\n",1);
 				this.compute(featureVersion);
 			}
 			countFvs = countFvs + fvs.size();
