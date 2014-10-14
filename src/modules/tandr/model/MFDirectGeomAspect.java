@@ -103,12 +103,9 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 	}
 	
 	public void calculateWeightedAvgs(ArrayList<MFeatureVersion> featureVersions) {
-		
-		if ( this.prevVersions == null || ! ( this.prevVersions.containsAll(featureVersions) && featureVersions.containsAll(prevVersions)) ) {
-			
+		if ( this.prevVersions == null || (! ( this.prevVersions.containsAll(featureVersions) && featureVersions.containsAll(prevVersions)) )) {
 			this.setPrevVersions(featureVersions);
-			this.calculateWeightedAvgs();
-			
+			this.calculateWeightedAvgs();			
 		}
 	}
 	
@@ -144,7 +141,7 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 		double totNoVertices = 0.0;
 		
 		double totReputations = 0.0;
-		
+
 		if (prevVersions.size() != 0) {
 			
 			for ( MFeatureVersion fv : prevVersions) {
@@ -158,9 +155,16 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 				totReputations += reputation.getValue();
 			}
 			
-			this.avgArea       = totArea       / totReputations;
-			this.avgPerimeter  = totPerimeter  / totReputations;
-			this.avgNoVertices = totNoVertices / totReputations;
+			if (totReputations != 0.0) {
+				this.avgArea       = totArea       / totReputations;
+				this.avgPerimeter  = totPerimeter  / totReputations;
+				this.avgNoVertices = totNoVertices / totReputations;
+			} else {
+				this.avgArea       = 0.0;
+				this.avgPerimeter  = 0.0;
+				this.avgNoVertices = 0.0;
+			}
+			
 		} else {
 			this.avgArea       = 0.0;
 			this.avgPerimeter  = 0.0;

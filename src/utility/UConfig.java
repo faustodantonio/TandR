@@ -74,24 +74,28 @@ public class UConfig {
 	/**
 	 * 0 -> Never perform installation (DEFAULT)                            *|*  
 	 * 1 -> Perform installation whether it has not yet been performed      *|*  
-	 * 2 -> Perform installation, it deletes the previouses installed data  *|*
+	 * 2 -> Perform installation, deleting the previouses installed data  *|*
 	 * 3 -> Leave previous dataset, but deletes the computed T and R values *|*
 	 * 4 -> Restore dataset, leaving the computed T and R values            *|*
 	 */
-	public static int installation_mode = 3;
+	public static int installation_mode = 2;
 	
 	public static boolean graph_usage = true;
 	
 	public static String graphURI = "http://parliament.semwebcentral.org/parliament#";
-	public static String hvgiGraph = "hvgi_test";
-	public static String tandrGraph = "tandr_test";
-//	public static String hvgiGraph = "hvgi_wien";
-//	public static String tandrGraph = "tandr_wien";
+	
+//	public static String hvgiGraph = "hvgi_test";
+//	public static String tandrGraph = "tandr_test";
+//	public static String inputRDFfilesDirectory = "./input/test/";
+	
+	public static String hvgiGraph = "hvgi_wien";
+	public static String tandrGraph = "tandr_wien";
+	public static String inputRDFfilesDirectory = "./input/wien/";
+	
 //	public static String hvgiGraph = "hvgi_laquila";
 //	public static String tandrGraph = "tandr_laquila";
-	
-//	public static String inputRDFfilesDirectory = "/opt/lampp/htdocs/data/hvgi/";
-	public static String inputRDFfilesDirectory = "./input/test/";
+//	public static String inputRDFfilesDirectory = "./input/laquila/";	
+
 	public static String inputRDFfileRegex = ".*.rdf";
 	
 	/*************************

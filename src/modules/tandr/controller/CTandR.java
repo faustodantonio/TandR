@@ -68,13 +68,7 @@ public class CTandR extends CCalculusAbstract{
 	private MTrustworthinessTandr calculateFirstVersionTrustworthiness(MFeatureVersion featureVersion) {
 		
 		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) featureVersion.getTrustworthiness();
-		MReputationTandr reputation = (MReputationTandr) featureVersion.getAuthor().getReputation();
-		
-//		UDebug.print("\n\n" + ffacade.convertToRDFTTL(reputation) +"\n\n",4);
-//		UDebug.print("\n\n" + reputation.getUri() +"\n",3);
-//		UDebug.print("" + reputation.getValueString() +"\n",3);
-//		UDebug.print("" + ffacade.convertToRDFTTL(reputation) +"\n",4);
-		
+		MReputationTandr reputation = (MReputationTandr) featureVersion.getAuthor().getReputation();		
 		
 		trustworthiness.getDirectEffect().getGeometricAspect().setValue(   reputation.getDirectEffect().getGeometricAspect().getValue()   );
 		trustworthiness.getDirectEffect().getQualitativeAspect().setValue( reputation.getDirectEffect().getQualitativeAspect().getValue() );
@@ -214,9 +208,9 @@ public class CTandR extends CCalculusAbstract{
 		int dbgLevel = 1;
 		UDebug.print("\t Trust :"+ trustworthiness.getValueString() +"\t [ ", dbgLevel);
 		
-		trustworthiness.getDirectEffect().debugTDirectInfo(dbgLevel);
-		trustworthiness.getIndirectEffect().debugTIndirectInfo(dbgLevel);
-		trustworthiness.getTemporalEffect().debugTTemporalInfo(dbgLevel);
+		trustworthiness.getDirectEffect().debugTDirectInfo(dbgLevel+1);
+		trustworthiness.getIndirectEffect().debugTIndirectInfo(dbgLevel+1);
+		trustworthiness.getTemporalEffect().debugTTemporalInfo(dbgLevel+1);
 		
 		UDebug.print(" ]" + "\n", dbgLevel);
 	}
@@ -226,9 +220,9 @@ public class CTandR extends CCalculusAbstract{
 		int dbgLevel = 1;
 		UDebug.print("\t Rep   :"+ reputation.getValueString() +"\t [ ", dbgLevel);
 		
-		reputation.getDirectEffect().debugRDirectInfo(dbgLevel);
-		reputation.getIndirectEffect().debugRIndirectInfo(dbgLevel);
-		reputation.getTemporalEffect().debugRTemporalInfo(dbgLevel);
+		reputation.getDirectEffect().debugRDirectInfo(dbgLevel+1);
+		reputation.getIndirectEffect().debugRIndirectInfo(dbgLevel+1);
+		reputation.getTemporalEffect().debugRTemporalInfo(dbgLevel+1);
 		
 		UDebug.print(" ]" + "\n", dbgLevel);
 	}

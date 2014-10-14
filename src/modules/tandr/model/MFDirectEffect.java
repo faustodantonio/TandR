@@ -40,13 +40,6 @@ public class MFDirectEffect extends MFEffect{
 		
 		super.value = 0.0;
 		
-		// get all feature versions
-//		MFeature feature = featureVersion.getFeature();
-//		ArrayList<MFeatureVersion> versions = feature.getPreviousVersions(featureVersion.getVersionNo(), 0);
-		
-//		if ( featureVersion.isFirst() ) 			; // assign Reputation author's value
-		
-//		this.geometricAspect.calculateAvgs(versions);
 		this.geometricAspect.calculateWeightedAvgs(versions);
 		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(featureVersion));		
 		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(versions, featureVersion));
