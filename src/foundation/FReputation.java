@@ -24,6 +24,16 @@ public class FReputation extends FFoundationAbstract {
 		return fReputationExport.convertToRDFXML((MReputation) obj);
 	}
 	
+	public boolean create(MReputation reputation, String graph) {
+		FReputationExport fReputationExport = this.getFReputationExport();
+		return fReputationExport.create(reputation, graph);
+	}
+	
+	public MReputation getMaximumReputation(String computedAt) {
+		FReputationExport fReputationExport = this.getFReputationExport();
+		return fReputationExport.getMaximumReputation(computedAt);
+	}
+	
 	private FReputationExport getFReputationExport(){
 		
 		FReputationExport fReputationExport;

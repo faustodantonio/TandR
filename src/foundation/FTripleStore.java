@@ -45,8 +45,11 @@ public abstract class FTripleStore {
 		
 		String prefixes = "\n";
 		
-		for (Entry<String, Namespace> namespace : UConfig.namespaces.entrySet())
-			prefixes += "PREFIX " + namespace.getKey() + ": \t\t <" + namespace.getValue().getURI() +">\n" ;
+		for (Entry<String, Namespace> namespace : UConfig.namespaces.entrySet()) {
+			prefixes += "PREFIX " + namespace.getKey() + ": \t";
+			if(namespace.getKey().length() < 7) prefixes +=  "\t";
+			prefixes +=  " <" + namespace.getValue().getURI() +">\n" ;
+		}
 		
 		UDebug.print(prefixes, 6);
 		

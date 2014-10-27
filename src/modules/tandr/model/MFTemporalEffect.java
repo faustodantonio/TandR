@@ -164,4 +164,11 @@ public class MFTemporalEffect extends MFEffect{
 	public String getEffectName() {
 		return "Temporal Effect";
 	}
+
+	public double validateTrustworthiness(MFeatureVersion fv1, MFeatureVersion fv2) {
+		
+		super.value = 1;
+		
+		return super.value;
+	}
 }

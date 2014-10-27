@@ -5,6 +5,7 @@ import java.util.Map;
 
 import model.MAuthor;
 import model.MFeatureVersion;
+import model.MReputation;
 
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -309,6 +310,52 @@ public class FFoundationFacade {
 	public ArrayList<MAuthor> retriveAuthorConfirmers(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
 		FAuthor ffoundation = new FAuthor();
 		return ffoundation.retrieveConfirmers(featureVersion, dateTo, graphUri, lazyDepth);
+	}
+	
+	public MReputation getMaximumReputation(String computedAt) {
+		FReputation ffoundation = new FReputation();
+		return ffoundation.getMaximumReputation(computedAt);
+	}
+	
+	/*************************
+	 * 
+	 * Validation FUNCTIONS
+	 *
+	 *************************/	
+
+	public Map<String,String> getIntersectedFV(String wktAuthority) {
+		FValidation fauthority = new FValidation();
+		return fauthority.getIntersectedFV(wktAuthority);
+	}
+	public Map<String,String> getIntersectedFV(String wktAuthority,String graphUri) {
+		FValidation fauthority = new FValidation();
+		return fauthority.getIntersectedFV(wktAuthority,graphUri);
+	}
+	
+	public String retrieveLowestTrustworthyFVUri(String featureUri, String hvgiGraphUri, String tandrGraphUri) {
+		FValidation fvalidation = new FValidation();
+		return fvalidation.retrieveLowestTrustworthyFVUri(featureUri, hvgiGraphUri, tandrGraphUri);
+	}
+	public String retrieveAverageTrustworthyFVUri(String featureUri, String hvgiGraphUri, String tandrGraphUri) {
+		FValidation fvalidation = new FValidation();
+		return fvalidation.retrieveAverageTrustworthyFVUri(featureUri, hvgiGraphUri, tandrGraphUri);
+	}
+	public String retrieveHighestTrustworthyFVUri(String featureUri, String hvgiGraphUri, String tandrGraphUri) {
+		FValidation fvalidation = new FValidation();
+		return fvalidation.retrieveHighestTrustworthyFVUri(featureUri, hvgiGraphUri, tandrGraphUri);
+	}
+	
+	public MFeatureVersion retrieveLowestTrustworthyFV(String featureUri, String hvgiGraphUri, String tandrGraphUri) {
+		FValidation fvalidation = new FValidation();
+		return fvalidation.retrieveLowestTrustworthyFV(featureUri, hvgiGraphUri, tandrGraphUri);
+	}
+	public MFeatureVersion retrieveAverageTrustworthyFV(String featureUri, String hvgiGraphUri, String tandrGraphUri) {
+		FValidation fvalidation = new FValidation();
+		return fvalidation.retrieveAverageTrustworthyFV(featureUri, hvgiGraphUri, tandrGraphUri);
+	}
+	public MFeatureVersion retrieveHighestTrustworthyFV(String featureUri, String hvgiGraphUri, String tandrGraphUri) {
+		FValidation fvalidation = new FValidation();
+		return fvalidation.retrieveHighestTrustworthyFV(featureUri, hvgiGraphUri, tandrGraphUri);
 	}
 	
 	/*************************

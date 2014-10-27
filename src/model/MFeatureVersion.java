@@ -13,6 +13,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.WKTWriter;
 
 import foundation.FFoundationFacade;
 
@@ -117,6 +118,39 @@ public class MFeatureVersion {
 		if (lazyDepth>0)
 			this.setFeature( (MFeature) foundation.retrieveByUri(featureUri, UConfig.getVGIHGraphURI(), lazyDepth - 1, MFeature.class) );
 	}
+	
+	
+	public String generateUri() {
+		
+		String featureID = "";
+		String versionID = "";
+		
+		UDebug.print("\n\nFeature URI: " + this.getFeatureUri(), 1);
+		
+		if ( this.getGeometry().getGeometryType().equals("Point") )
+			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
+		else if ( this.getGeometry().getGeometryType().equals("LineString") )
+			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
+		else
+			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
+		
+//		featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
+//		featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
+//		featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
+		
+		versionID = this.versionNo;
+		
+		if ( this.getGeometry().getGeometryType().equals("Point") )
+			this.setUri( "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion" + featureID + "_" + versionID );
+		else if ( this.getGeometry().getGeometryType().equals("LineString") )
+			this.setUri( "http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion" + featureID + "_" + versionID);
+		else
+			this.setUri( "http://semantic.web/data/hvgi/featureVersions.rdf#featureVersion" + featureID + "_" + versionID);
+		
+		return this.getUri();
+	}
+	
+	
 	public MFeature getFeature() {
 		if (this.feature == null) {
 			if (this.getFeatureUri() != null && ! this.getFeatureUri().equals(""))
@@ -266,10 +300,14 @@ public class MFeatureVersion {
 	}
 	public void setGeometry(Geometry the_geom) {
 		this.geometry = the_geom;
+		
+		WKTWriter writer = new WKTWriter();
+		this.wktGeometry = writer.write(the_geom);
 	}
 	public void setGeometry(String wktGeometry) {
 		try {
 			this.geometry = new WKTReader().read(wktGeometry);
+			this.setWktGeometry(wktGeometry);
 		} catch (com.vividsolutions.jts.io.ParseException e1) {
 			UDebug.print("\n*** ERROR: wkt geometry bad formatted\nCorrection Attempt #1",1);
 			UDebug.print("\n*** ERROR: " + e1.getMessage(),2);

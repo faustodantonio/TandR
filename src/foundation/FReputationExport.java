@@ -11,5 +11,7 @@ public interface FReputationExport {
 
 	public abstract String convertToRDFXML(MReputation trustworthiness);
 	public abstract MReputation retrieveByURI(String reputationUri,String graphUri, int lazyDepth);
+	public abstract MReputation getMaximumReputation(String computedAt);
+	public abstract boolean create(MReputation reputation, String  graph);
 	
 }

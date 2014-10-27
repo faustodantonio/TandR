@@ -118,5 +118,16 @@ public class MFDirectEffect extends MFEffect{
 	public String getEffectName() {
 		return "Direct Effect";
 	}
+
+	public double validateTrustworthiness(MFeatureVersion fv1,	MFeatureVersion fv2) {
+		super.value = 0.0;
+		
+//		this.geometricAspect.calculateWeightedAvgs(versions);
+		super.value = super.value + (dirGeomWeight * this.geometricAspect.validateTrustworthiness(fv1, fv2));		
+		super.value = super.value + (dirQualWeight * this.qualitativeAspect.validateTrustworthiness(fv1, fv2));
+		super.value = super.value + (dirSemWeight  * this.semanticAspect.validateTrustworthiness(fv1, fv2));
+		
+		return super.value;
+	}
     
 }

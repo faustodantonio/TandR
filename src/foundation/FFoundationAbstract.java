@@ -136,7 +136,7 @@ public abstract class FFoundationAbstract {
 		else
 			updateQueryString = "INSERT DATA { GRAPH "+ graphUri +" {"+ rdfTriples +" } }";
 		
-		UDebug.print(updateQueryString,10);
+		UDebug.print("\n\n Insertion Query : \n" + updateQueryString,10);
 		
 		boolean result = this.triplestore.sparqlUpdateHandled(updateQueryString);
 		

@@ -8,6 +8,7 @@ import utility.UDebug;
 import controller.CInstallation;
 import controller.CTest;
 import controller.CTRCalculus;
+import controller.validation.CValidation;
 import foundation.FFuseki;
 
 
@@ -20,6 +21,7 @@ public class TandR_VGIModel_Test {
 		CTest test = new CTest();
 		CTRCalculus trust = new CTRCalculus();
 		CInstallation install = new CInstallation();
+		CValidation validation = new CValidation();
 		
 //		test.printAllAuthorURIs();
 //		test.printFirstAuthorInfos();
@@ -32,7 +34,9 @@ public class TandR_VGIModel_Test {
 //		test.retreiveSuccNeighboursFVs();
 		
 //		test.printTrustworthiness();
-		test.printQuery_3();
+//		test.printQuery_3();
+		
+		validation.validate();
 		
 //		install.install();
 

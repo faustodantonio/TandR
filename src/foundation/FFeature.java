@@ -2,6 +2,9 @@ package foundation;
 
 import java.util.Map;
 
+import org.jdom2.Document;
+
+import model.MAuthor;
 import model.MFeature;
 import model.MFeatureVersion;
 import utility.UDebug;
@@ -12,6 +15,9 @@ import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.ResultSetRewindable;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+
+import foundation.RDFconverter.xml.FAuthor2XML;
+import foundation.RDFconverter.xml.FFeature2XML;
 
 public class FFeature extends FFoundationAbstract{
 	
@@ -25,9 +31,13 @@ public class FFeature extends FFoundationAbstract{
 	}
 	
 	@Override
-	public String convertToRDFXML(Object obj) {
-		// TODO Auto-generated method stub
-		return null;
+	public String convertToRDFXML(Object feature) {
+		
+		FFeature2XML featureXML = new FFeature2XML();
+		Document featureDoc = featureXML.convertToRDFXML( (MFeature) feature );
+		
+		String featureTriples = this.writeRDFXML(featureDoc);
+		return featureTriples;
 	}
 	
 	@Override

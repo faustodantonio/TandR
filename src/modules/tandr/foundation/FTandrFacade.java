@@ -2,6 +2,7 @@ package modules.tandr.foundation;
 
 import java.util.Map;
 
+import modules.tandr.model.MReputationTandr;
 import foundation.FFoundationFacade;
 
 public class FTandrFacade extends FFoundationFacade {
@@ -10,6 +11,11 @@ public class FTandrFacade extends FFoundationFacade {
 		super();
 		super.setFfactory(new FTandrFactory());
 	}	
+	
+	public MReputationTandr getMaximumReputation(String computedAt) {
+		FReputationTandr foundation = new FReputationTandr();
+		return foundation.getMaximumReputation(computedAt);
+	}
 	
 	/*************************
 	 * 

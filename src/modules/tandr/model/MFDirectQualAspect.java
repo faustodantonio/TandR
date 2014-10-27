@@ -70,6 +70,38 @@ public class MFDirectQualAspect extends MFDirectAspect {
 	public String getAspectName() {
 		return "Qualitative Direct Aspect";
 	}
+
+	public double validateTrustworthiness(MFeatureVersion fv1, MFeatureVersion fv2) {
+		double t_dir_qual = 0.0;
+		
+		Map<String,IntersectionMatrix> fv2Relates = new HashMap<String, IntersectionMatrix> ();
+		Map<String,IntersectionMatrix> fv1Relates = new HashMap<String, IntersectionMatrix> ();
+		
+		Map<String,Boolean> matrixDifferences = new HashMap<String, Boolean> ();
+		
+		int differences = 0;
+	
+		ArrayList<String> neighborsUris = foundation.retrieveFVPreviousesNeighbours(fv1, UConfig.getVGIHGraphURI(), fv1.getGeometryBuffer(10.0));	
+		for (String uri : neighborsUris)  {
+			MFeatureVersion neighbor = (MFeatureVersion) foundation.retrieveByUri(uri, UConfig.getVGIHGraphURI(), 0, MFeatureVersion.class);
+			fv2Relates.put(uri, fv2.getGeometry().relate(neighbor.getGeometry()));
+			fv1Relates.put(uri, fv1.getGeometry().relate(neighbor.getGeometry()));
+			matrixDifferences.put(uri, fv2Relates.get(uri).equals( fv1Relates.get(uri) ));
+			if ( fv2Relates.get(uri).equals( fv1Relates.get(uri) ) ) differences++;
+		}
+		
+		if (neighborsUris.size() == 0)
+			t_dir_qual = 0.0;
+		else {
+			if (differences == 0)
+				t_dir_qual = 1.0;
+			else
+				t_dir_qual = 1 - (differences / neighborsUris.size());
+		}
+		
+		super.value = t_dir_qual;
+		return super.value;
+	}
 	
 //	private void buildRCCDistancesMap() {
 //		

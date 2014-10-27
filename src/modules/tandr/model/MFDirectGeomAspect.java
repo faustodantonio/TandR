@@ -36,9 +36,9 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 		double dNoVertices = 0.0;
 		
 		if ( ! this.prevVersions.isEmpty() ) {
-			dArea       = Math.abs( this.calculateDArea(featureVersion) );
-			dPerimeter  = Math.abs( this.calculateDPerimeter(featureVersion) );
-			dNoVertices = Math.abs(this.calculateDNoVertices(featureVersion) );
+			dArea       = Math.abs( this.calculateDArea(featureVersion, avgArea) );
+			dPerimeter  = Math.abs( this.calculateDPerimeter(featureVersion, avgPerimeter) );
+			dNoVertices = Math.abs(this.calculateDNoVertices(featureVersion, avgNoVertices) );
 			
 			contribArea = 1 - ( dArea / (dArea + 1) );
 			contribPerimeter = 1 - ( dPerimeter / (dPerimeter + 1) );
@@ -46,8 +46,6 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 			
 			t_dir_geom = this.calculateTDirGeom(contribArea, contribPerimeter, contribNoVertices);
 		}
-		
-		// add the weighting reputation reference (Paolo)
 		
 		super.value = t_dir_geom;
 		return super.value;
@@ -60,34 +58,34 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 		return t_dir_geom;
 	}
 	
-	private double calculateDArea(MFeatureVersion featureVersion){
+	private double calculateDArea(MFeatureVersion featureVersion, double comparisonArea){
 		double dArea       = 0.0;
 		String geometryType = featureVersion.getGeometry().getGeometryType();
 		
 		if (geometryType.equals("Point") || geometryType.equals("LineString")) 
 			dArea = 1.0;
 		else 
-			dArea = Math.abs(featureVersion.getGeometry().getArea() - avgArea      );
+			dArea = Math.abs(featureVersion.getGeometry().getArea() - comparisonArea      );
 		
 		return dArea;
 	}
 	
-	private double calculateDPerimeter(MFeatureVersion featureVersion){
+	private double calculateDPerimeter(MFeatureVersion featureVersion, double comparisonPerimeter){
 		double dPerimeter  = 0.0;
 		String geometryType = featureVersion.getGeometry().getGeometryType();
 		
 		if (geometryType.equals("Point")) 
 			dPerimeter = 1.0;
 		else 
-			dPerimeter = Math.abs(featureVersion.getGeometry().getLength() - avgPerimeter );
+			dPerimeter = Math.abs(featureVersion.getGeometry().getLength() - comparisonPerimeter );
 		
 		return dPerimeter;
 	}
 	
-	private double calculateDNoVertices(MFeatureVersion featureVersion){
+	private double calculateDNoVertices(MFeatureVersion featureVersion, double comparisonNoVertices){
 		double dNoVertices       = 0.0;
 		
-		dNoVertices = 1 - (Math.abs(featureVersion.getGeometry().getNumPoints() - avgNoVertices));
+		dNoVertices = 1 - (Math.abs(featureVersion.getGeometry().getNumPoints() - comparisonNoVertices));
 		
 		return dNoVertices;
 	}
@@ -187,6 +185,33 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 	}
 	private void setPrevVersions(ArrayList<MFeatureVersion> prevVersions) {
 		this.prevVersions = prevVersions;
+	}
+
+	public double validateTrustworthiness(MFeatureVersion fv1, MFeatureVersion fv2) {
+		double t_dir_geom = 0.0;
+		
+		// TODO : add the maximum distance 
+		
+		double contribArea       = 0.0;
+		double contribPerimeter  = 0.0;
+		double contribNoVertices = 0.0;
+		
+		double dArea       = 0.0;
+		double dPerimeter  = 0.0;
+		double dNoVertices = 0.0;
+		
+		dArea       = Math.abs( this.calculateDArea(fv2,fv1.getGeometry().getArea()) );
+		dPerimeter  = Math.abs( this.calculateDPerimeter(fv2,fv1.getGeometry().getArea()) );
+		dNoVertices = Math.abs( this.calculateDNoVertices(fv2,fv1.getGeometry().getArea()) );
+		
+		contribArea = 1 - ( dArea / (dArea + 1) );
+		contribPerimeter = 1 - ( dPerimeter / (dPerimeter + 1) );
+		contribNoVertices = 1 - ( dNoVertices / (dNoVertices + 1) );
+		
+		t_dir_geom = this.calculateTDirGeom(contribArea, contribPerimeter, contribNoVertices);
+		
+		super.value = t_dir_geom;
+		return super.value;
 	}
 
 

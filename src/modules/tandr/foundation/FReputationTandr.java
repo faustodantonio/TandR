@@ -104,6 +104,32 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 	public Map<String,MFEffect> retrieveReputationEffectList(MReputation reputation, String graphUri) {
 		return feffect.retrieveReputationEffectList(reputation, graphUri);
 	}
+	@Override
+	public MReputationTandr getMaximumReputation(String computedAt) {
+		MReputationTandr maxR = new MReputationTandr();
+		
+		maxR.getDirectEffect().getGeometricAspect().setValue(1);
+		maxR.getDirectEffect().getQualitativeAspect().setValue(1);
+		maxR.getDirectEffect().getSemanticAspect().setValue(1);
+		maxR.getDirectEffect().setValue(1);
+		
+		maxR.getIndirectEffect().getGeometricAspect().setValue(1);
+		maxR.getIndirectEffect().getQualitativeAspect().setValue(1);
+		maxR.getIndirectEffect().getSemanticAspect().setValue(1);
+		maxR.getIndirectEffect().setValue(1);
+		
+		maxR.getTemporalEffect().setValue(1);
+		
+		maxR.setValue(1);
+		maxR.setComputedAt(computedAt);
+		
+		return maxR;
+	}
+	@Override
+	public boolean create(MReputation reputation, String graph) {
+		FTandrFacade ffoundation = new FTandrFacade();
+		return ffoundation.create(reputation, graph);
+	}
 	
 	private MReputationTandr setReputationEffects(MReputationTandr reputation,String graphUri) {
 		Map<String,MFEffect> effects = new HashMap<String,MFEffect>();

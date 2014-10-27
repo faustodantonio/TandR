@@ -41,5 +41,12 @@ public class MFDirectSemAspect extends MFDirectAspect {
 		return "Semantic Direct Aspect";
 	}
 
+	public double validateTrustworthiness(MFeatureVersion fv1,	MFeatureVersion fv2) {
+
+		super.value = 1;
+		
+		return super.value;
+	}
+
 
 }

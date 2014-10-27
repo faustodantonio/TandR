@@ -2,6 +2,9 @@ package foundation;
 
 import java.util.ArrayList;
 
+
+import org.jdom2.Document;
+
 import utility.UDebug;
 import model.MAuthor;
 import model.MFeatureVersion;
@@ -12,6 +15,8 @@ import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.ResultSetRewindable;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+
+import foundation.RDFconverter.xml.FAuthor2XML;
 
 public class FAuthor extends FFoundationAbstract{
 	
@@ -181,9 +186,13 @@ public class FAuthor extends FFoundationAbstract{
 	
 	
 	@Override
-	public String convertToRDFXML(Object obj) {
-		// TODO implement author conversion, from object to RDF/XML
-		return null;
+	public String convertToRDFXML(Object author) {
+				
+		FAuthor2XML authorXML = new FAuthor2XML();
+		Document authorDoc = authorXML.convertToRDFXML( (MAuthor) author );
+		
+		String authorTriples = this.writeRDFXML(authorDoc);
+		return authorTriples;
 	}
 	
 }

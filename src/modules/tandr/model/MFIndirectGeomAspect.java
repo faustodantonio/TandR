@@ -1,5 +1,7 @@
 package modules.tandr.model;
 
+import model.MFeatureVersion;
+
 public class MFIndirectGeomAspect extends MFIndirectAspect {
 
 	public MFIndirectGeomAspect() {	}
@@ -21,6 +23,11 @@ public class MFIndirectGeomAspect extends MFIndirectAspect {
 	@Override
 	public MFAspect fetchAspectFromReputation(MReputationTandr repo) {
 		return repo.getIndirectEffect().getGeometricAspect();
+	}
+
+	public double validaterustworthiness(MFeatureVersion fv1, MFeatureVersion fv2) {		
+		super.value = 1;
+		return super.value;
 	}
 	
 }

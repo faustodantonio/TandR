@@ -73,7 +73,13 @@ public class MFeature {
 		return featureString;
 	}
 
-	
+	public String getUriID(){
+		String uriID = this.getUri();
+		uriID = uriID.replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
+		uriID = uriID.replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
+		uriID = uriID.replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
+		return uriID;
+	}
 	public String getUri() {
 		if (this.uri == null) this.uri = "";
 		return uri;
@@ -126,5 +132,18 @@ public class MFeature {
 		return this.getFeatureVersionByURI(uri, lazyDepth);
 	}
 
-	
+	public String generateFeatureVesionUri(String version)	{
+		String fvUri = "";
+		
+		if ( this.getUri().contains("http://semantic.web/data/hvgi/nodes.rdf#node") )
+			fvUri = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion";
+		else if ( this.getUri().contains("http://semantic.web/data/hvgi/ways.rdf#way") )
+			fvUri = "http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion";
+		else
+			fvUri = "http://semantic.web/data/hvgi/featureVersions.rdf#featureVersion";
+		
+		fvUri = fvUri + this.getUriID() + "_" + version;
+		
+		return fvUri;
+	}
 }

@@ -39,6 +39,10 @@ public class UConfig {
 	 */
 	public static String main_trustworthiness_calculus = "controller.CTandR";
 	/**
+	 * the referenced class has to extend controller.CMainFactor class
+	 */
+	public static String validation_trustworthiness = "controller.CValidationTandR";
+	/**
 	 * the referenced class has to extend view.VTrustworthiness class
 	 */
 	public static String view_trustworthiness = "view.VTrustworthinessTandr";	
@@ -84,18 +88,30 @@ public class UConfig {
 	
 	public static String graphURI = "http://parliament.semwebcentral.org/parliament#";
 	
-//	public static String hvgiGraph = "hvgi_test";
-//	public static String tandrGraph = "tandr_test";
-//	public static String inputRDFfilesDirectory = "./input/test/";
+	public static String hvgiGraph = "hvgi_test";
+	public static String tandrGraph = "tandr_test";
+	public static String inputRDFfilesDirectory = "./input/test/";
 	
-	public static String hvgiGraph = "hvgi_wien";
-	public static String tandrGraph = "tandr_wien";
-	public static String inputRDFfilesDirectory = "./input/wien/";
+	public static String lowerTGraph = "lowerT_test";
+	public static String averageTGraph = "averegeT_test";
+	public static String higherTGraph = "higherT_test";
+	
+//	public static String hvgiGraph = "hvgi_wien";
+//	public static String tandrGraph = "tandr_wien";
+//	public static String inputRDFfilesDirectory = "./input/wien/";
+//	
+//	public static String lowerTGraph = "lowerT_wien";
+//	public static String averageTGraph = "averegeT_wien";
+//	public static String higherTGraph = "higherT_wien";
 	
 //	public static String hvgiGraph = "hvgi_laquila";
 //	public static String tandrGraph = "tandr_laquila";
-//	public static String inputRDFfilesDirectory = "./input/laquila/";	
-
+//	public static String inputRDFfilesDirectory = "./input/laquila/";	 
+//	
+//	public static String lowerTGraph = "lowerT_laquila";
+//	public static String averageTGraph = "averegeT_laquila";
+//	public static String higherTGraph = "higherT_laquila";
+	
 	public static String inputRDFfileRegex = ".*.rdf";
 	
 	/*************************
@@ -121,6 +137,9 @@ public class UConfig {
 	
 	public static Map< Map.Entry<String, Map<String,Double>>, Double> effects_hierarchy = 
 			new HashMap< Map.Entry<String, Map<String,Double>>, Double>();
+
+//	public static String validationPath = "input/validation/REALNUT2012OGD.csv";
+	public static String validationPath = "input/validation/testValidation.csv";
 	
 	/*************************
 	 *
@@ -162,6 +181,18 @@ public class UConfig {
 	public static String getTANDRGraphURI(){
 		// return "graphs:" + UConfig.tandrGraph;
 		return "<" + UConfig.graphURI + UConfig.tandrGraph + ">";
+	}
+	public static String getLOWESTTGraphURI(){
+		// return "graphs:" + UConfig.tandrGraph;
+		return "<" + UConfig.graphURI + UConfig.lowerTGraph + ">";
+	}
+	public static String getAVERAGETraphURI(){
+		// return "graphs:" + UConfig.tandrGraph;
+		return "<" + UConfig.graphURI + UConfig.averageTGraph + ">";
+	}
+	public static String getHIGHESTTGraphURI(){
+		// return "graphs:" + UConfig.tandrGraph;
+		return "<" + UConfig.graphURI + UConfig.higherTGraph + ">";
 	}
 	
 	public static String getMinDateTimeAsString(){
@@ -221,6 +252,8 @@ public class UConfig {
 		Namespace hvgi      = Namespace.getNamespace("hvgi",      "http://semantic.web/vocabs/history_vgi/hvgi#"       );
 		Namespace tandr     = Namespace.getNamespace("tandr",     "http://semantic.web/vocabs/tandr_assessment/tandr#" );
 		Namespace graphs    = Namespace.getNamespace("graphs",    "http://parliament.semwebcentral.org/parliament#"    );
+		Namespace fn        = Namespace.getNamespace("fn",        "http://www.w3.org/2005/xpath-functions#"            );
+		Namespace afn       = Namespace.getNamespace("afn",       "http://jena.hpl.hp.com/ARQ/function#"               );
 				
 		namespaces.put(rdf.getPrefix()       , rdf       );
 		namespaces.put(xsd.getPrefix()       , xsd       );
@@ -228,7 +261,7 @@ public class UConfig {
 		namespaces.put(foaf.getPrefix()      , foaf      );
 		namespaces.put(time.getPrefix()      , time      );
 		namespaces.put(geosparql.getPrefix() , geosparql );
-		namespaces.put(geof.getPrefix()      , geof );
+		namespaces.put(geof.getPrefix()      , geof      );
 		namespaces.put(sf.getPrefix()        , sf        );
 		namespaces.put(units.getPrefix()     , units     );
 		namespaces.put(prv.getPrefix()       , prv       );		
@@ -236,6 +269,8 @@ public class UConfig {
 		namespaces.put(hvgi.getPrefix()      , hvgi      );
 		namespaces.put(tandr.getPrefix()     , tandr     );
 		namespaces.put(graphs.getPrefix()    , graphs    );
+		namespaces.put(fn.getPrefix()        , fn        );
+		namespaces.put(afn.getPrefix()       , afn       );
 	}
 	
 }

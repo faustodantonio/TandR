@@ -3,6 +3,8 @@ package foundation;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
+import org.jdom2.Document;
+
 import model.MAuthor;
 import model.MEdit;
 import model.MFeature;
@@ -15,6 +17,9 @@ import com.hp.hpl.jena.query.ResultSetFactory;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.ResultSetRewindable;
 import com.hp.hpl.jena.rdf.model.RDFNode;
+
+import foundation.RDFconverter.xml.FAuthor2XML;
+import foundation.RDFconverter.xml.FFeatureVersion2XML;
 
 class FFeatureVersion extends FFoundationAbstract{
 	
@@ -75,9 +80,12 @@ class FFeatureVersion extends FFoundationAbstract{
 	}
 	
 	@Override
-	public String convertToRDFXML(Object obj) {
-		// TODO Auto-generated method stub
-		return null;
+	public String convertToRDFXML(Object featureVersion) {
+		FFeatureVersion2XML fvXML = new FFeatureVersion2XML();
+		Document fvDoc = fvXML.convertToRDFXML( (MFeatureVersion) featureVersion );
+		
+		String fvTriples = this.writeRDFXML(fvDoc);
+		return fvTriples;
 	}
 	
 	public String retrieveFirst()	{
@@ -323,8 +331,8 @@ class FFeatureVersion extends FFoundationAbstract{
 		if (isDeleted != null)   fversion.setIsDeleted( Boolean.parseBoolean(isDeleted.toString()) );
 		
 		if (wktGeom != null) { 
-			fversion.setWktGeometry(wktGeom.toString().replace("^^http://www.opengis.net/ont/sf#wktLiteral", ""));
-		 	fversion.setGeometry(wktGeom.toString());
+			fversion.setWktGeometry( wktGeom.toString().replace("^^http://www.opengis.net/ont/sf#wktLiteral", "") );			
+		 	fversion.setGeometry( wktGeom.toString().replace("^^http://www.opengis.net/ont/sf#wktLiteral","") );
 		}
 		
 		queryRawResults.reset();
