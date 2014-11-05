@@ -14,6 +14,8 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public class FEdit extends FFoundationAbstract {
 	
+	int dbgLevel = 100;
+	
 	public FEdit()
 	{
 		super();
@@ -47,12 +49,12 @@ public class FEdit extends FFoundationAbstract {
 		queryString += ""
 				+ "\t}";
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 5);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
 		
 		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
 		queryRawResults.reset();
 		
 		QuerySolution generalQueryResults = queryRawResults.next();

@@ -9,22 +9,24 @@ import utility.UDebug;
 
 public class FInstallation {
 
+	int dbgLevel = 100;
+	
 	protected FTripleStore triplestore;
 	
 	public FInstallation() {
 		try {
 			this.triplestore = (FTripleStore) Class.forName("foundation."+UConfig.triplestoreConnectionClass).newInstance();
 		} catch (ClassNotFoundException e) {
-			UDebug.print("triplestoreConnectionClass NOT FOUND. \nException: " + e.getMessage() + "\n\n"
-					+ "The Parliament (default) one will be loaded", 1);
+			UDebug.error("triplestoreConnectionClass NOT FOUND. \nException: " + e.getMessage() + "\n\n"
+					+ "The Parliament (default) one will be loaded");
 			this.triplestore = new FParliament();
 		} catch (InstantiationException e) {
-			UDebug.print("Cannot instantiate triplestoreConnectionClass. \nException: " + e.getMessage() + "\n\n"
-					+ "The Parliament (default) one will be loaded", 1);
+			UDebug.error("Cannot instantiate triplestoreConnectionClass. \nException: " + e.getMessage() + "\n\n"
+					+ "The Parliament (default) one will be loaded");
 			this.triplestore = new FParliament();
 		} catch (IllegalAccessException e) {
-			UDebug.print("Cannot access to triplestoreConnectionClass. \nException: " + e.getMessage() + "\n\n"
-					+ "The Parliament (default) one will be loaded", 1);
+			UDebug.error("Cannot access to triplestoreConnectionClass. \nException: " + e.getMessage() + "\n\n"
+					+ "The Parliament (default) one will be loaded");
 		}		
 	}
 
@@ -39,7 +41,7 @@ public class FInstallation {
 			createGraphQueryString = createGraphQueryString + namespace + ":";
 		createGraphQueryString = createGraphQueryString + graphName;
 		
-		UDebug.print("SPARQL query: \n" + createGraphQueryString + "\n\n", 2);
+		UDebug.print("SPARQL query: \n" + createGraphQueryString + "\n\n", dbgLevel+2);
 		
 		try {
 			result = this.triplestore.sparqlUpdate(createGraphQueryString);
@@ -57,13 +59,13 @@ public class FInstallation {
 			deleteGraphQueryString = deleteGraphQueryString + namespace + ":";
 		deleteGraphQueryString = deleteGraphQueryString + graphName;
 		
-		UDebug.print("SPARQL query: \n" + deleteGraphQueryString + "\n\n", 2);
+		UDebug.print("SPARQL query: \n" + deleteGraphQueryString + "\n\n", dbgLevel+2);
 		
 		try {
 			result = this.triplestore.sparqlUpdate(deleteGraphQueryString);
 		} catch (IOException e) {
 			
-			UDebug.print(e.getMessage(), 6);
+			UDebug.error(e.getMessage());
 			result = false;
 			e.printStackTrace();
 		}		

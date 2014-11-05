@@ -20,7 +20,7 @@ import foundation.RDFconverter.xml.FAuthor2XML;
 
 public class FAuthor extends FFoundationAbstract{
 	
-	int dbgLevel = 4;
+	int dbgLevel = 100;
 	
 	public FAuthor()
 	{
@@ -53,12 +53,12 @@ public class FAuthor extends FFoundationAbstract{
 		queryString += ""
 				+ "\t} \n";
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 5);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
 		
 		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
 		queryRawResults.reset();
 		
 		if (queryRawResults.hasNext())
@@ -96,12 +96,12 @@ public class FAuthor extends FFoundationAbstract{
 		queryString += ""
 				+ "\t} \n";
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 5);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
 		
 		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
 		queryRawResults.reset();
 		
 		while (queryRawResults.hasNext()) {

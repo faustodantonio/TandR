@@ -33,7 +33,7 @@ public class CVModule {
 			version.setIsValidTo(UConfig.getMaxDateTime());
 			version.setUri(version.generateUri());
 			
-			UDebug.print("\n\n" + foundation.convertToRDFTTL(version), 1);
+			UDebug.print("\n\n" + foundation.convertToRDFTTL(version), 10);
 			
 			foundation.create(version, graph);
 		}

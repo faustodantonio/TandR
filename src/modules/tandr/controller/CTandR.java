@@ -32,34 +32,38 @@ public class CTandR extends CCalculusAbstract{
 	@Override
 	public boolean computeTW(MFeatureVersion featureVersion) {
 		boolean result = true;
+		int dbgLevel = 100;
 		
 		String tandrGraphUri = UConfig.getTANDRGraphURI();
 		String vgihGraphUri = UConfig.getVGIHGraphURI();
 		
-		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( featureVersion );
+		MTrustworthinessTandr trustworthiness;
 		
 		MFeature feature = featureVersion.getFeature();
-		ArrayList<MFeatureVersion> prevVersions = feature.getPreviousVersions(featureVersion.getVersionNo(), 0);
+		ArrayList<MFeatureVersion> prevVersions = new ArrayList<MFeatureVersion>();
 		
-		if ( featureVersion.isFirst() )
+		if ( featureVersion.isFirst() ) {
 			trustworthiness = this.calculateFirstVersionTrustworthiness(featureVersion);
-		else
+		} else {
+			prevVersions = feature.getPreviousVersions(featureVersion.getVersionNo(), 0);			
 			trustworthiness = this.calculateSuccVersionTrustworthiness(featureVersion, prevVersions);
+		}
 		
 		this.debugTrust(trustworthiness);
 		
 		//save and debug Trustworthiness
 		ffacade.create(trustworthiness, tandrGraphUri);
 		
-		UDebug.print("\n\n" + ffacade.convertToRDFTTL(trustworthiness),4);
-		UDebug.log("\nCREATE TRUSTWORTHINESS (new): " + trustworthiness.getUri() + " - validity time: " + trustworthiness.getComputedAtString(),4);
-		UDebug.log("\n\t" + TView.getTrustworthinessString(featureVersion) + "\n",4);
+//		UDebug.print("\n\n" + ffacade.convertToRDFTTL(trustworthiness),4);
+		UDebug.log("\nCREATE TRUSTWORTHINESS (new): " + trustworthiness.getUri() + " - validity time: " + trustworthiness.getComputedAtString(),dbgLevel);
+		UDebug.log("\n\t" + TView.getTrustworthinessString(featureVersion) + "\n",dbgLevel);
 		
 		//update Reputation
 		this.updateUserReputation(featureVersion,featureVersion.getIsValidFromString());
 		
 		//propagate to dependencies
-		this.updatePrevVersionsTrustworthiness(prevVersions, featureVersion);
+		if ( ! featureVersion.isFirst() )
+			this.updatePrevVersionsTrustworthiness(prevVersions, featureVersion);
 		this.confirmNeighbours(featureVersion, vgihGraphUri);
 		
 		return result;
@@ -67,7 +71,8 @@ public class CTandR extends CCalculusAbstract{
 
 	private MTrustworthinessTandr calculateFirstVersionTrustworthiness(MFeatureVersion featureVersion) {
 		
-		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) featureVersion.getTrustworthiness();
+		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( featureVersion );
+//		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) featureVersion.getTrustworthiness();
 		MReputationTandr reputation = (MReputationTandr) featureVersion.getAuthor().getReputation();		
 		
 		trustworthiness.getDirectEffect().getGeometricAspect().setValue(   reputation.getDirectEffect().getGeometricAspect().getValue()   );
@@ -91,7 +96,8 @@ public class CTandR extends CCalculusAbstract{
 
 	private MTrustworthinessTandr calculateSuccVersionTrustworthiness(MFeatureVersion featureVersion, ArrayList<MFeatureVersion> prevVersions) {
 		
-		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) featureVersion.getTrustworthiness();
+		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( featureVersion );
+//		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) featureVersion.getTrustworthiness();
 		
 		double trustValue = 0.0;
 		
@@ -114,30 +120,36 @@ public class CTandR extends CCalculusAbstract{
 			reputation = new MReputationTandr( featureVersion.getAuthor() );
 		else reputation = (MReputationTandr) featureVersion.getAuthor().getReputation();
 		
-		UDebug.print("\n\n" + ffacade.convertToRDFTTL(reputation),4);
+//		UDebug.print("\n\n" + ffacade.convertToRDFTTL(reputation),10);
 		
-		double repValue = 0.0;
+//		double repValue = 0.0;
+//		repValue = repValue + (dirEffectWeight  * reputation.getDirectEffect().calculateReputation(featureVersion.getAuthor(),untilDate)) ;
+//		repValue = repValue + (indEffectWeight  * reputation.getIndirectEffect().calculateReputation(featureVersion.getAuthor(),untilDate));
+//		repValue = repValue + (tempEffectWeight * reputation.getTemporalEffect().calculateReputation(featureVersion.getAuthor(),untilDate));
+//		reputation.setValue(repValue);
+//		reputation.setComputedAt(untilDate);
 		
-		repValue = repValue + (dirEffectWeight  * reputation.getDirectEffect().calculateReputation(featureVersion.getAuthor(),untilDate)) ;
-		repValue = repValue + (indEffectWeight  * reputation.getIndirectEffect().calculateReputation(featureVersion.getAuthor(),untilDate));
-		repValue = repValue + (tempEffectWeight * reputation.getTemporalEffect().calculateReputation(featureVersion.getAuthor(),untilDate));
-		
-		reputation.setValue(repValue);
-		reputation.setComputedAt(untilDate);
+		reputation = ffacade.getCalculatedReputation(featureVersion.getAuthorUri(), untilDate, true);
+		reputation.setAuthor(featureVersion.getAuthor());
 		
 		this.debugRep(reputation);
 		
-		UDebug.print("\n\n" + ffacade.convertToRDFXML(reputation),4);
+//		UDebug.print("\n\n" + ffacade.convertToRDFXML(reputation),10);
 		
 		ffacade.create(reputation, UConfig.getTANDRGraphURI());
-		UDebug.log("\nCREATE REPUTATION (new): " + reputation.getUri() + " - validity time: " + reputation.getComputedAtString(),4);
-		UDebug.log("\n\t" + RView.getReputationString(featureVersion.getAuthor()) + "\n",4);
+		UDebug.log("\nCREATE REPUTATION (new): " + reputation.getUri() + " - validity time: " + reputation.getComputedAtString(),10);
+		UDebug.log("\n\t" + RView.getReputationString(featureVersion.getAuthor()) + "\n",10);
 		
 		return result;
 	}
 	
+
 	//	save fvs Trustworthiness affected by direct evaluation 
 	private void updatePrevVersionsTrustworthiness(ArrayList<MFeatureVersion> prevVersions, MFeatureVersion featureVersion) {
+		
+		//TODO: optimize: the avarage calculus must be done once per featureVersion
+		
+		int dbgLevel = 1;
 		
 		for ( MFeatureVersion fv : prevVersions) {			
 			MTrustworthinessTandr trust;
@@ -155,16 +167,18 @@ public class CTandR extends CCalculusAbstract{
 			trustValue = trustValue + (dirEffectWeight  * trust.getIndirectEffect().getValue());
 			trustValue = trustValue + (dirEffectWeight  * trust.getTemporalEffect().calculateTrustworthiness(fv,featureVersion.getIsValidFrom()));
 			
+//			MFeatureVersion featureFirst = featureVersion.getFeature().getFirstVersion();
+						
 			trust.setValue(trustValue);
 			trust.setComputedAt( featureVersion.getIsValidFromString() );
 			
-			UDebug.print("\t * feature version "+ fv.getUriID() +"",1);
-			UDebug.print("\t * author "+ fv.getAuthor().getAccountName() +"\n",1);
+			UDebug.print("\t * feature version "+ fv.getUriID() +"",dbgLevel+2);
+			UDebug.print("\t * author "+ fv.getAuthor().getAccountName() +"\n",dbgLevel+2);
 			this.debugTrust(trust);
 			
 			ffacade.create(trust, UConfig.getTANDRGraphURI());
-			UDebug.log("\nCREATE TRUSTWORTHINESS (upd): " + trust.getUri() + " - validity time: " + trust.getComputedAtString(),4);
-			UDebug.log("\n\t" + TView.getTrustworthinessString(fv) + "\n",4);
+			UDebug.log("\nCREATE TRUSTWORTHINESS (upd): " + trust.getUri() + " - validity time: " + trust.getComputedAtString(),10);
+			UDebug.log("\n\t" + TView.getTrustworthinessString(fv) + "\n",10);
 			
 			this.updateUserReputation(fv,featureVersion.getIsValidFromString());
 		}
@@ -206,25 +220,29 @@ public class CTandR extends CCalculusAbstract{
 	private void debugTrust(MTrustworthinessTandr trustworthiness) {
 		
 		int dbgLevel = 1;
-		UDebug.print("\t Trust :"+ trustworthiness.getValueString() +"\t [ ", dbgLevel);
+		UDebug.print("\t Trust :"+ trustworthiness.getValueString(), dbgLevel+2);
 		
-		trustworthiness.getDirectEffect().debugTDirectInfo(dbgLevel+1);
-		trustworthiness.getIndirectEffect().debugTIndirectInfo(dbgLevel+1);
-		trustworthiness.getTemporalEffect().debugTTemporalInfo(dbgLevel+1);
+		UDebug.print("\t [ ", dbgLevel+3);
+		trustworthiness.getDirectEffect().debugTDirectInfo(dbgLevel+3);
+		trustworthiness.getIndirectEffect().debugTIndirectInfo(dbgLevel+3);
+		trustworthiness.getTemporalEffect().debugTTemporalInfo(dbgLevel+3);
+		UDebug.print(" ]", dbgLevel+3);
 		
-		UDebug.print(" ]" + "\n", dbgLevel);
+		UDebug.print("\n", dbgLevel+2);
 	}
 	
 	private void debugRep(MReputationTandr reputation) {
 		
 		int dbgLevel = 1;
-		UDebug.print("\t Rep   :"+ reputation.getValueString() +"\t [ ", dbgLevel);
+		UDebug.print("\t Rep   :"+ reputation.getValueString(), dbgLevel+2);
 		
-		reputation.getDirectEffect().debugRDirectInfo(dbgLevel+1);
-		reputation.getIndirectEffect().debugRIndirectInfo(dbgLevel+1);
-		reputation.getTemporalEffect().debugRTemporalInfo(dbgLevel+1);
+		UDebug.print("\t [ ", dbgLevel+3);
+		reputation.getDirectEffect().debugRDirectInfo(dbgLevel+3);
+		reputation.getIndirectEffect().debugRIndirectInfo(dbgLevel+3);
+		reputation.getTemporalEffect().debugRTemporalInfo(dbgLevel+3);
+		UDebug.print(" ]", dbgLevel+3);
 		
-		UDebug.print(" ]" + "\n", dbgLevel);
+		UDebug.print("\n", dbgLevel+2);
 	}
 
 }

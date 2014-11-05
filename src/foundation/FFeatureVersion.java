@@ -1,6 +1,8 @@
 package foundation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jdom2.Document;
@@ -18,12 +20,11 @@ import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.query.ResultSetRewindable;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
-import foundation.RDFconverter.xml.FAuthor2XML;
 import foundation.RDFconverter.xml.FFeatureVersion2XML;
 
 class FFeatureVersion extends FFoundationAbstract{
 	
-	int dbgLevel = 4;
+	int dbgLevel = 100;
 	
 	public FFeatureVersion()	{
 		super();
@@ -276,13 +277,37 @@ class FFeatureVersion extends FFoundationAbstract{
 	@SuppressWarnings("unchecked")
 	private MFeatureVersion setFVAttributes(ResultSetRewindable queryRawResults, String fversionURI, String graphUri, int lazyDepth)
 	{
+
+		FTag ftag = new FTag();
+		
+		QuerySolution generalQueryResults = queryRawResults.next();
+		
+		MFeatureVersion fversion = this.setFVAttributes(generalQueryResults, fversionURI, graphUri, lazyDepth);
+		
+		queryRawResults.reset();
+
+		for (int i = 0; i < queryRawResults.size(); i++ )
+		{
+			QuerySolution generalQuery = queryRawResults.next();
+			
+			if ( generalQuery.getResource("hasTag") != null )
+			{
+				String tagUri = generalQuery.getResource("hasTag").toString();
+				Entry<String, String> tag = (Entry<String, String>) ftag.retrieveByURI(tagUri, graphUri, 0);
+				if (tag != null && tag.getKey() != null && tag.getValue() != null) 
+					fversion.addTag(tag.getKey(), tag.getValue());
+			}
+		}
+		
+		return fversion;
+	}
+	
+	public MFeatureVersion setFVAttributes(QuerySolution generalQueryResults, String fversionURI, String graphUri, int lazyDepth) {
+		
 		MFeatureVersion fversion = new MFeatureVersion();
 		FEdit fedit = new FEdit();
 		FAuthor fauthor = new FAuthor();
-		FTag ftag = new FTag();
 		FFeature ffeature = new FFeature();
-		
-		QuerySolution generalQueryResults = queryRawResults.next();
 		
 		RDFNode isVersionOf = generalQueryResults.getResource("isVersionOf");
 		RDFNode versionNo   = generalQueryResults.getLiteral("versionNo");
@@ -335,22 +360,8 @@ class FFeatureVersion extends FFoundationAbstract{
 		 	fversion.setGeometry( wktGeom.toString().replace("^^http://www.opengis.net/ont/sf#wktLiteral","") );
 		}
 		
-		queryRawResults.reset();
-
-		for (int i = 0; i < queryRawResults.size(); i++ )
-		{
-			QuerySolution generalQuery = queryRawResults.next();
-			
-			if ( generalQuery.getResource("hasTag") != null )
-			{
-				String tagUri = generalQuery.getResource("hasTag").toString();
-				Entry<String, String> tag = (Entry<String, String>) ftag.retrieveByURI(tagUri, graphUri, 0);
-				if (tag != null && tag.getKey() != null && tag.getValue() != null) 
-					fversion.addTag(tag.getKey(), tag.getValue());
-			}
-		}
-		
 		return fversion;
+		
 	}
 	
 	public ArrayList<String> retrieveDateList(String graphUri)
@@ -435,13 +446,91 @@ class FFeatureVersion extends FFoundationAbstract{
 		return uris;
 	}
 	
-	public ArrayList<MFeatureVersion> retrieveByDate(String dateFrom, String graphUri, int lazyDepth) {	
+	public ArrayList<MFeatureVersion> retrieveUrisByDate(String dateFrom, String graphUri, int lazyDepth) {	
 		ArrayList<MFeatureVersion> fvs = new ArrayList<MFeatureVersion>();
 		ArrayList<String> uris = new ArrayList<String>();
 		uris = this.retrieveURIByDate(dateFrom, graphUri);
 		
 		for (String fversionURI : uris)
 			fvs.add( this.retrieveByURI(fversionURI, graphUri, lazyDepth) );
+		
+		return fvs;
+	}
+	
+	public ArrayList<MFeatureVersion> retrieveFVSByDate(String dateFrom, String graphUri, int lazyDepth) {	
+		ArrayList<MFeatureVersion> fvs = new ArrayList<MFeatureVersion>();
+		Map <String, MFeatureVersion> fvsMap = new HashMap<String, MFeatureVersion>();
+
+		String queryString = ""
+				+ "\tSELECT DISTINCT ?uri ?isVersionOf ?versionNo ?precededBy ?createdBy ?contributor ?validTo ?isDeleted ?tagKey ?tagValue ?wktGeom \n"
+				+ "\tWHERE \n"
+				+ "\t{ \n";
+		
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n {\n";
+		
+		queryString += ""
+				+ "\t\t?uri   rdf:type       osp:FeatureState .\n"
+				+ "\t\t?uri   hvgi:valid     ?valid           . \n"
+				+ "\t\t?valid hvgi:validFrom _:timeFrom       . \n"
+				+ "\t\t_:timeFrom    time:inXSDDateTime   \""+ dateFrom +"\"^^xsd:dateTime .\n"
+				
+				+ "\t\tOPTIONAL { ?uri   hvgi:isVersionOf      ?isVersionOf } \n"
+				+ "\t\tOPTIONAL { ?uri   hvgi:hasVersion       _:ver        . \n"
+				+ "\t\t           _:ver      hvgi:versionNo     ?versionNo  } \n"
+				+ "\t\tOPTIONAL { ?uri   prv:precededBy        ?precededBy  } \n"
+				+ "\t\tOPTIONAL { ?uri   osp:createdBy         ?createdBy   } \n"
+				+ "\t\tOPTIONAL { ?uri   dcterms:contributor   ?contributor } \n"
+				+ "\t\tOPTIONAL { ?valid     hvgi:validTo       _:timeTo    . \n"
+				+ "\t\t			  _:timeTo   time:inXSDDateTime ?validTo	} \n"
+				+ "\t\tOPTIONAL { ?uri   hvgi:isDeleted        ?isDeleted   } \n"
+				+ "\t\tOPTIONAL { ?uri   geosparql:hasGeometry _:geom       . \n"
+				+ "\t\t           _:geom       geosparql:asWKT    ?wktGeom  } \n"
+				+ "\t\tOPTIONAL { ?uri  osp:hasTag    ?tag       . \n"
+				+ "\t\t           ?tag  osp:hasKey    ?key       . \n"
+				+ "\t\t           ?tag  osp:hasValue  ?val       . \n"
+				+ "\t\t           ?key  osp:isKey     ?tagKey    . \n"
+				+ "\t\t           ?val  osp:isValue   ?tagValue  } \n"
+				;
+		
+		if (!graphUri.equals("")) queryString += "\t\t }\n";
+		
+		queryString += ""
+				+ "\t}\n"
+				+ "ORDER BY ?uri";	
+		
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
+		
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
+		
+		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
+		queryRawResults.reset();
+		
+		while (queryRawResults.hasNext()){
+			QuerySolution generalQueryResults = queryRawResults.next();
+			
+			RDFNode uriNode  = generalQueryResults.getResource("uri");
+			RDFNode tagKey   = generalQueryResults.getLiteral("tagKey");
+			RDFNode tagValue = generalQueryResults.getLiteral("tagValue");
+			
+			String uri = uriNode.toString();
+			
+			// if is the first fv occurrence create the object and add it to the map  
+			MFeatureVersion fversion = fvsMap.get(uri);
+			if (fversion == null) {
+				fversion = this.setFVAttributes(generalQueryResults, uri, graphUri, lazyDepth);
+				fversion.setIsValidFrom(dateFrom);
+				fvsMap.put(uri, fversion);
+			}
+			
+			//add tags
+			if  (tagKey != null && tagValue != null)
+				fversion.addTag(tagKey.toString().replace("^^http://www.w3.org/2001/XMLSchema#string", ""), 
+							tagValue.toString().replace("^^http://www.w3.org/2001/XMLSchema#string", ""));
+		}
+		
+		for ( Entry<String, MFeatureVersion> fvEntry : fvsMap.entrySet()) 
+			fvs.add(fvEntry.getValue());
 		
 		return fvs;
 	}

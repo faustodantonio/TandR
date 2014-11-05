@@ -52,9 +52,9 @@ public class MFDirectEffect extends MFEffect{
 		
 		super.value = 0.0;
 		
-		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
-		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
-		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));
+//		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
+//		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
+//		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));
 		
 		return super.value;
 	}
@@ -122,10 +122,13 @@ public class MFDirectEffect extends MFEffect{
 	public double validateTrustworthiness(MFeatureVersion fv1,	MFeatureVersion fv2) {
 		super.value = 0.0;
 		
+		double dirGeomValWeight = 0.5;
+		double dirQualValWeight = 0.5;
+		
 //		this.geometricAspect.calculateWeightedAvgs(versions);
-		super.value = super.value + (dirGeomWeight * this.geometricAspect.validateTrustworthiness(fv1, fv2));		
-		super.value = super.value + (dirQualWeight * this.qualitativeAspect.validateTrustworthiness(fv1, fv2));
-		super.value = super.value + (dirSemWeight  * this.semanticAspect.validateTrustworthiness(fv1, fv2));
+		super.value = super.value + (dirGeomValWeight * this.geometricAspect.validateTrustworthiness(fv1, fv2));		
+		super.value = super.value + (dirQualValWeight * this.qualitativeAspect.validateTrustworthiness(fv1, fv2));
+//		super.value = super.value + (dirSemWeight  * this.semanticAspect.validateTrustworthiness(fv1, fv2));
 		
 		return super.value;
 	}

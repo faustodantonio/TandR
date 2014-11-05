@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import utility.UConfig;
 import utility.UDebug;
@@ -63,28 +64,39 @@ public class CTRCalculus {
 		
 		this.dates = ffacade.retrieveDateList(vgihGraphUri);
 		
+		int dbgLevel = 1;
+		
 		int countDate = 1;
 		int countFvs = 0;
 //		int totalFvs = ffacade.countClassSubject("MFeatureVersion", "graphs:hvgi");
-		int totalFvs = ffacade.countClassSubject("MFeatureVersion", "graphs:"+UConfig.hvgiGraph);
-		int totalFs = ffacade.countClassSubject("MFeature", "graphs:"+UConfig.hvgiGraph);
-		this.debugGeneralInformations(totalFs, totalFvs, dates.size(), 3);
+		int totalFvs = ffacade.countClassSubject("MFeatureVersion", UConfig.getVGIHGraphURI());
+		int totalFs = ffacade.countClassSubject("MFeature", UConfig.getVGIHGraphURI());
+		this.debugGeneralInformations(totalFs, totalFvs, dates.size(), dbgLevel);
+		
+		Date startedAt = new Date();
+		Date startedDate = startedAt;
 		
 		for (String date : dates) {
-			if (countDate % 100 == 0) UDebug.print("Features versions retrieved for " + countDate + " dates of " + dates.size() + ".", 3);
-			UDebug.print("Retriving features versions for date " + date + " (" + countDate + " of " + dates.size() + ").", 3);
+			if (countDate % 100 == 0) UDebug.print("Features versions retrieved for " + countDate + " dates of " + dates.size() + ".\t", dbgLevel);
+			UDebug.print("Retriving features versions for date " + date + " (" + countDate + " of " + dates.size() + ").\t", dbgLevel+1);
 			ArrayList<MFeatureVersion> fvs = new ArrayList<MFeatureVersion>();
 			fvs = ffacade.retrieveFVByDate(date, vgihGraphUri, 1);
-			UDebug.print("\t\t # features versions retrieved "+fvs.size()+"\n",1);
+			UDebug.print("\t # features versions retrieved "+fvs.size()+"\n",dbgLevel+2);
 			for (MFeatureVersion featureVersion : fvs) {
-				UDebug.print("\t * feature version "+ featureVersion.getUriID() +"",1);
-				UDebug.print("\t * author "+ featureVersion.getAuthor().getAccountName() +"\n",1);
+				UDebug.print("\t * feature version "+ featureVersion.getUriID() +"",dbgLevel+2);
+				UDebug.print("\t * author "+ featureVersion.getAuthor().getAccountName() +"\n",dbgLevel+2);
 				this.compute(featureVersion);
 			}
 			countFvs = countFvs + fvs.size();
-			UDebug.print("# features versions processed "+fvs.size()+" for a total of " + countFvs +"/"+ totalFvs, 3);
-			UDebug.print(".\n\n", 3);
+			
+			Date endedDate = new Date();
+			
+			UDebug.print("\n# features versions processed "+fvs.size()+" for a total of " + countFvs +"/"+ totalFvs, dbgLevel+1);
+			UDebug.print("\n# PARTIAL elapsed time: " + UDebug.formatInterval(endedDate.getTime() - startedDate.getTime()) +", "
+							+ "TOTAL elapsed time: "  + UDebug.formatInterval(endedDate.getTime() - startedAt.getTime()) + ". ", dbgLevel+1);
+			UDebug.print("\n\n", dbgLevel+1);
 			countDate++;
+			startedDate = endedDate;
 		}
 	}
 

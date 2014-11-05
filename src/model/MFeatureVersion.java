@@ -94,7 +94,10 @@ public class MFeatureVersion {
 	public boolean isFirst() {
 		boolean first = true;
 		
-		if ( this.getFeature().getFirstVersion().getUri().equals(this.uri) ) first = true;
+		if (this.getFeature().getFirstVersion() == null) {
+			if ( this.getFeature().getFirstVersion().getUri().equals(this.uri) ) first = true;
+			else first = false;
+		}
 		else first = false;
 		
 		return first;

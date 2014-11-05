@@ -64,10 +64,8 @@ public class VShow {
 			for (MFeatureVersion featureVersion : fvs) {
 				trustInfo = trust.getTrustworthinessString(featureVersion);
 				UDebug.output("\t\t Feature Version "+ featureVersion.getUriID() +" " + trustInfo +"\n",4);
-			}
-			
+			}	
 		}
-		
 		UDebug.output("\n" ,10);
 	}
 

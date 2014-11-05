@@ -291,7 +291,8 @@ public class FFoundationFacade {
 	}
 	public ArrayList<MFeatureVersion> retrieveFVByDate(String dateFrom, String graphUri, int lazyDepth) {
 		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveByDate(dateFrom, graphUri, lazyDepth);
+//		return ffoundation.retrieveUrisByDate(dateFrom, graphUri, lazyDepth);
+		return ffoundation.retrieveFVSByDate(dateFrom, graphUri, lazyDepth);
 	}
 	public Map<String, MFeatureVersion> retrieveVersionsListbyFeature(String featureUri) {
 		return null;

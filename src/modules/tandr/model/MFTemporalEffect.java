@@ -53,21 +53,21 @@ public class MFTemporalEffect extends MFEffect{
 	 */
 	public double calculateReputation(MAuthor author, String untilDate) {
 		
-		double repEffect = 0.0;
-		
-		FTandrFacade foundation = new FTandrFacade();
-		Map<String, Double> effectList = foundation.getEffectList( this.getEffectName(), author.getUri(), untilDate, true);
-		
-		for (Entry<String, Double> effect : effectList.entrySet()) {
-			MFeatureVersion featureVersion = (MFeatureVersion) this.foundation.retrieveByUri(effect.getKey() , UConfig.getVGIHGraphURI(), 0, MFeatureVersion.class);
-			repEffect += this.calculateTemporalEffect(featureVersion, untilDate);
-		}
-		
-		if ( ! effectList.entrySet().isEmpty() )
-			repEffect = repEffect / effectList.entrySet().size();
-		else repEffect = 0.0;
-		
-		this.value = repEffect;
+//		double repEffect = 0.0;
+//		
+//		FTandrFacade foundation = new FTandrFacade();
+//		Map<String, Double> effectList = foundation.getEffectList( this.getEffectName(), author.getUri(), untilDate, true);
+//		
+//		for (Entry<String, Double> effect : effectList.entrySet()) {
+//			MFeatureVersion featureVersion = (MFeatureVersion) this.foundation.retrieveByUri(effect.getKey() , UConfig.getVGIHGraphURI(), 0, MFeatureVersion.class);
+//			repEffect += this.calculateTemporalEffect(featureVersion, untilDate);
+//		}
+//		
+//		if ( ! effectList.entrySet().isEmpty() )
+//			repEffect = repEffect / effectList.entrySet().size();
+//		else repEffect = 0.0;
+//		
+//		this.value = repEffect;
 		
 		return this.value;
 
@@ -113,9 +113,12 @@ public class MFTemporalEffect extends MFEffect{
 		featureFrom = featureFirst.getIsValidFrom().getTime();
 		
 		if (untilDate == null) untilDate = UConfig.getMaxDateTime(); 
-		if ( untilDate.before(featureVersion.getIsValidFrom()) || untilDate.before(featureFirst.getIsValidFrom()) )
-			UDebug.error("untilDate preceds feature or feature version validity interval");
-		else {
+		if ( untilDate.before(featureVersion.getIsValidFrom()) || untilDate.before(featureFirst.getIsValidFrom()) ) {
+			UDebug.error("untilDate preceds feature or feature version validity interval. "
+					+ "untilDate: " + untilDate.toString() +"; "
+					+ "feature is valid from: " + featureFirst.getIsValidFrom().toString() + "; "
+					+ "featureVersion is valid from: " + featureVersion.getIsValidFrom().toString() + ". ");
+		} else {
 			if ( featureVersion.getIsValidTo() != null && featureVersion.getIsValidTo().before(untilDate) )
 				versionTo = featureVersion.getIsValidTo().getTime();
 			else versionTo = untilDate.getTime();

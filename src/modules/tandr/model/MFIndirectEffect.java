@@ -72,9 +72,9 @@ public class MFIndirectEffect extends MFEffect{
 		
 		super.value = 0.0;
 		
-		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
-		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
-		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));		
+//		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
+//		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
+//		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));		
 
 		return super.value;
 	}

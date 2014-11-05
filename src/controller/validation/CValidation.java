@@ -2,11 +2,8 @@ package controller.validation;
 
 import java.util.Set;
 
-import controller.CCalculusAbstract;
 import model.MFeature;
 import model.MFeatureVersion;
-import modules.tandr.controller.CValidationTandR;
-import modules.tandr.model.MTrustworthinessTandr;
 import foundation.FFoundationFacade;
 import utility.UConfig;
 

@@ -16,7 +16,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public class FValidation {
 	
-	int dbgLevel = 4;
+	int dbgLevel = 100;
 	protected FTripleStore triplestore;
 	
 	public FValidation() {

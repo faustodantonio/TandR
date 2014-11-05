@@ -253,6 +253,272 @@ public class CTest {
 		UDebug.print("SPARQL query: \n" + printPrefixes(queryString) + "\n\n", 1);
 	}
 	
+	public void printQuery_4()
+	{
+		String trustworthinessUri = "http://parliament.semwebcentral.org/parliament#Trustworthiness_tandr_1_1";
+		
+		String graphUri = UConfig.getTANDRGraphURI();
+		
+		String queryString = ""
+				+ "SELECT \n"
+				+ "#Trustworthiness Info \n"
+				+ " ?tUri ?fvUri (str(?computedAt) AS ?timeStamp) (str(?trustworthinessValue) AS ?TrustValue)\n"
+				+ "# Effects Values \n"
+				+ " (str(?directEffectValue) AS ?DirValue) (str(?inirectEffectValue) AS ?IndValue) (str(?temporalEffectValue) AS ?TempValue)\n"
+				+ "#Direct Aspects Values\n"
+				+ " (str(?dirGeomAspectValue) AS ?GeomDirValue) (str(?dirQualAspectValue) AS ?QualDirValue) (str(?dirSemAspectValue) AS ?SemDirValue)\n"
+				+ "#Indirect Aspect Values\n"
+				+ " (str(?indGeomAspectValue) AS ?GeomIndValue) (str(?indQualAspectValue) AS ?QualIndValue) (str(?indSemAspectValue) AS ?SemIndValue)\n"
+				+ "\n"
+				+ "WHERE \n"
+				+ "{ \n";
+				
+		if (!graphUri.equals("")) queryString += " GRAPH " +graphUri+ "\n {\n";
+		
+		// General T info
+		queryString += ""
+				+ "\t ?tUri tandr:hasTrustworthinessValue ?value                 .\n"
+				+ "\t ?tUri tandr:refersToFeatureVersion ?fvUri                  .\n"
+				+ "\t ?value tandr:trustworthinessValueIs  ?trustworthinessValue .\n"
+				+ "\t ?value tandr:computedAt              ?computedAt           .\n"
+				+ "\n" 
+				;
+		
+		// Effect Values
+		queryString += ""
+				+ "\t ?tUri          tandr:hasTrustworthinessEffect       ?dirEffect     .\n"
+			    + "\t ?dirEffect      tandr:hasEffectDescription  <http://parliament.semwebcentral.org/parliament#tandrEffectDirect> .\n"
+				+ "\t ?dirEffect      tandr:hasEffectValue        ?dirEffectValue         .\n"
+				+ "\t ?dirEffectValue tandr:effectValueIs         ?directEffectValue      .\n"
+				+ "\t ?dirEffectValue tandr:computedAt            ?computedAt .\n"
+				+ "\n";
+				
+		queryString += ""
+				+ "\t ?tUri          tandr:hasTrustworthinessEffect  ?indEffect            .\n"
+			    + "\t ?indEffect      tandr:hasEffectDescription  <http://parliament.semwebcentral.org/parliament#tandrEffectIndirect>  .\n"
+				+ "\t ?indEffect      tandr:hasEffectValue        ?indEffectValue           .\n"
+				+ "\t ?indEffectValue tandr:effectValueIs         ?indirectEffectValue      .\n"
+				+ "\t ?indEffectValue tandr:computedAt            ?computedAt .\n"
+				+ "\n";
+				
+		queryString += ""
+				+ "\t ?tUri           tandr:hasTrustworthinessEffect ?tempEffect           .\n"
+				+ "\t ?tempEffect      tandr:hasEffectDescription <http://parliament.semwebcentral.org/parliament#tandrEffectTemporal>  .\n"
+				+ "\t ?tempEffect      tandr:hasEffectValue       ?tempEffectValue          .\n"
+				+ "\t ?tempEffectValue tandr:effectValueIs        ?temporalEffectValue      .\n"
+				+ "\t ?tempEffectValue tandr:computedAt           ?computedAt .\n"
+				+ "\n"
+				;
+				
+		// Direct Aspect Values
+		queryString += ""
+				+ "\t OPTIONAL { \n"
+				+ "\t\t ?dirEffect          tandr:hasTrustworthinessAspect ?dirGeomAspect      .\n"
+				+ "\t\t ?dirGeomAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectGeomDir> .\n"	
+				+ "\t\t ?dirGeomAspect      tandr:hasAspectValue           ?dirGeomValue       .\n"
+				+ "\t\t ?dirGeomValue       tandr:aspectValueIs            ?dirGeomAspectValue .\n"
+				+ "\t\t ?dirGeomValue       tandr:computedAt               ?computedAt  .\n"
+				+ "\t }\n"
+				+ ""
+				+ "\t OPTIONAL { \n"
+				+ "\t\t ?dirEffect          tandr:hasTrustworthinessAspect ?dirQualAspect      .\n"
+				+ "\t\t ?dirQualAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectQualDir> .\n"
+				+ "\t\t ?dirQualAspect      tandr:hasAspectValue           ?dirQualValue       .\n"
+				+ "\t\t ?dirQualValue       tandr:aspectValueIs            ?dirQualAspectValue .\n"
+				+ "\t\t ?dirQualValue       tandr:computedAt               ?computedAt  .\n"
+				+ "\t }\n"
+				+ ""
+				+ "\t OPTIONAL { \n"
+				+ "\t\t ?dirEffect         tandr:hasTrustworthinessAspect ?dirSemAspect      .\n"
+				+ "\t\t ?dirSemAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectSemDir> .\n"
+				+ "\t\t ?dirSemAspect      tandr:hasAspectValue           ?dirSemValue       .\n"
+				+ "\t\t ?dirSemValue       tandr:aspectValueIs            ?dirSemAspectValue .\n"
+				+ "\t\t ?dirSemValue       tandr:computedAt               ?computedAt  .\n"
+				+ "\t }\n"
+				+ "";
+		
+		// Indirect Aspect Values
+		queryString += ""
+				+ "\t OPTIONAL { \n"
+				+ "\t\t ?indEffect          tandr:hasTrustworthinessAspect ?indGeomAspect                   .\n"
+				+ "\t\t ?indGeomAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectGeomInd> .\n"
+				+ "\t\t ?indGeomAspect      tandr:hasAspectValue           ?indGeomValue                    .\n"
+				+ "\t\t ?indGeomValue       tandr:aspectValueIs            ?indGeomAspectValue              .\n"
+				+ "\t\t ?indGeomValue       tandr:computedAt               ?computedAt               .\n"
+				+ "\t }\n"
+				+ "\t OPTIONAL { \n"
+				+ "\t\t ?indEffect          tandr:hasTrustworthinessAspect ?indQualAspect                     .\n"
+				+ "\t\t ?indQualAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectQualInd> .\n"
+				+ "\t\t ?indQualAspect      tandr:hasAspectValue           ?indQualValue                      .\n"
+				+ "\t\t ?indQualValue       tandr:aspectValueIs            ?indQualAspectValue                .\n"
+				+ "\t\t ?indQualValue       tandr:computedAt               ?computedAt                 .\n"
+				+ "\t }\n"
+				+ "\t OPTIONAL { \n"
+				+ "\t\t ?indEffect         tandr:hasTrustworthinessAspect ?indSemAspect                   .\n"
+				+ "\t\t ?indSemAspect      tandr:hasAspectDescrDirValueasdasdasdasdasdiption     <http://parliament.semwebcentral.org/parliament#tandrAspectSemInd> .\n"
+				+ "\t\t ?indSemAspect      tandr:hasAspectValue           ?indSemValue                    .\n"
+				+ "\t\t ?indSemValue       tandr:aspectValueIs            ?indSemAspectValue              .\n"
+				+ "\t\t ?indSemValue       tandr:computedAt               ?computedAt               .\n"
+				+ "\t }\n";
+		
+		if (!graphUri.equals("")) queryString += " }\n";
+		
+		queryString += ""
+				+ " FILTER (?tUri = <"+trustworthinessUri+">)"
+				+ "\n"
+				;
+		
+		queryString += ""
+				+ "}"
+				+ "\nORDER BY DESC(?computedAt) \n"
+				+ "LIMIT 1 \n";	
+
+		UDebug.print("SPARQL query: \n" + printPrefixes(queryString) + "\n\n", 1);
+	}
+	
+	public void printQuery_5()
+	{
+		boolean graphUri = true;
+		String authorUri = "http://semantic.web/data/hvgi/author.rdf#author2";
+		String untilDate = "2012-01-01T06:00:00Z";
+		
+		String queryString = ""
+				+ "\tSELECT \n"
+				+ "\t#Reputation Info \n"
+				+ "\t (( <"+ authorUri +">) AS ?author) (STR(AVG(?trustworthinessValue)) AS ?repuValue)\n"
+				+ "\t# Effects Values \n"
+				+ "\t (STR(AVG(?directEffectValue)) AS ?directRepValue) (STR(AVG(?indirectEffectValue)) AS ?indirectRepValue) (STR(AVG(?temporalEffectValue)) AS ?temporalRepValue)\n"
+				+ "\t#Direct Aspects Values\n"
+				+ "\t (STR(AVG(?dirGeomAspectValue)) AS ?DirGeomRepValue) (STR(AVG(?dirQualAspectValue)) AS ?DirQualRepValue) (STR(AVG(?dirSemAspectValue)) AS ?DirSemRepValue)\n"
+				+ "\t#Indirect Aspect Values\n"
+				+ "\t (STR(AVG(?indGeomAspectValue)) AS ?IndGeomRepValue) (STR(AVG(?indQualAspectValue)) AS ?IndQualRepValue) (STR(AVG(?indSemAspectValue)) AS ?IndSemRepValue)\n"
+				+ "\n"
+				+ "\tWHERE \n"
+				+ "\t{ \n";
+		
+		if (graphUri) queryString += "\t GRAPH " +UConfig.getVGIHGraphURI()+ "\n\t {\n";
+		
+		queryString += ""
+				+ "\t  ?fvUri dcterms:contributor <"+ authorUri +"> .\n"
+				;
+		if (graphUri) queryString += "\t }\n";
+		
+		//***//
+				
+		if (graphUri) queryString += "\t GRAPH " +UConfig.getTANDRGraphURI()+ "\n\t {\n";
+		
+		queryString += ""
+				+ "\t  ?tUri  tandr:refersToFeatureVersion  ?fvUri                .\n"
+				+ "\t  ?tUri  tandr:hasTrustworthinessValue ?value                .\n"
+				+ "\t  ?value tandr:trustworthinessValueIs  ?trustworthinessValue .\n"
+				+ "\t  ?value tandr:computedAt              ?computedAt           .\n"
+				+ "\n" 
+				;
+		
+		queryString += ""
+				+ "\t  ?tUri           tandr:hasTrustworthinessEffect ?dirEffect  .\n"
+			    + "\t  ?dirEffect      tandr:hasEffectDescription     <http://parliament.semwebcentral.org/parliament#tandrEffectDirect> .\n"
+				+ "\t  ?dirEffect      tandr:hasEffectValue           ?dirEffectValue     .\n"
+				+ "\t  ?dirEffectValue tandr:effectValueIs            ?directEffectValue  .\n"
+				+ "\t  ?dirEffectValue tandr:computedAt               ?computedAt .\n"
+				+ "\n"
+				+ "\t  ?tUri           tandr:hasTrustworthinessEffect  ?indEffect        .\n"
+			    + "\t  ?indEffect      tandr:hasEffectDescription      <http://parliament.semwebcentral.org/parliament#tandrEffectIndirect>  .\n"
+				+ "\t  ?indEffect      tandr:hasEffectValue            ?indEffectValue      .\n"
+				+ "\t  ?indEffectValue tandr:effectValueIs             ?indirectEffectValue .\n"
+				+ "\t  ?indEffectValue tandr:computedAt                ?computedAt          .\n"
+				+ "\n"
+				+ "\t  ?tUri            tandr:hasTrustworthinessEffect ?tempEffect       .\n"
+				+ "\t  ?tempEffect      tandr:hasEffectDescription     <http://parliament.semwebcentral.org/parliament#tandrEffectTemporal>  .\n"
+				+ "\t  ?tempEffect      tandr:hasEffectValue           ?tempEffectValue     .\n"
+				+ "\t  ?tempEffectValue tandr:effectValueIs            ?temporalEffectValue .\n"
+				+ "\t  ?tempEffectValue tandr:computedAt               ?computedAt          .\n"
+				+ "\n"
+				;
+		
+		queryString += ""
+				+ "\t  OPTIONAL { \n"
+				+ "\t\t ?dirEffect          tandr:hasTrustworthinessAspect ?dirGeomAspect      .\n"
+				+ "\t\t ?dirGeomAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectGeomDir> .\n"	
+				+ "\t\t ?dirGeomAspect      tandr:hasAspectValue           ?dirGeomValue       .\n"
+				+ "\t\t ?dirGeomValue       tandr:aspectValueIs            ?dirGeomAspectValue .\n"
+				+ "\t\t ?dirGeomValue       tandr:computedAt               ?computedAt         .\n"
+				+ "\t  }\n"
+				+ ""
+				+ "\t  OPTIONAL { \n"
+				+ "\t\t ?dirEffect          tandr:hasTrustworthinessAspect ?dirQualAspect      .\n"
+				+ "\t\t ?dirQualAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectQualDir> .\n"
+				+ "\t\t ?dirQualAspect      tandr:hasAspectValue           ?dirQualValue       .\n"
+				+ "\t\t ?dirQualValue       tandr:aspectValueIs            ?dirQualAspectValue .\n"
+				+ "\t\t ?dirQualValue       tandr:computedAt               ?computedAt         .\n"
+				+ "\t  }\n"
+				+ ""
+				+ "\t  OPTIONAL { \n"
+				+ "\t\t ?dirEffect         tandr:hasTrustworthinessAspect ?dirSemAspect      .\n"
+				+ "\t\t ?dirSemAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectSemDir> .\n"
+				+ "\t\t ?dirSemAspect      tandr:hasAspectValue           ?dirSemValue       .\n"
+				+ "\t\t ?dirSemValue       tandr:aspectValueIs            ?dirSemAspectValue .\n"
+				+ "\t\t ?dirSemValue       tandr:computedAt               ?computedAt        .\n"
+				+ "\t  }\n"
+				+ "";
+		
+		queryString += ""
+				+ "\t  OPTIONAL { \n"
+				+ "\t\t ?indEffect          tandr:hasTrustworthinessAspect ?indGeomAspect      .\n"
+				+ "\t\t ?indGeomAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectGeomInd> .\n"
+				+ "\t\t ?indGeomAspect      tandr:hasAspectValue           ?indGeomValue       .\n"
+				+ "\t\t ?indGeomValue       tandr:aspectValueIs            ?indGeomAspectValue .\n"
+				+ "\t\t ?indGeomValue       tandr:computedAt               ?computedAt         .\n"
+				+ "\t  }\n"
+				+ "\t  OPTIONAL { \n"
+				+ "\t\t ?indEffect          tandr:hasTrustworthinessAspect ?indQualAspect      .\n"
+				+ "\t\t ?indQualAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectQualInd> .\n"
+				+ "\t\t ?indQualAspect      tandr:hasAspectValue           ?indQualValue       .\n"
+				+ "\t\t ?indQualValue       tandr:aspectValueIs            ?indQualAspectValue .\n"
+				+ "\t\t ?indQualValue       tandr:computedAt               ?computedAt         .\n"
+				+ "\t  }\n"
+				+ "\t  OPTIONAL { \n"
+				+ "\t\t ?indEffect         tandr:hasTrustworthinessAspect ?indSemAspect      .\n"
+				+ "\t\t ?indSemAspect      tandr:hasAspectDescription     <http://parliament.semwebcentral.org/parliament#tandrAspectSemInd> .\n"
+				+ "\t\t ?indSemAspect      tandr:hasAspectValue           ?indSemValue       .\n"
+				+ "\t\t ?indSemValue       tandr:aspectValueIs            ?indSemAspectValue .\n"
+				+ "\t\t ?indSemValue       tandr:computedAt               ?computedAt        .\n"
+				+ "\t  }\n";
+		
+		queryString += ""
+				+ "\t  { \n"
+				+ "\t   SELECT (MAX(?aspectTimeStamp) AS ?computedAt)\n"
+				+ "\t   WHERE \n"
+				+ "\t   { \n";
+		
+		if (graphUri) queryString += "\t    GRAPH " +UConfig.getTANDRGraphURI()+ "\n\t   {\n";
+		
+		queryString += ""
+				+ "\t     ?tUri1  tandr:refersToFeatureVersion  ?fvUri .\n"
+				+ "\t     ?tUri1  tandr:hasTrustworthinessValue ?value1 .\n"
+				+ "\t     ?value1 tandr:trustworthinessValueIs  ?trustworthinessValue1 .\n"
+				+ "\t     ?value1 tandr:computedAt  ?aspectTimeStamp  .\n"
+				;
+		
+		if (graphUri) queryString += "\t    }\n";
+		
+		queryString += "\t    FILTER( ?aspectTimeStamp  \""+untilDate+"\"^^xsd:dateTime  )";
+		
+		queryString += ""
+				+ "\n\t   } \n"
+				+ "\t  } \n"
+				;
+		
+		if (graphUri) queryString += "\t }\n";
+		
+		queryString += ""
+				+ "\t} \n"
+				;
+		
+		UDebug.print("SPARQL query: \n" + printPrefixes(queryString) + "\n\n", 1);
+	}
+	
+	
 	public void printTrustworthiness()
 	{
 		FFoundationFacade ffactory = new FFoundationFacade();

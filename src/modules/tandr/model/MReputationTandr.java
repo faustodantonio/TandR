@@ -30,29 +30,46 @@ public class MReputationTandr extends MReputation {
 		this.setAuthor(author);
 		
 		FReputationTandr freputation = new FReputationTandr();
-		Map<String, MFEffect> effects = freputation.retrieveReputationEffectList(this, UConfig.getTANDRGraphURI());
+//		Map<String, MFEffect> effects = freputation.retrieveReputationEffectList(this, UConfig.getTANDRGraphURI());
+//		
+//		if (effects.get("direct").equals("") || effects.get("direct") == null)
+//		direct = new MFDirectEffect();
+//		else direct = (MFDirectEffect) effects.get("direct");
+//		
+//		if (effects.get("indirect").equals("") || effects.get("indirect") == null)
+//		indirect = new MFIndirectEffect();
+//		else indirect = (MFIndirectEffect) effects.get("indirect");
+//		
+//		if (effects.get("temporal").equals("") || effects.get("temporal") == null)
+//		temporal = new MFTemporalEffect();
+//		else	temporal = (MFTemporalEffect) effects.get("temporal");
+//		
+//		// Retrieving reputation attributes
+//		MReputation rep = freputation.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 1); 
+//		if (rep != null && rep.getUri() != null) {
+//			this.value = rep.getValue();
+//			this.setComputedAt( rep.getComputedAt() );
+//		}
+//		else {
+//			this.value = 0.0;
+//			this.setComputedAt( UConfig.getMinDateTime() );
+//		}
 		
-		if (effects.get("direct").equals("") || effects.get("direct") == null)
-		direct = new MFDirectEffect();
-		else direct = (MFDirectEffect) effects.get("direct");
-		
-		if (effects.get("indirect").equals("") || effects.get("indirect") == null)
-		indirect = new MFIndirectEffect();
-		else indirect = (MFIndirectEffect) effects.get("indirect");
-		
-		if (effects.get("temporal").equals("") || effects.get("temporal") == null)
-		temporal = new MFTemporalEffect();
-		else	temporal = (MFTemporalEffect) effects.get("temporal");
-		
-		// Retrieving reputation attributes
-		MReputation rep = freputation.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 1); 
-		if (rep != null && rep.getUri() != null) {
-			this.value = rep.getValue();
-			this.setComputedAt( rep.getComputedAt() );
-		}
-		else {
+		MReputationTandr rpt = (MReputationTandr) freputation.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 0); 
+		if (rpt != null && rpt.getUri() != null) {
+			this.direct   = rpt.getDirectEffect();
+			this.indirect = rpt.getIndirectEffect();
+			this.temporal = rpt.getTemporalEffect();
+
+			this.value = rpt.getValue();
+			this.setComputedAt( rpt.getComputedAt() );
+		} else {
+			direct   = new MFDirectEffect();
+			indirect = new MFIndirectEffect();
+			temporal = new MFTemporalEffect();
+
 			this.value = 0.0;
-			this.setComputedAt( UConfig.getMinDateTime() );
+			this.setComputedAt(UConfig.getMinDateTime());
 		}
 	}
 	

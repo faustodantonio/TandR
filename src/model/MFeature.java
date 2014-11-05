@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -17,6 +18,9 @@ public class MFeature {
 	private Map<String, MFeatureVersion> versionsByUri;
 	private Map<String, String> versionsByVersion;
 	
+	private MFeatureVersion firstVersion;
+	private MFeatureVersion lastVersion;
+	
 	private FFoundationFacade foundation;
 		
 	public MFeature() {
@@ -26,16 +30,23 @@ public class MFeature {
 		this.versionsByVersion = new TreeMap<String, String>();
 	}
 	
-	public MFeatureVersion getFirstVersion() {
-		String minFVuri = versionsByVersion.get( Collections.min( versionsByVersion.keySet() ));
-		UDebug.print("\nFirst Version: " + minFVuri.toString(), 10);
-		return this.getFeatureVersionByURI(minFVuri, 0);
-	}
+//	public MFeatureVersion getFirstVersion() {
+//		String minFVuri = versionsByVersion.get( Collections.min( versionsByVersion.keySet() ));
+//		UDebug.print("\nFirst Version: " + minFVuri.toString(), 10);
+//		return this.getFeatureVersionByURI(minFVuri, 0);
+//	}
+//	
+//	public MFeatureVersion getLastVersion() {
+//		String maxFVuri = versionsByVersion.get( Collections.max( versionsByVersion.keySet() ));
+//		UDebug.print("\nLast Version: " + maxFVuri.toString(), 10);
+//		return this.getFeatureVersionByURI(maxFVuri, 0);
+//	}
 	
+	public MFeatureVersion getFirstVersion() {
+		return this.firstVersion;
+	}
 	public MFeatureVersion getLastVersion() {
-		String maxFVuri = versionsByVersion.get( Collections.max( versionsByVersion.keySet() ));
-		UDebug.print("\nLast Version: " + maxFVuri.toString(), 10);
-		return this.getFeatureVersionByURI(maxFVuri, 0);
+		return this.lastVersion;
 	}
 	
 	public ArrayList<MFeatureVersion> getPreviousVersions(String version, int lazyDepth) {
@@ -47,12 +58,44 @@ public class MFeature {
 		boolean beforeLimit = true;
 		while ( verIterator.hasNext() && beforeLimit) {
 			versionEntry = verIterator.next();
-			if (version.compareTo( versionEntry.getKey() ) > 0)
+			if (compareVersions(version,versionEntry.getKey()) > 0)//version.compareTo( versionEntry.getKey() ) > 0)
 				versions.add( this.getFeatureVersionByVersion(versionEntry.getKey(), 0));
 			else beforeLimit = false;
 		}
 		
 		return versions;
+	}
+	
+	/**
+	 * 
+	 * @param leftVer
+	 * @param rightVer
+	 * @return 
+	 * 		 1 if leftVer > rightVer; 
+	 * 		 0 if leftVer = rightVer; 
+	 * 		-1 if leftVer < rightVer;
+	 */
+	public int compareVersions(String leftVer, String rightVer) 
+	{
+		ArrayList<String> leftVer_array =  new ArrayList<String>( Arrays.asList( leftVer.split("\\.") ) );
+		ArrayList<String> rightVer_array = new ArrayList<String>( Arrays.asList( rightVer.split("\\.") ) );
+		
+		int length_gap = leftVer_array.size() - rightVer_array.size();
+		int abs_gap = Math.abs(length_gap);
+		
+		for (int i = 0; i < abs_gap; i++ )
+			if (length_gap > 0)
+				rightVer_array.add( "0" );
+			else
+				leftVer_array.add( "0" );	
+		
+		for ( int i = 0; i < leftVer_array.size() ; i++  )
+			if (Integer.parseInt(leftVer_array.get(i)) > Integer.parseInt(rightVer_array.get(i)) )
+				return 1;
+			else if (Integer.parseInt(leftVer_array.get(i)) < Integer.parseInt(rightVer_array.get(i))) 
+				return -1;
+		
+		return 0;
 	}
 	
 	public String toString(String rowPrefix)
@@ -105,16 +148,53 @@ public class MFeature {
 		this.versionsByVersion = versionsByVersion;
 	}
 
+	@Deprecated
 	public void addVersion(String fversionuri, MFeatureVersion fversion)
 	{
+		this.updateFirstLastVersion(fversionuri, null, fversion);
 		this.versionsByUri.put(fversionuri, fversion);
 	}
 	public void addVersion(String fversionUri, String version, MFeatureVersion fversion)
 	{
+		this.updateFirstLastVersion(fversionUri, version, fversion);
 		this.versionsByUri.put(fversionUri, fversion);
 		this.versionsByVersion.put(version, fversionUri);
 	}
 
+	private void updateFirstLastVersion(String fversionUri, String version, MFeatureVersion fversion) {
+		String vgihGraphUri = UConfig.getVGIHGraphURI();
+		
+		if (this.firstVersion == null) {
+			if (fversion == null)
+				fversion = (MFeatureVersion) foundation.retrieveByUri(fversionUri, vgihGraphUri, 0, MFeatureVersion.class);
+			this.firstVersion = fversion;
+		} else {
+			if ( this.compareVersions(version, this.firstVersion.getVersionNo()) < 0 ){
+				if (fversion == null)
+					fversion = (MFeatureVersion) foundation.retrieveByUri(fversionUri, vgihGraphUri, 0, MFeatureVersion.class);
+				this.firstVersion = fversion;
+			}
+		}
+		
+		if (this.lastVersion == null) {
+			if (fversion == null)
+				fversion = (MFeatureVersion) foundation.retrieveByUri(fversionUri, vgihGraphUri, 0, MFeatureVersion.class);
+			this.lastVersion = fversion;
+		} else {
+			if ( this.compareVersions(version, this.lastVersion.getVersionNo()) > 0 ){
+				if (fversion == null)
+					fversion = (MFeatureVersion) foundation.retrieveByUri(fversionUri, vgihGraphUri, 0, MFeatureVersion.class);
+				this.lastVersion = fversion;
+			}
+		}
+		
+//		if (this.lastVersion == null) 
+//			this.lastVersion = fversion;
+//		else
+//			if ( this.compareVersions(fversion.getVersionNo(), this.lastVersion.getVersionNo()) > 0 )
+//				this.lastVersion = fversion;
+	}
+	
 	public MFeatureVersion getFeatureVersionByURI(String uri, int lazyDepth) {
 		MFeatureVersion featureVersion;
 		String vgihGraphUri = UConfig.getVGIHGraphURI();

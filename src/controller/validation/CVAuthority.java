@@ -151,7 +151,7 @@ public class CVAuthority {
 	
 	private void generateAuthoritiesFeatures(Map<String, MFeature> features) {
 		
-		int dbgLevel = 1;
+		int dbgLevel = 10;
 		String fUri;
 		String fGeometry;
 		
@@ -180,7 +180,7 @@ public class CVAuthority {
 			
 			feature.addVersion(version.getUri(), version);
 			
-			UDebug.print("\nUri Version: " + version.getUri(), 1);
+			UDebug.print("\nUri Version: " + version.getUri(), dbgLevel+1);
 			
 			this.authorityFeatures.put(feature, version);
 		}

@@ -29,29 +29,47 @@ public class MTrustworthinessTandr extends MTrustworthiness{
 		featureVersion.setTrustworthiness(this);
 		this.setFeatureVersion(featureVersion);
 		
+//		FTrustworthinessTandr ftrustworthiness = new FTrustworthinessTandr();
 		FTrustworthinessTandr ftrustworthiness = new FTrustworthinessTandr();
-		Map<String, MFEffect> effects = ftrustworthiness.retrieveTrustworthinessEffectList(this,UConfig.getTANDRGraphURI());
-		
-		// Retrieving trustworthiness effects
-		if (effects.get("direct").equals("") || effects.get("direct") == null)
-			direct = new MFDirectEffect();
-		else direct = (MFDirectEffect) effects.get("direct");
-		
-		if (effects.get("indirect").equals("") || effects.get("indirect") == null)
-			indirect = new MFIndirectEffect();
-		else indirect = (MFIndirectEffect) effects.get("indirect");
-		
-		if (effects.get("temporal").equals("") || effects.get("temporal") == null)
-			temporal = new MFTemporalEffect();
-		else temporal = (MFTemporalEffect) effects.get("temporal");
+//		Map<String, MFEffect> effects = ftrustworthiness.retrieveTrustworthinessEffectList(this,UConfig.getTANDRGraphURI());
+//		
+//		// Retrieving trustworthiness effects
+//		if (effects.get("direct").equals("") || effects.get("direct") == null)
+//			direct = new MFDirectEffect();
+//		else direct = (MFDirectEffect) effects.get("direct");
+//		
+//		if (effects.get("indirect").equals("") || effects.get("indirect") == null)
+//			indirect = new MFIndirectEffect();
+//		else indirect = (MFIndirectEffect) effects.get("indirect");
+//		
+//		if (effects.get("temporal").equals("") || effects.get("temporal") == null)
+//			temporal = new MFTemporalEffect();
+//		else temporal = (MFTemporalEffect) effects.get("temporal");
 		
 		// Retrieving trustworthiness attributes
-		MTrustworthiness trust = ftrustworthiness.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 0); 
+//		MTrustworthiness trust = ftrustworthiness.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 0); 
+//		if (trust != null && trust.getUri() != null) {
+//			this.value = trust.getValue();
+//			this.setComputedAt( trust.getComputedAt() );
+//		}
+//		else {
+//			this.value = 0.0;
+//			this.setComputedAt(featureVersion.getIsValidFromString());
+//		}
+		
+		MTrustworthinessTandr trust = (MTrustworthinessTandr) ftrustworthiness.retrieveByURI(this.getUri(), UConfig.getTANDRGraphURI(), 0); 
 		if (trust != null && trust.getUri() != null) {
+			this.direct   = trust.getDirectEffect();
+			this.indirect = trust.getIndirectEffect();
+			this.temporal = trust.getTemporalEffect();
+
 			this.value = trust.getValue();
 			this.setComputedAt( trust.getComputedAt() );
-		}
-		else {
+		} else {
+			direct   = new MFDirectEffect();
+			indirect = new MFIndirectEffect();
+			temporal = new MFTemporalEffect();
+			
 			this.value = 0.0;
 			this.setComputedAt(featureVersion.getIsValidFromString());
 		}

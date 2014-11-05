@@ -21,7 +21,7 @@ public class TandR_VGIModel_Test {
 		CTest test = new CTest();
 		CTRCalculus trust = new CTRCalculus();
 		CInstallation install = new CInstallation();
-		CValidation validation = new CValidation();
+//		CValidation validation = new CValidation();
 		
 //		test.printAllAuthorURIs();
 //		test.printFirstAuthorInfos();
@@ -34,9 +34,9 @@ public class TandR_VGIModel_Test {
 //		test.retreiveSuccNeighboursFVs();
 		
 //		test.printTrustworthiness();
-//		test.printQuery_3();
+		test.printQuery_5();
 		
-		validation.validate();
+//		validation.validate();
 		
 //		install.install();
 
