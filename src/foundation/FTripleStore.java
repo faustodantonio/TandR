@@ -12,6 +12,8 @@ import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.Model;
 
 public abstract class FTripleStore {
+	
+	private int dbgLevel = 100;
 
 	public FTripleStore() {	}
 	
@@ -51,7 +53,7 @@ public abstract class FTripleStore {
 			prefixes +=  " <" + namespace.getValue().getURI() +">\n" ;
 		}
 		
-		UDebug.print(prefixes, 6);
+		UDebug.print(prefixes, dbgLevel+1);
 		
 		return prefixes + "\n" + queryString;
 		

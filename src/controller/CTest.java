@@ -9,8 +9,13 @@ import model.MAuthor;
 import model.MEdit;
 import model.MFeature;
 import model.MFeatureVersion;
+import model.MReputation;
+import modules.tandr.foundation.FTandrFacade;
+import modules.tandr.model.MReputationTandr;
+import modules.tandr.view.VReputationTandr;
 import utility.UConfig;
 import utility.UDebug;
+import view.VReputation;
 
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
@@ -81,6 +86,20 @@ public class CTest {
 		MFeature feature = (MFeature) ffactory.retrieveByUri(id, graphUri, 0, "MFeature");
 		
 		UDebug.print(feature.toString(""),1);   	  
+	}
+	
+	public void printReputationInfos()
+	{
+		modules.tandr.foundation.FTandrFacade ffactory = new FTandrFacade();
+		String id = "http://semantic.web/data/hvgi/author.rdf#author303158";
+
+		VReputationTandr view = new VReputationTandr(); 		
+		
+		MAuthor author = (MAuthor) ffactory.retrieveByUri( id, graphUri, 0, "MAuthor");
+		MReputationTandr rep = (MReputationTandr) ffactory.retrieveByUri( author.getReputationUri(), graphUri, 0, "MReputationTandr");
+		author.setReputation(rep);
+		
+		UDebug.print(author.getReputationUri() + "\n\n\n" + view.getReputationString(author),1);  
 	}
 	
 	public void printFeatureVersionInfos()
@@ -534,26 +553,26 @@ public class CTest {
 		controller.compute(featureVersion);
 	}
 	
-	public void retreiveNextFV()
-	{
-		FFoundationFacade ffactory = new FFoundationFacade();
-		String id = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion198467_2";
-		
-		MFeatureVersion fversion = (MFeatureVersion) ffactory.retrieveByUri(id, graphUri, 1, "MFeatureVersion");
-		
-		UDebug.print(fversion.toString(""),2);
-		
-		UDebug.print("\n\nDATA ESTRATTA: " + fversion.getIsValidFromString() + "\n\n",2);  
-		
-		String nextUri = ffactory.retrieveNextFVUri( fversion, graphUri );
-		
-		UDebug.print("Prossima feature version: \n\t" + nextUri , 2);
-	}
+//	public void retreiveNextFV()
+//	{
+//		FFoundationFacade ffactory = new FFoundationFacade();
+//		String id = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion198467_2";
+//		
+//		MFeatureVersion fversion = (MFeatureVersion) ffactory.retrieveByUri(id, graphUri, 1, "MFeatureVersion");
+//		
+//		UDebug.print(fversion.toString(""),2);
+//		
+//		UDebug.print("\n\nDATA ESTRATTA: " + fversion.getIsValidFromString() + "\n\n",2);  
+//		
+//		String nextUri = ffactory.retrieveNextFVUri( fversion, graphUri );
+//		
+//		UDebug.print("Prossima feature version: \n\t" + nextUri , 2);
+//	}
 	
 	public void retreiveSuccNeighboursFVs()
 	{
 		FFoundationFacade ffactory = new FFoundationFacade();
-		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(  ), Integer.parseInt(UConfig.epsg_crs));
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(  ), Integer.parseInt(UConfig.rdf_epsg_crs));
 		
 		Double radius = UConfig.featureInfluenceRadius;
 		String wktGeometryBuffered = null;
@@ -580,6 +599,31 @@ public class CTest {
 			UDebug.print("\n\t feature version: \t" + uri , 2);
 	}	
 	
+	public void printCleanedPreviousVersions() {
+		int dbgLevel = 1;
+		FFoundationFacade ffactory = new FFoundationFacade();
+		String id = "http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion8043973_27.1";
+//		String id = "http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion8179208_3.0";
+		
+		MFeatureVersion fversion = (MFeatureVersion) ffactory.retrieveByUri(id,UConfig.getVGIHGraphURI(),1,"MFeatureVersion");
+		MFeature feat = fversion.getFeature();
+		
+
+		
+		ArrayList<MFeatureVersion> fvs = feat.getCleanedPreviousVersions(fversion, 0);
+		
+		UDebug.print("Number of fvs retrieved: " + fvs.size() + " for...\n",dbgLevel+2);
+		UDebug.print("  feature version "+ fversion.getUriID() +"",dbgLevel+2);
+		UDebug.print("\n  author "+ fversion.getAuthor().getAccountName() +"\n",dbgLevel+2);
+		UDebug.print("\n\n",dbgLevel+2);
+		
+		for(MFeatureVersion fv : fvs) {
+			UDebug.print("\t * feature version "+ fv.getUriID() +"",dbgLevel+2);
+			UDebug.print("\n\t * author "+ fv.getAuthor().getAccountName() +"\n",dbgLevel+2);
+			UDebug.print("\n",dbgLevel+2);
+		}
+	}
+	
 	private String printPrefixes(String query) {
 		String prefixes = "\n";
 		
@@ -592,4 +636,7 @@ public class CTest {
 		
 		return query;
 	}
+	
+
+	
 }

@@ -16,6 +16,8 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.bbn.parliament.jena.joseki.client.RemoteModel;
 
 public class FParliament extends FTripleStore{
+	
+	private int dbgLevel = 100;
 
 	private RemoteModel parliament;
 	
@@ -113,13 +115,13 @@ public class FParliament extends FTripleStore{
 					+ "\t" + "\"true\"^^<http://www.w3.org/2001/XMLSchema#boolean> " + "\n"
 				+ "}";
 		
-		UDebug.print("\nSPARQL query: \n" + createIndexesQueryString + "\n\n", 4);
+		UDebug.print("\nSPARQL query: \n" + createIndexesQueryString + "\n\n", dbgLevel+1);
 		
 		try {
 			result = this.sparqlUpdate(createIndexesQueryString);
 		} catch (IOException e) {
 			
-			UDebug.print(e.getMessage(), 6);
+			UDebug.print(e.getMessage(), dbgLevel+2);
 			result = false;
 			e.printStackTrace();
 		}		
@@ -137,7 +139,7 @@ public class FParliament extends FTripleStore{
 				+ "\t\t{?graphUri ?p ?o}"
 				+ "}";
 		
-		UDebug.print("\n\tSPARQL query: \n" + grpahsQueryString + "\n\n", 6);
+		UDebug.print("\n\tSPARQL query: \n" + grpahsQueryString + "\n\n", dbgLevel+1);
 		ResultSet rawResults;
 		int count = 0;
 		
@@ -145,7 +147,7 @@ public class FParliament extends FTripleStore{
 			
 			rawResults = this.sparqlSelect(grpahsQueryString);
 			ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-			UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+			UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
 			queryRawResults.reset();
 			
 			while ( count < queryRawResults.size() && result.equals(false) )
@@ -153,7 +155,7 @@ public class FParliament extends FTripleStore{
 				QuerySolution generalQueryResults = queryRawResults.next();
 				if (generalQueryResults.getResource("graphUri").toString().equals(namespaceUri+graphName)) 
 					result = true;
-				UDebug.print(generalQueryResults.toString()+ (count+1) +"/"+ queryRawResults.size() +"\n", 6);
+				UDebug.print(generalQueryResults.toString()+ (count+1) +"/"+ queryRawResults.size() +"\n", dbgLevel+3);
 				count++;
 			}
 			

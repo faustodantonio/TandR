@@ -105,28 +105,28 @@ public class TandR_VGIModel {
 		
 		UDebug.log("\n\nStarting Installation at: " + installationStartTmp.toString() , dbgLogLevel);
 		UDebug.log("\nInstallation ended at: " + installationEndTmp.toString() , dbgLogLevel);
-		UDebug.log("\nInstallation time: " + ((installationEndTmp.getTime() - installationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
+		UDebug.log("\nInstallation time: " + (  UDebug.formatInterval(installationEndTmp.getTime() - installationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
 		
 		/****** COMPUTATION ***/
 		
 		UDebug.log("\n\nStarting Computation at: " + computationStartTmp.toString() , dbgLogLevel);
 		UDebug.log("\nComputation ended at: " + computationEndTmp.toString() , dbgLogLevel);
-		UDebug.log("\nComputation time: " + ((computationEndTmp.getTime() - computationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
+		UDebug.log("\nComputation time: " + ( UDebug.formatInterval(computationEndTmp.getTime() - computationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
 		
 		/****** VALIDATION ***/
 		
 		UDebug.log("\n\nStarting Validation at: " + validationStartTmp.toString() , dbgLogLevel);
 		UDebug.log("\nValidation ended at: " + validationEndTmp.toString() , dbgLogLevel);
-		UDebug.log("\nValidation time: " + ((validationEndTmp.getTime() - validationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
+		UDebug.log("\nValidation time: " + ( UDebug.formatInterval(validationEndTmp.getTime() - validationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
 		
 		/****** VISUALIZATION ***/
 		
 		UDebug.log("\n\nStarting Visualization at: " + visualizationStartTmp.toString() , dbgLogLevel);
 		UDebug.log("\nVisualization ended at: " + visualizationEndTmp.toString() , dbgLogLevel);
-		UDebug.log("\nVisualization time: " + ((visualizationEndTmp.getTime() - visualizationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
+		UDebug.log("\nVisualization time: " + ( UDebug.formatInterval(visualizationEndTmp.getTime() - visualizationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
 		
 		/****** VISUALIZATION ***/
-		UDebug.log("\n\nWhole process execution time: " + ((visualizationEndTmp.getTime() - installationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
+		UDebug.log("\n\nWhole process execution time: " + ( UDebug.formatInterval(visualizationEndTmp.getTime() - installationStartTmp.getTime())) + " milliseconds", dbgLogLevel);
 		UDebug.log("\n" , dbgLogLevel);
 	}
 

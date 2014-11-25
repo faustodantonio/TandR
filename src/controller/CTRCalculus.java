@@ -2,10 +2,15 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import utility.UConfig;
 import utility.UDebug;
 import foundation.FFoundationFacade;
+import model.MFeature;
 import model.MFeatureVersion;
 
 public class CTRCalculus {
@@ -82,6 +87,9 @@ public class CTRCalculus {
 			ArrayList<MFeatureVersion> fvs = new ArrayList<MFeatureVersion>();
 			fvs = ffacade.retrieveFVByDate(date, vgihGraphUri, 1);
 			UDebug.print("\t # features versions retrieved "+fvs.size()+"\n",dbgLevel+2);
+			
+//			fvs = this.cleanFVS(fvs);
+			
 			for (MFeatureVersion featureVersion : fvs) {
 				UDebug.print("\t * feature version "+ featureVersion.getUriID() +"",dbgLevel+2);
 				UDebug.print("\t * author "+ featureVersion.getAuthor().getAccountName() +"\n",dbgLevel+2);

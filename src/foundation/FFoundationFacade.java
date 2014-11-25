@@ -259,31 +259,31 @@ public class FFoundationFacade {
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveLivingNeighbours(featureVersion.getIsValidFromString(), fv_wkt_buffered);
 	}
-	public String retrieveFirstFVUri()
-	{
-		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveNext(null);
-	}
-	public String retrieveNextFVUri(MFeatureVersion fv)
-	{
-		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveNext(fv.getIsValidFromString());
-	}
 	public ArrayList<String> retrieveFVPreviousesNeighbours(MFeatureVersion featureVersion, String graphUri, String fv_wkt_buffered)
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveLivingNeighbours(featureVersion.getIsValidFromString(), fv_wkt_buffered, graphUri);
+		return ffoundation.retrieveLivingNeighbours_debug(featureVersion.getIsValidFromString(), fv_wkt_buffered, graphUri);
 	}
-	public String retrieveFirstFVUri(String graphUri)
-	{
-		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveNext(null,graphUri);
-	}
-	public String retrieveNextFVUri(MFeatureVersion fv, String graphUri)
-	{
-		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveNext(fv.getIsValidFromString(), graphUri);
-	}
+//	public String retrieveFirstFVUri()
+//	{
+//		FFeatureVersion ffoundation = new FFeatureVersion();
+//		return ffoundation.retrieveNext(null);
+//	}
+//	public String retrieveNextFVUri(MFeatureVersion fv)
+//	{
+//		FFeatureVersion ffoundation = new FFeatureVersion();
+//		return ffoundation.retrieveNext(fv.getIsValidFromString());
+//	}
+//	public String retrieveFirstFVUri(String graphUri)
+//	{
+//		FFeatureVersion ffoundation = new FFeatureVersion();
+//		return ffoundation.retrieveNext(null,graphUri);
+//	}
+//	public String retrieveNextFVUri(MFeatureVersion fv, String graphUri)
+//	{
+//		FFeatureVersion ffoundation = new FFeatureVersion();
+//		return ffoundation.retrieveNext(fv.getIsValidFromString(), graphUri);
+//	}
 	public ArrayList<String> retrieveDateList(String graphUri)
 	{	
 		FFeatureVersion ffoundation = new FFeatureVersion();
@@ -297,10 +297,10 @@ public class FFoundationFacade {
 	public Map<String, MFeatureVersion> retrieveVersionsListbyFeature(String featureUri) {
 		return null;
 	}
-	public ArrayList<MFeatureVersion> retriveFVConfirmers(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
-		FFeatureVersion ffoundation = new FFeatureVersion();
-		return ffoundation.retrieveConfirmers(featureVersion, dateTo, graphUri, lazyDepth);
-	}
+//	public ArrayList<MFeatureVersion> retriveFVConfirmers(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
+//		FFeatureVersion ffoundation = new FFeatureVersion();
+//		return ffoundation.retrieveConfirmers(featureVersion, dateTo, graphUri, lazyDepth);
+//	}
 	
 	/*************************
 	 * 

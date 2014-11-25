@@ -2,7 +2,7 @@ package model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -66,6 +66,92 @@ public class MFeature {
 		return versions;
 	}
 	
+//	public ArrayList<MFeatureVersion> getCleanedPreviousVersions(MFeatureVersion fversion, int lazyDepth) {
+//		
+//		String version = fversion.getVersionNo();
+//		
+//		ArrayList<MFeatureVersion> versions = new ArrayList<MFeatureVersion>();
+//		Iterator<Entry<String, String>> verIterator = versionsByVersion.entrySet().iterator();
+//		Entry<String, String> versionEntry;
+//		
+//		boolean beforeLimit = true;
+//		while ( verIterator.hasNext() && beforeLimit) {
+//			versionEntry = verIterator.next();
+//			if (compareVersions(version,versionEntry.getKey()) > 0 ) {
+//				//TODO: ***URGENT!!! consider only the latest version for each author! 
+//				MFeatureVersion fvEntry = this.getFeatureVersionByVersion(versionEntry.getKey(), 0);
+//				if(! fversion.getAuthorUri().equals(fvEntry.getAuthorUri()))
+//					versions.add( fvEntry );
+//			}
+//			else beforeLimit = false;
+//		}
+//		
+//		return versions;
+//	}
+	
+	
+	/**
+	 * Returns a array list of Feature Versions (fv) such that:
+	 * 		+ fv is a version of this feature
+	 * 		+ fv has version lower than the version of fversion
+	 * 		+ fv has the maximum (possible) version beneath the feature versions of its author 
+	 * 
+	 * @param fversion
+	 * @param lazyDepth
+	 * @return
+	 */
+	public ArrayList<MFeatureVersion> getCleanedPreviousVersions(MFeatureVersion fversion, int lazyDepth) {
+		
+//		int dbgLevel = 100;
+		String version = fversion.getVersionNo();
+		
+		Map<String,Map<String,MFeatureVersion>> cleanedMap = new HashMap<String, Map<String,MFeatureVersion>>();
+		
+		ArrayList<MFeatureVersion> versions = new ArrayList<MFeatureVersion>();
+		Iterator<Entry<String, String>> verIterator = versionsByVersion.entrySet().iterator();
+		Entry<String, String> versionEntry;
+		
+		boolean beforeLimit = true;
+		while ( verIterator.hasNext() && beforeLimit) {
+			versionEntry = verIterator.next();
+			
+			if (compareVersions(version,versionEntry.getKey()) > 0 ) {
+				MFeatureVersion fvEntry = this.getFeatureVersionByVersion(versionEntry.getKey(), 0);
+				
+				Map<String,MFeatureVersion> authorFVS = new HashMap<String, MFeatureVersion>();
+				
+				if ( cleanedMap.containsKey(fvEntry.getAuthorUri()) )
+					authorFVS = cleanedMap.get(fvEntry.getAuthorUri());
+				else cleanedMap.put(fvEntry.getAuthorUri(), authorFVS);
+				
+				if ( authorFVS.containsKey(fvEntry.getFeatureUri()) ) {
+					if( compareVersions( authorFVS.get(fvEntry.getFeatureUri()).getVersionNo(), fvEntry.getVersionNo()) == -1 ) {
+						versions.remove( authorFVS.get(fvEntry.getFeatureUri()) );
+						authorFVS.put(fvEntry.getFeatureUri(), fvEntry);
+					}
+				}
+				else authorFVS.put(fvEntry.getFeatureUri(), fvEntry);
+				
+				if(! fversion.getAuthorUri().equals(fvEntry.getAuthorUri()))
+					versions.add( fvEntry );
+			}
+			else beforeLimit = false;
+		}
+		
+//		ArrayList<MFeatureVersion> versionsAux = new ArrayList<MFeatureVersion>();
+//		UDebug.print("\n\nAuthors in map :",dbgLevel+1);
+//		for ( Entry<String, Map<String, MFeatureVersion>> authorEntry : cleanedMap.entrySet()){
+//			UDebug.print("\n author: " + authorEntry.getKey() +" has features: ",dbgLevel+1);
+//			for (Entry<String, MFeatureVersion> featureEntry : authorEntry.getValue().entrySet()) {
+//				UDebug.print("\n\t feature: " + featureEntry.getKey() + ", with version: " + featureEntry.getValue().getVersionNo(),dbgLevel+1);
+//				versionsAux.add(featureEntry.getValue());
+//			}
+//		}
+//		UDebug.print("\n\n\n\n\n",dbgLevel+1);
+		
+		return versions;
+	}	
+	
 	/**
 	 * 
 	 * @param leftVer
@@ -75,7 +161,7 @@ public class MFeature {
 	 * 		 0 if leftVer = rightVer; 
 	 * 		-1 if leftVer < rightVer;
 	 */
-	public int compareVersions(String leftVer, String rightVer) 
+	public static int compareVersions(String leftVer, String rightVer) 
 	{
 		ArrayList<String> leftVer_array =  new ArrayList<String>( Arrays.asList( leftVer.split("\\.") ) );
 		ArrayList<String> rightVer_array = new ArrayList<String>( Arrays.asList( rightVer.split("\\.") ) );
@@ -120,7 +206,9 @@ public class MFeature {
 		String uriID = this.getUri();
 		uriID = uriID.replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
 		uriID = uriID.replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
+//							   http://semantic.web/data/hvgi/ways.rdf#way		
 		uriID = uriID.replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
+//		uriID = uriID.replace("http://semantic.web/data/hvgi/featureVersions.rdf#featureVersion", "");
 		return uriID;
 	}
 	public String getUri() {
@@ -215,6 +303,8 @@ public class MFeature {
 	public String generateFeatureVesionUri(String version)	{
 		String fvUri = "";
 		
+		UDebug.print("\n\n(generating fv uri) Feature Uri: "+this.getUri()+"\n",1);
+		
 		if ( this.getUri().contains("http://semantic.web/data/hvgi/nodes.rdf#node") )
 			fvUri = "http://semantic.web/data/hvgi/nodeVersions.rdf#nodeVersion";
 		else if ( this.getUri().contains("http://semantic.web/data/hvgi/ways.rdf#way") )
@@ -223,6 +313,22 @@ public class MFeature {
 			fvUri = "http://semantic.web/data/hvgi/featureVersions.rdf#featureVersion";
 		
 		fvUri = fvUri + this.getUriID() + "_" + version;
+		
+		UDebug.print("(generating fv uri) Feature Version Uri: "+fvUri+"\n\n",1);
+		
+		return fvUri;
+	}
+	
+	public String generateGeneralFeatureVesionUri(String version)	{
+		String fvUri = "";
+		
+		UDebug.print("\n\n(generating fv uri) Feature Uri: "+this.getUri()+"\n",1);
+		
+		fvUri = "http://semantic.web/data/hvgi/featureVersions.rdf#featureVersion";
+		
+		fvUri = fvUri + this.getUriID() + "_" + version;
+		
+		UDebug.print("(generating fv uri) Feature Version Uri: "+fvUri+"\n\n",1);
 		
 		return fvUri;
 	}

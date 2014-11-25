@@ -45,7 +45,7 @@ public class MFIndirectEffect extends MFEffect{
 		
 		super.value = 0.0;
 		
-		MReputationTandr authorReputation = new MReputationTandr( featureVersion.getAuthor() );
+		MReputationTandr authorReputation = (MReputationTandr) featureVersion.getAuthor().getReputation();
 		
 		// TODO: update temporal aspect
 		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateTrustworthiness(authorReputation));
@@ -68,16 +68,16 @@ public class MFIndirectEffect extends MFEffect{
 		return super.value;
 	}
 	
-	public double calculateReputation(MAuthor author, String untilDate) {
-		
-		super.value = 0.0;
-		
-//		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
-//		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
-//		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));		
-
-		return super.value;
-	}
+//	public double calculateReputation(MAuthor author, String untilDate) {
+//		
+//		super.value = 0.0;
+//		
+////		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
+////		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
+////		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));		
+//
+//		return super.value;
+//	}
 	
 	public MFAspect getGeometricAspect() {
 		return geometricAspect;

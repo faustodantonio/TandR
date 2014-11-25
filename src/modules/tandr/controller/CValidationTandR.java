@@ -1,5 +1,6 @@
 package modules.tandr.controller;
 
+import utility.UConfig;
 import model.MFeatureVersion;
 import modules.tandr.foundation.FTandrFacade;
 import modules.tandr.model.MTrustworthinessTandr;
@@ -17,7 +18,9 @@ public class CValidationTandR extends CValidationAbstract {
 
 	@Override
 	public boolean validateTrustworthiness(MFeatureVersion fv1,	MFeatureVersion fv2, String graph) {
-		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( fv2 );
+//		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( fv2 );
+//		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) foundation.retrieveByUri(fv2.generateTrustworthinessUri(), UConfig.getVGIHGraphURI(), 0, MTrustworthinessTandr.class);
+		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) fv2.getTrustworthiness();
 		
 		double dirEffectWeight  = 1;
 		double indEffectWeight  = 0;

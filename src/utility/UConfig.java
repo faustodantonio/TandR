@@ -27,7 +27,7 @@ public class UConfig {
 	 * 3rd char -> 0:don't validate  *|* 1: validate
 	 * 4th char -> 0:don't visualize *|* 1: visualize
 	 */
-	public static String cmdString = "1111";
+	public static String cmdString = "1110";
 	
 	/**
 	 * 0 -> Never perform installation (DEFAULT)                            *|*  
@@ -36,17 +36,19 @@ public class UConfig {
 	 * 3 -> Leave previous dataset, but deletes the computed T and R values *|*
 	 * 4 -> Restore dataset, leaving the computed T and R values            *|*
 	 */
-	public static int installation_mode = 2;
+	public static int installation_mode = 3;
 	
 	/**
 	 * Possible values: 
-	 * **|** Test **|** LAquila **|**  Wien **|**  SingerstrasseWien **|**  StephansdomWien **|**
+	 * **|** Test **|** LAquila **|**  Wien **|**  SingerstrasseWien **|**  StephansdomWien **|** SeestadtWien **|** BreitenleerWien
 	 */
 //	public static String dataset_selection = "SingerstrasseWien";
 //	public static String dataset_selection = "StephansdomWien";
 //	public static String dataset_selection = "Wien";
 //	public static String dataset_selection = "LAquila";
-	public static String dataset_selection = "Test";
+//	public static String dataset_selection = "Test";
+	public static String dataset_selection = "SeestadtWien";
+//	public static String dataset_selection = "BreitenleerWien";
 	
 	/**
 	 * Possible values: 
@@ -63,7 +65,7 @@ public class UConfig {
 	
 	public static boolean graph_usage = true;
 	
-	public static int debugLevel = 2;
+	public static int debugLevel = 4;
 	
 	/*************************
 	 * 
@@ -148,11 +150,15 @@ public class UConfig {
 	 *
 	 *************************/
 	
-	public static SimpleDateFormat sdf;
-//	public static String epsg_crs = "900913";
-	public static String epsg_crs = "4326";
-	public static double featureInfluenceRadius = 50;
+	// EPSG:900913  ---->    Spherical Mercator
+	// EPSG:3857    ---->    Spherical Mercator
+	// EPSG:4326    ---->    WGS84
+	public static String rdf_epsg_crs = "900913";
+	public static String ogd_epsg_crs = "900913";
+	public static double featureInfluenceRadius = 10;
 	public static double temporalCurveSlope = 10000000000.0;
+	
+	public static SimpleDateFormat sdf;
 
 	//***************************************************************************************//
 	//*************************************** METHODS ***************************************//
@@ -323,7 +329,7 @@ public class UConfig {
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
 		
-		validationPath = "input/validation/REALNUT2012OGD.csv";
+		validationPath = "input/validation/REALNUT2012OGD_BEZ1_3857.csv";
 		
 		generalOutputFilePath = "./output/singerstrasse.txt";
 		logFilePath = "./output/log_singerstrasse_"+ new Date().toGMTString().trim() +".txt";
@@ -345,10 +351,54 @@ public class UConfig {
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
 		
-		validationPath = "input/validation/REALNUT2012OGD.csv";
+		validationPath = "input/validation/REALNUT2012OGD_BEZ1_3857.csv";
 		
 		generalOutputFilePath = "./output/stephansdom.txt";
 		logFilePath = "./output/log_stephansdom_"+ new Date().toGMTString().trim() +".txt";
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void initSeestadtWienVariables() {
+		
+		/*** Data Graphs		 */
+		hvgiGraph 				= "hvgi_seestadt";
+		tandrGraph 				= "tandr_seestadt";
+		inputRDFfilesDirectory 	= "./input/seestadtWien/";
+		
+		/*** Validation Graphs		 */
+		lowerTGraph 	= "lowerT_seestadt";
+		averageTGraph 	= "averegeT_seestadt";
+		higherTGraph 	= "higherT_seestadt";
+		
+		minDateTime = "2005-09-15T21:42:44Z";
+		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
+		
+		validationPath = "input/validation/3857/REALNUT2012OGD_BEZ22_3857.csv";
+		
+		generalOutputFilePath = "./output/seestadt.txt";
+		logFilePath = "./output/log_seestadt_"+ new Date().toGMTString().trim() +".txt";
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void initBreitenleerWienVariables() {
+		
+		/*** Data Graphs		 */
+		hvgiGraph 				= "hvgi_breitenleer";
+		tandrGraph 				= "tandr_breitenleer";
+		inputRDFfilesDirectory 	= "./input/breitenleerWien/";
+		
+		/*** Validation Graphs		 */
+		lowerTGraph 	= "lowerT_breitenleer";
+		averageTGraph 	= "averegeT_breitenleer";
+		higherTGraph 	= "higherT_breitenleer";
+		
+		minDateTime = "2005-09-15T21:42:44Z";
+		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
+		
+		validationPath = "input/validation/3857/REALNUT2012OGD_BEZ22_3857.csv";
+		
+		generalOutputFilePath = "./output/breitenleer.txt";
+		logFilePath = "./output/log_breitenleer_"+ new Date().toGMTString().trim() +".txt";
 	}
 	
 	private void initNamespaces()

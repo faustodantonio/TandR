@@ -1,8 +1,5 @@
 package modules.tandr.foundation;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.jdom2.Document;
 
 import utility.UConfig;
@@ -18,28 +15,17 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import model.MAuthor;
 import model.MReputation;
 import modules.tandr.foundation.RDFconverter.xml.FReputation2XML;
-import modules.tandr.model.MFDirectEffect;
-import modules.tandr.model.MFDirectGeomAspect;
-import modules.tandr.model.MFDirectQualAspect;
-import modules.tandr.model.MFDirectSemAspect;
-import modules.tandr.model.MFEffect;
-import modules.tandr.model.MFIndirectEffect;
-import modules.tandr.model.MFIndirectGeomAspect;
-import modules.tandr.model.MFIndirectQualAspect;
-import modules.tandr.model.MFIndirectSemAspect;
-import modules.tandr.model.MFTemporalEffect;
-import modules.tandr.model.MReputationTandr;
+import modules.tandr.model.*;
 import foundation.FFoundationAbstract;
 import foundation.FFoundationFacade;
 import foundation.FReputationExport;
 
 public class FReputationTandr extends FFoundationAbstract implements FReputationExport {
-
-//	private FReputationEffect feffect;
+	
+	private int dbgLevel = 100;
 	
 	public FReputationTandr() {
 		super();
-//		this.feffect = new FReputationEffect( super.triplestore );
 	}
 	
 	@Override
@@ -65,56 +51,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 	public MReputation retrieveByURI(String reputationUri, String graphUri, int lazyDepth) {
 		return this.retrieveByURI_prod(reputationUri, graphUri, lazyDepth);
 	}
-	
-//	public MReputation retrieveByURI_debug(String reputationUri, String graphUri, int lazyDepth) {
-//		
-//		MReputationTandr reputation = new MReputationTandr();
-//		reputation.setUri(reputationUri);
-//		
-//		String queryString = ""
-//				+ "\tSELECT ?authorUri ?reputationValue ?computedAt \n"
-//				+ "\tWHERE \n"
-//				+ "\t{ \n";
-//				
-//		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
-//		
-//		queryString += ""
-//				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:refersToAuthor     ?authorUri       }\n"
-//				+ "\t\tOPTIONAL { <"+reputationUri+">" + " tandr:hasReputationValue ?value           .\n"
-//				+ "\t\t           ?value                   tandr:reputationValueIs  ?reputationValue .\n"
-//				+ "\t\t           ?value                   tandr:computedAt         ?computedAt     }\n" 
-//				;
-//						
-//		if (!graphUri.equals("")) queryString += "\t}\n";
-//				
-//		queryString += ""
-//				+ "\t}"
-//				+ "\tORDER BY DESC(?computedAt) \n"
-//				+ "\tLIMIT 1 \n";	
-//		
-//		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 4);
-//		
-//		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
-//		
-//		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-//		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",4);
-//		queryRawResults.reset();
-//		
-//		QuerySolution generalQueryResults = queryRawResults.next();
-//		
-//		reputation = this.setReputationAttributes(reputation, graphUri, generalQueryResults, lazyDepth);
-//		reputation = this.setReputationEffects(reputation, graphUri);
-//		
-//		return reputation;
-//	}
-	
-//	public Map<String,MFEffect> retrieveReputationEffectList(MReputation reputation) {
-//		return feffect.retrieveReputationEffectList(reputation, "");
-//	}
-//	
-//	public Map<String,MFEffect> retrieveReputationEffectList(MReputation reputation, String graphUri) {
-//		return feffect.retrieveReputationEffectList(reputation, graphUri);
-//	}
+
 	@Override
 	public MReputationTandr getMaximumReputation(String computedAt) {
 		MReputationTandr maxR = new MReputationTandr();
@@ -152,7 +89,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 				+ "#Reputation Info \n"
 				+ " ?repUri ?authorUri (str(?computedAt) AS ?timeStamp) (str(?reputationValue) AS ?RepValue)\n"
 				+ "# Effects Values \n"
-				+ " (str(?directEffectValue) AS ?DirValue) (str(?inirectEffectValue) AS ?IndValue) (str(?temporalEffectValue) AS ?TempValue)\n"
+				+ " (str(?directEffectValue) AS ?DirValue) (str(?indirectEffectValue) AS ?IndValue) (str(?temporalEffectValue) AS ?TempValue)\n"
 				+ "#Direct Aspects Values\n"
 				+ " (str(?dirGeomAspectValue) AS ?GeomDirValue) (str(?dirQualAspectValue) AS ?QualDirValue) (str(?dirSemAspectValue) AS ?SemDirValue)\n"
 				+ "#Indirect Aspect Values\n"
@@ -164,9 +101,9 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
 		
 		queryString += ""
-				+ "\t ?repUri  tandr:refersToUser       ?authorUri       .\n"
+				+ "\t ?repUri  tandr:refersToAuthor     ?authorUri       .\n"
 				+ "\t ?repUri  tandr:hasReputationValue ?value           .\n"
-				+ "\t ?value   tandr:reputationsValueIs ?reputationValue .\n"
+				+ "\t ?value   tandr:reputationValueIs  ?reputationValue .\n"
 				+ "\t ?value   tandr:computedAt         ?computedAt      .\n" 
 				;
 		
@@ -186,12 +123,12 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 				+ "\nORDER BY DESC(?computedAt) \n"
 				+ "LIMIT 1 \n";			
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 4);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
 		
 		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
 		queryRawResults.reset();
 		
 		QuerySolution generalQueryResults;
@@ -204,43 +141,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		
 		return reputation;
 	}
-	
-//	private MReputationTandr setReputationEffects(MReputationTandr reputation,String graphUri) {
-//		Map<String,MFEffect> effects = new HashMap<String,MFEffect>();
-//		effects = feffect.retrieveReputationEffectList(reputation,graphUri);
-//		
-////		System.out.print("\n\n Direct Effect Retrieved Value" + ((MFDirectEffect) effects.get("direct")).getValue() ) ;
-//		
-//		reputation.setDirectEffect((MFDirectEffect) effects.get("direct"));
-//		reputation.setIndirectEffect((MFIndirectEffect) effects.get("indirect"));
-//		reputation.setTemporalEffect((MFTemporalEffect) effects.get("temporal"));
-//		return reputation;
-//	}
-//
-//	private MReputationTandr setReputationAttributes(MReputationTandr reputation, String graphUri, QuerySolution generalQueryResults, int lazyDepth){
-//		
-//		FFoundationFacade ffacade = new FFoundationFacade();
-//		
-//		RDFNode refersToAuthor  = generalQueryResults.getResource("authorUri");
-//		RDFNode reputationValue = generalQueryResults.getLiteral("reputationValue");
-//		RDFNode computedAt      = generalQueryResults.getLiteral("computedAt");
-//		
-//		if (refersToAuthor != null){
-//			reputation.setAuthorUri(refersToAuthor.toString());
-//			if ( lazyDepth > 0 ) {
-//				MAuthor author = (MAuthor) ffacade.retrieveByUri( refersToAuthor.toString(), graphUri, lazyDepth-1, MAuthor.class); 
-//				reputation.setAuthor(author);
-//			}			
-//		}
-//		if (reputationValue != null)
-//			reputation.setValue( Double.parseDouble(reputationValue.toString().replace("^^http://www.w3.org/2001/XMLSchema#decimal", "")));
-//		if (computedAt != null && ! computedAt.toString().equals(""))
-//			reputation.setComputedAt(computedAt.toString().replace("^^http://www.w3.org/2001/XMLSchema#dateTime", ""));		
-//		
-//		return reputation;
-//	}
-	
-	
+		
 	public MReputationTandr computeReputationValues(String authorUri,String untilDate,Boolean graphUri) {
 
 		MReputationTandr reputation = new MReputationTandr();
@@ -283,19 +184,21 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		queryString += this.getIndirectTrustAspectsQueryString();
 		queryString += this.getComputedAtQueryString(untilDate, graphUri);
 		
-		if (graphUri) queryString += "\t }\n";
+		queryString += "\t }\n";
+		
+		if (graphUri) queryString += "\t  FILTER( ?computedAt <= ?maxComputedAt  )\n";
 		
 		queryString += ""
 				+ "\t} \n"
 				;
 	
 		
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n", 4);
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
 		
 		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
 		
 		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",6);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
 		queryRawResults.reset();
 		
 		QuerySolution generalQueryResults;
@@ -530,7 +433,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		String queryString = "";
 		queryString += ""
 				+ "\t  { \n"
-				+ "\t   SELECT (MAX(?aspectTimeStamp) AS ?computedAt)\n"
+				+ "\t   SELECT (MAX(?aspectTimeStamp) AS ?maxComputedAt)\n"
 				+ "\t   WHERE \n"
 				+ "\t   { \n";
 		
@@ -545,7 +448,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		
 		if (graphUri) queryString += "\t    }\n";
 		
-		queryString += "\t    FILTER( ?aspectTimeStamp < \""+untilDate+"\"^^xsd:dateTime  )";
+		queryString += "\t    FILTER( ?aspectTimeStamp <= \""+untilDate+"\"^^xsd:dateTime  )";
 		
 		queryString += ""
 				+ "\n\t   } \n"

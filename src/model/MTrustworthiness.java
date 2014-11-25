@@ -26,19 +26,19 @@ public class MTrustworthiness {
 		this.foundation = new FFoundationFacade();
 	}
 	
-	public MTrustworthiness(MFeatureVersion featureVersion) {
-		this.sdf = UConfig.sdf;
-		
-		this.setUri(this.generateTrustworthinessUri(featureVersion));
-		this.setComputedAt(featureVersion.getIsValidFromString());
-		
-		featureVersion.setTrustworthiness(this);
-		this.setFeatureVersion(featureVersion);
-	}
+//	public MTrustworthiness(MFeatureVersion featureVersion) {
+//		this.sdf = UConfig.sdf;
+//		
+//		this.setUri(this.generateTrustworthinessUri(featureVersion));
+//		this.setComputedAt(featureVersion.getIsValidFromString());
+//		
+//		featureVersion.setTrustworthiness(this);
+//		this.setFeatureVersion(featureVersion);
+//	}
 	
-	public String generateTrustworthinessUri() {
-		return ""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + featureVersion.getUriID();
-	}
+//	public String generateTrustworthinessUri() {
+//		return ""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + featureVersion.getUriID();
+//	}
 	public String generateTrustworthinessUri(MFeatureVersion fVersion) {
 		return ""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + fVersion.getUriID();
 	}

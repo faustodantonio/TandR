@@ -61,7 +61,7 @@ public class MFeatureVersion {
 	{
 		String wktGeometryBuffered = null;
 		
-		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(  ), Integer.parseInt(UConfig.epsg_crs));
+		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(  ), Integer.parseInt(UConfig.rdf_epsg_crs));
 		WKTReader reader = new WKTReader( geometryFactory );
 		
 		Geometry geometryBuffered;
@@ -94,7 +94,7 @@ public class MFeatureVersion {
 	public boolean isFirst() {
 		boolean first = true;
 		
-		if (this.getFeature().getFirstVersion() == null) {
+		if (this.getFeature().getFirstVersion() != null) {
 			if ( this.getFeature().getFirstVersion().getUri().equals(this.uri) ) first = true;
 			else first = false;
 		}
@@ -130,16 +130,18 @@ public class MFeatureVersion {
 		
 		UDebug.print("\n\nFeature URI: " + this.getFeatureUri(), 1);
 		
-		if ( this.getGeometry().getGeometryType().equals("Point") )
-			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
-		else if ( this.getGeometry().getGeometryType().equals("LineString") )
-			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
-		else
-			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
+//		if ( this.getGeometry().getGeometryType().equals("Point") )
+//			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
+//		else if ( this.getGeometry().getGeometryType().equals("LineString") )
+//			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
+//		else
+//			featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
 		
-//		featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
-//		featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
-//		featureID = this.getFeatureUri().replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
+		featureID = this.getFeatureUri();
+		
+		featureID = featureID.replace("http://semantic.web/data/hvgi/nodes.rdf#node", "");
+		featureID = featureID.replace("http://semantic.web/data/hvgi/ways.rdf#way", "");
+		featureID = featureID.replace("http://semantic.web/data/hvgi/features.rdf#feature", "");
 		
 		versionID = this.versionNo;
 		
@@ -338,9 +340,13 @@ public class MFeatureVersion {
 	
 	public MTrustworthiness getTrustworthiness() {
 		if (this.trustworthiness == null) {
-			if (this.getTrustworthinessUri() != null && ! this.getTrustworthinessUri().equals(""))
+			if (this.getUri() != null) {				
 				this.setTrustworthiness( (MTrustworthiness) foundation.retrieveByUri(this.getTrustworthinessUri(), UConfig.getTANDRGraphURI(), 0, MTrustworthiness.class) );
-			else this.trustworthiness = null;
+				this.trustworthiness.setFeatureVersionUri(this.getUri());
+				this.trustworthiness.setFeatureVersion(this);
+			} else {
+				this.trustworthiness = new MTrustworthiness();
+			}
 		}
 		return this.trustworthiness;
 	}
@@ -349,6 +355,8 @@ public class MFeatureVersion {
 		this.setTrustworthinessUri(trustworthiness.getUri(), 0);
 	}
 	public String getTrustworthinessUri() {
+		if (this.trustworthinessUri == null || this.trustworthinessUri.equals(""))
+			this.setTrustworthinessUri( this.generateTrustworthinessUri() );
 		return trustworthinessUri;
 	}
 	public void setTrustworthinessUri(String trustworthinessUri) {
@@ -360,6 +368,9 @@ public class MFeatureVersion {
 			this.setTrustworthiness( (MTrustworthiness) foundation.retrieveByUri(this.getTrustworthinessUri(), UConfig.getTANDRGraphURI(), lazyDepth - 1, MTrustworthiness.class) );
 	}
 
+	public String generateTrustworthinessUri() {
+		return ""+UConfig.graphURI + "Trustworthiness_" + UConfig.module_trustworthiness_calculus + "_" + this.getUriID();
+	}
 	
 	public String toString(String rowPrefix)
 	{

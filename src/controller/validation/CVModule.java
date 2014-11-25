@@ -10,6 +10,8 @@ import model.MFeature;
 import model.MFeatureVersion;
 
 public class CVModule {
+	
+	private int dbgLevel = 100;
 
 	private Set<MFeature> features;
 	private FFoundationFacade foundation;
@@ -23,7 +25,7 @@ public class CVModule {
 
 	public void featurePopulateLowerGraph(String graph) {
 		for (MFeature feature : features) {
-			UDebug.print(foundation.convertToRDFTTL(feature) , 10);
+			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);
 			MFeatureVersion version = this.foundation.retrieveLowestTrustworthyFV(feature.getUri(), UConfig.getVGIHGraphURI(), UConfig.getTANDRGraphURI());
 			
 			//** Update feature version information			
@@ -33,7 +35,7 @@ public class CVModule {
 			version.setIsValidTo(UConfig.getMaxDateTime());
 			version.setUri(version.generateUri());
 			
-			UDebug.print("\n\n" + foundation.convertToRDFTTL(version), 10);
+			UDebug.print("\n\n" + foundation.convertToRDFTTL(version), dbgLevel);
 			
 			foundation.create(version, graph);
 		}
@@ -41,7 +43,7 @@ public class CVModule {
 	
 	public void featurePopulateAverageGraph(String graph) {
 		for (MFeature feature : features) {
-			UDebug.print(foundation.convertToRDFTTL(feature) , 10);
+			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);
 			MFeatureVersion version = this.foundation.retrieveAverageTrustworthyFV(feature.getUri(), UConfig.getVGIHGraphURI(), UConfig.getTANDRGraphURI());
 			
 			version.setVersionNo("2");
@@ -56,7 +58,7 @@ public class CVModule {
 	
 	public void featurePopulateHigherGraph(String graph) {
 		for (MFeature feature : features) {
-			UDebug.print(foundation.convertToRDFTTL(feature) , 10);
+			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);
 			MFeatureVersion version = this.foundation.retrieveHighestTrustworthyFV(feature.getUri(), UConfig.getVGIHGraphURI(), UConfig.getTANDRGraphURI());
 			
 			version.setVersionNo("2");

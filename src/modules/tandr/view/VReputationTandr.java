@@ -14,9 +14,8 @@ public class VReputationTandr extends VReputation{
 	public String getReputationString(MAuthor author) {
 		
 		MReputationTandr reputation;
-		if ( author.getReputation() == null && (author.getReputationUri() == null || author.getReputationUri() .equals("")) ) 
-			reputation = new MReputationTandr( author );
-		else reputation = (MReputationTandr) author.getReputation();
+		
+		reputation = (MReputationTandr) author.getReputation();
 		
 //		FTandrFacade ffacade = new FTandrFacade();
 //		UDebug.print("\n\n" + ffacade.convertToRDFTTL(trust),4);

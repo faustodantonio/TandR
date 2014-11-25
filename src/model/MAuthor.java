@@ -26,7 +26,7 @@ public class MAuthor {
 		this.uri = uri;
 	}
 	public String getAccountName() {
-		return accountName;
+		return this.accountName;
 	}
 	public void setAccountName(String accountName) {
 		this.accountName = accountName;
@@ -39,9 +39,15 @@ public class MAuthor {
 	}
 	public MReputation getReputation() {
 		if (this.reputation == null) {
-			MReputation authorRep = (MReputation) foundation.retrieveByUri(this.getReputationUri(), UConfig.getTANDRGraphURI(), 0, MReputation.class) ;
-			authorRep.setAuthor(this);
-			this.setReputation( authorRep );
+			if (this.accountName != null ) {
+				this.setReputation( (MReputation) foundation.retrieveByUri(this.getReputationUri(), UConfig.getTANDRGraphURI(), 0, MReputation.class) );
+				this.reputation.setAuthorUri(this.uri);
+				this.reputation.setAuthor(this);
+			} else {
+				this.reputation = new MReputation();
+				this.reputation.setAuthorUri(this.uri);
+				this.reputation.setAuthor(this);
+			}			
 		} 
 		return reputation;
 	}
@@ -71,8 +77,8 @@ public class MAuthor {
 		
 		authorString = rowPrefix +  "Author :" + "\n"
 				+ rowPrefix + "\t uri                   = \""+ this.getUri() +"\"\n"
-				+ rowPrefix +  "\t accountName           = \""+ this.getAccountName() +"\"\n"
-				+ rowPrefix +  "\t accountServerHomepage = \""+ this.getAccountServerHomepage() +"\"\n";
+				+ rowPrefix + "\t accountName           = \""+ this.getAccountName() +"\"\n"
+				+ rowPrefix + "\t accountServerHomepage = \""+ this.getAccountServerHomepage() +"\"\n";
 		
 		return authorString;
 	}

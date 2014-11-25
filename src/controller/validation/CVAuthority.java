@@ -13,6 +13,7 @@ import org.apache.commons.csv.CSVRecord;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.WKTWriter;
 
 import model.MAuthor;
 import model.MFeature;
@@ -22,6 +23,16 @@ import utility.UConfig;
 import utility.UDebug;
 import foundation.FFoundationFacade;
 import foundation.FReputation;
+
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.opengis.geometry.MismatchedDimensionException;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
+
 
 public class CVAuthority {
 
@@ -117,7 +128,7 @@ public class CVAuthority {
 		Map<String, MFeature> features = new HashMap<String, MFeature>();
 		Map<String,String> intersectedFVs = new HashMap<String,String>();
 		
-		int dbgLevel = 4;
+		int dbgLevel = 1;
 		
     	UDebug.print("\nInizializing features map", dbgLevel);
 		
@@ -130,18 +141,20 @@ public class CVAuthority {
         	MFeature bindedFeature;
         	
         	String wktAuthority = record.get("SHAPE");
+        	wktAuthority = this.transformGeometry(wktAuthority);
         	intersectedFVs = foundation.getIntersectedFV(wktAuthority,UConfig.getVGIHGraphURI());
         	
-        	UDebug.print("\nProcessing " + record.get("OBJECTID") + " object.", dbgLevel + 1);
-        	UDebug.print("\n\tExpected Intersections " + record.get("EXPECTED_INTERSECTIONS"), dbgLevel + 1);
-        	UDebug.print("\n\tObtained Intersections " + intersectedFVs.size() +"\n", dbgLevel + 1);
+        	UDebug.print("\nProcessing object ID:" + record.get("OBJECTID") + ".", dbgLevel + 1);
+//        	UDebug.print("\n\tExpected Intersections " + record.get("EXPECTED_INTERSECTIONS"), dbgLevel + 1);
+        	UDebug.print("\tObtained Intersections " + intersectedFVs.size() +"\n", dbgLevel + 1);
         	
         	if ( ! intersectedFVs.isEmpty() ) {
         		String bindedFeatureUri = this.getHigherIntersects(wktAuthority, intersectedFVs);
+        		UDebug.print("\t\tFeature Selected " + bindedFeatureUri +"\n", dbgLevel + 1);
         		if ( ! bindedFeatureUri.equals("")) {
         			bindedFeature = (MFeature) foundation.retrieveByUri(bindedFeatureUri, UConfig.getVGIHGraphURI(), 0, MFeature.class);
         			features.put(wktAuthority, bindedFeature);
-        			UDebug.print("\t\tFeature Selected " + bindedFeature.getUri() +"\n", dbgLevel + 1);
+//        			UDebug.print("\t\tFeature Selected " + bindedFeature.getUri() +"\n", dbgLevel + 1);
         		}
         	}
         }
@@ -178,7 +191,7 @@ public class CVAuthority {
 			version.setIsValidTo(UConfig.getMinDateTime());
 			version.generateUri();
 			
-			feature.addVersion(version.getUri(), version);
+			feature.addVersion(version.getUri(),"1", version);
 			
 			UDebug.print("\nUri Version: " + version.getUri(), dbgLevel+1);
 			
@@ -218,6 +231,10 @@ public class CVAuthority {
 							bindedFeatureUri = fUri;
 						}
 					}
+					UDebug.print("\n\t\tOGD Geometry: " + new WKTWriter().write(geomAuthority) + ""
+											+ " original string :" + wktAuthority, 100);
+					UDebug.print("\n\t\tOSH Geometry: " + new WKTWriter().write(geomFV) + ""
+							+ " original string :" + fvGeometry, 100);
 				}
 			}
 		} 
@@ -243,4 +260,48 @@ public class CVAuthority {
 			Map<MFeature, MFeatureVersion> authorityFeatures) {
 		this.authorityFeatures = authorityFeatures;
 	}
+	
+	private String transformGeometry(String ogd_geomWKT) {
+		
+		CoordinateReferenceSystem crs_ogd, crs_rdf;
+		MathTransform transform;
+		Geometry ogd_geom;
+		
+		String ogd_geomWKT_transformed =  ogd_geomWKT;
+		
+		if (! UConfig.ogd_epsg_crs.equals(UConfig.rdf_epsg_crs)) {
+			
+			try {
+				ogd_geom = new WKTReader().read(ogd_geomWKT);
+	
+				crs_ogd = CRS.decode("EPSG:" + UConfig.ogd_epsg_crs);
+				crs_rdf = CRS.decode("EPSG:" + UConfig.rdf_epsg_crs);
+				
+				transform = CRS.findMathTransform(crs_ogd, crs_rdf, true);		
+				ogd_geom = JTS.transform(ogd_geom, transform);
+		
+				ogd_geomWKT_transformed = new WKTWriter().write(ogd_geom);
+				
+			} catch (NoSuchAuthorityCodeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (FactoryException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (com.vividsolutions.jts.io.ParseException e1) {
+				UDebug.print("\n*** ERROR: wkt geometry bad formatted\nCorrection Attempt #1",1);
+				UDebug.print("\n*** ERROR: " + e1.getMessage(),2);
+			} catch (MismatchedDimensionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (TransformException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		return ogd_geomWKT_transformed;
+
+	}
+	
 }

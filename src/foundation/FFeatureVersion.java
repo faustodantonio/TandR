@@ -11,6 +11,7 @@ import model.MAuthor;
 import model.MEdit;
 import model.MFeature;
 import model.MFeatureVersion;
+import utility.UConfig;
 import utility.UDebug;
 
 import com.hp.hpl.jena.query.QuerySolution;
@@ -89,70 +90,70 @@ class FFeatureVersion extends FFoundationAbstract{
 		return fvTriples;
 	}
 	
-	public String retrieveFirst()	{
-		return this.retrieveNext(null);
-	}
+//	public String retrieveFirst()	{
+//		return this.retrieveNext(null);
+//	}
 	
-	public String retrieveFirst(String graphUri)	{
-		return this.retrieveNext(null,graphUri);
-	}
+//	public String retrieveFirst(String graphUri)	{
+//		return this.retrieveNext(null,graphUri);
+//	}
+//	
+//	public String retrieveNext(String fv_dateFrom)	{
+//		return this.retrieveNext(fv_dateFrom, "");
+//	}
 	
-	public String retrieveNext(String fv_dateFrom)	{
-		return this.retrieveNext(fv_dateFrom, "");
-	}
-	
-	public String retrieveNext(String fv_dateFrom,String graphUri)
-	{		
-		String queryString = ""
-				+ "\tSELECT ?uri ?dateFrom\n"
-				+ "\tWHERE \n"
-				+ "\t{ \n";
-				
-		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
-		
-		queryString += ""
-				+ "\t\tOPTIONAL { ?uri      rdf:type             osp:FeatureState } \n"
-				+ "\t\tOPTIONAL { ?uri      hvgi:valid           _:valid          . \n"
-				+ "			  _:valid   hvgi:validFrom       _:time            	  . \n"
-				+ "			  _:time    time:inXSDDateTime   ?dateFrom}          	\n";
-		
-		if (fv_dateFrom != null)
-			queryString += "\t\tFILTER( ?dateFrom > \"" + fv_dateFrom + "\"^^xsd:dateTime )  \n";
-		
-		if (!graphUri.equals("")) queryString += "\t }\n";
-		
-		queryString += ""
-				+ "\t}																\n"
-				+ "\tORDER BY ASC(?dateFrom) 										\n"
-				+ "\tLIMIT 1 \n\n"
-				;
-		
-		UDebug.print("Retriving the next feature version wrt date: "+ fv_dateFrom +" \n", dbgLevel);
-		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+1);
-		
-		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
-		
-		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
-		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2 );
-		queryRawResults.reset();
-		
-		QuerySolution generalQueryResults = queryRawResults.next();
-		
-		RDFNode uri = generalQueryResults.getResource("uri");
-		
-		return uri.toString();
-	}
+//	public String retrieveNext(String fv_dateFrom,String graphUri)
+//	{		
+//		String queryString = ""
+//				+ "\tSELECT ?uri ?dateFrom\n"
+//				+ "\tWHERE \n"
+//				+ "\t{ \n";
+//				
+//		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "\n\t {\n";
+//		
+//		queryString += ""
+//				+ "\t\tOPTIONAL { ?uri      rdf:type             osp:FeatureState } \n"
+//				+ "\t\tOPTIONAL { ?uri      hvgi:valid           _:valid          . \n"
+//				+ "			  _:valid   hvgi:validFrom       _:time            	  . \n"
+//				+ "			  _:time    time:inXSDDateTime   ?dateFrom}          	\n";
+//		
+//		if (fv_dateFrom != null)
+//			queryString += "\t\tFILTER( ?dateFrom > \"" + fv_dateFrom + "\"^^xsd:dateTime )  \n";
+//		
+//		if (!graphUri.equals("")) queryString += "\t }\n";
+//		
+//		queryString += ""
+//				+ "\t}																\n"
+//				+ "\tORDER BY ASC(?dateFrom) 										\n"
+//				+ "\tLIMIT 1 \n\n"
+//				;
+//		
+//		UDebug.print("Retriving the next feature version wrt date: "+ fv_dateFrom +" \n", dbgLevel);
+//		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+1);
+//		
+//		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
+//		
+//		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+//		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2 );
+//		queryRawResults.reset();
+//		
+//		QuerySolution generalQueryResults = queryRawResults.next();
+//		
+//		RDFNode uri = generalQueryResults.getResource("uri");
+//		
+//		return uri.toString();
+//	}
 	
 	public ArrayList<String> retrieveLivingNeighbours(String fv_dateFrom,String fv_wkt_buffered) {
-		return this.retrieveLivingNeighbours(fv_dateFrom, fv_wkt_buffered, "");
+		return this.retrieveLivingNeighbours_debug(fv_dateFrom, fv_wkt_buffered, "");
 	}
 	
-	public ArrayList<String> retrieveLivingNeighbours(String fv_dateFrom,String fv_wkt_buffered,String graphUri)
+	public ArrayList<String> retrieveLivingNeighbours_debug(String fv_dateFrom,String fv_wkt_buffered,String graphUri)
 	{	
 		ArrayList<String> uris = new ArrayList<String>();		
 		
 		String queryString = ""
-				+ "\tSELECT ?uri ?dateFrom ?dateTo ?wktString \n"
+				+ "\tSELECT ?uri ?validFrom ?dateTo ?wktString \n"
 				+ "\tWHERE \n"
 				+ "\t{ \n";
 				
@@ -163,9 +164,9 @@ class FFeatureVersion extends FFoundationAbstract{
 				// Join on TEMPORAL subgraph
 				+ "\t\tOPTIONAL { ?uri      hvgi:valid           ?valid               . \n"
 				+ "  			  ?valid     hvgi:validFrom      _:timeFrom           . \n"
-				+ "	     		            _:timeFrom time:inXSDDateTime  ?dateFrom  . \n"
+				+ "	     		            _:timeFrom time:inXSDDateTime  ?validFrom  . \n"
 				+ "  			  OPTIONAL {?valid     hvgi:validTo        _:timeTo   . \n"
-				+ "	     		            _:timeTo   time:inXSDDateTime  ?dateTo    } \n"				
+				+ "	     		            _:timeTo   time:inXSDDateTime  ?validTo    } \n"				
 				+ "\t\t\t} \n"
 				// Join on SPATIAL subgraph
 				+ "\t\tOPTIONAL { ?uri      geosparql:hasGeometry    _:geom       . \n"
@@ -173,18 +174,30 @@ class FFeatureVersion extends FFoundationAbstract{
 				
 		if (!graphUri.equals("")) queryString += "\t\t}\n";
 		
-		// TODO: manage if dateTo do not exists
+		queryString += ""
+				+ "\t\t  BIND(if( "
+				+ "NOT EXISTS {?valid hvgi:validTo ?timeTo . ?timeTo time:inXSDDateTime ?validTo },\""
+				+ UConfig.getMaxDateTimeAsString() +"\"^^xsd:dateTime,?validTo) AS ?dateTo)  \n";
 		
 		queryString += ""				
 				+ "\t\tFILTER(                                                               \n"
-				+ "\t\t\t?dateFrom < \"" + fv_dateFrom + "\"^^xsd:dateTime  &&  			 \n"
+				+ "\t\t\t?validFrom < \"" + fv_dateFrom + "\"^^xsd:dateTime  &&  			 \n"
 				+ "\t\t\t?dateTo > \"" + fv_dateFrom + "\"^^xsd:dateTime    &&               \n"
 				+ "\t\t\tgeof:sfWithin(?wktString, \""+ fv_wkt_buffered +"\"^^sf:wktLiteral) \n"
 				+ "\t\t\t)                                                                   \n"
 				+ "\t}																         \n"
-				+ "\tORDER BY DESC(?dateFrom) 										         \n"
-//				+ "\tLIMIT 10 										                         \n"
 				;
+
+//		queryString += ""				
+//				+ "\t\tFILTER(                                                               \n"
+//				+ "\t\t\t?dateFrom < \"" + fv_dateFrom + "\"^^xsd:dateTime  &&  			 \n"
+//				+ "\t\t\t?dateTo > \"" + fv_dateFrom + "\"^^xsd:dateTime    &&               \n"
+//				+ "\t\t\tgeof:sfWithin(?wktString, \""+ fv_wkt_buffered +"\"^^sf:wktLiteral) \n"
+//				+ "\t\t\t)                                                                   \n"
+//				+ "\t}																         \n"
+//				+ "\tORDER BY DESC(?dateFrom) 										         \n"
+////				+ "\tLIMIT 10 										                         \n"
+//				;
 		
 		UDebug.print("Retriving features valid at " +fv_dateFrom+" in "+ fv_wkt_buffered +" \n", dbgLevel+1);
 		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+2);
@@ -205,57 +218,52 @@ class FFeatureVersion extends FFoundationAbstract{
 		return uris;
 	}
 	
-	public ArrayList<MFeatureVersion> retrieveConfirmers(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
-		
-		ArrayList<MFeatureVersion> versions = new ArrayList<MFeatureVersion>();
-		ArrayList<String> uris = this.retrieveConfirmersUris(featureVersion, dateTo, graphUri, lazyDepth);
-		
-		for (String uri : uris) 
-			versions.add( this.retrieveByURI(uri, graphUri, 1) );
-		
-		return versions;
-	}
-	
-	public ArrayList<String> retrieveConfirmersUris(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
-		
-		ArrayList<String> uris = new ArrayList<String>();
-		double radius = 10.0;
-		
-		String fv_dateFrom = featureVersion.getIsValidFromString();
-//		String fv_dateTo = featureVersion.getIsValidToString(); //CHECK su fv_dateTo > fv_dateFrom???
-		String fv_wkt_buffered = featureVersion.getGeometryBuffer(radius);
+	public ArrayList<MFeatureVersion> retrieveLivingNeighbours_prod(String fv_dateFrom,String fv_wkt_buffered,String graphUri)
+	{	
+//		ArrayList<String> uris = new ArrayList<String>();		
 		
 		String queryString = ""
-				+ "\tSELECT ?uri \n"
+				+ "\tSELECT ?uri ?dateFrom ?dateTo ?wktString \n"
 				+ "\tWHERE \n"
 				+ "\t{ \n";
 				
-		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
+		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";				
 		
 		queryString += ""
-				+ "\t\tOPTIONAL { ?uri      rdf:type             osp:FeatureState } \n"
-				// Join on TEMPORAL subgraph
-				+ "\t\tOPTIONAL { ?uri      hvgi:valid           ?valid       . \n"
-				+ "  			  ?valid     hvgi:validFrom      _:timeFrom   . \n"
-				+ "	     		  _:timeFrom time:inXSDDateTime  ?dateFrom      \n"		
-				+ "\t\t\t} \n"
-				// Join on SPATIAL subgraph
-				+ "\t\tOPTIONAL { ?uri      geosparql:hasGeometry    _:geom       . \n"
-				+ "	     		  _:geom    geosparql:asWKT          ?wktString   } \n";
-				
+				+ "\t\tOPTIONAL { ?uri  hvgi:isVersionOf      ?isVersionOf } \n"
+				+ "\t\tOPTIONAL { ?uri  hvgi:hasVersion       _:ver         .\n"
+				+ "\t\t           _:ver hvgi:versionNo     ?versionNo      } \n"
+				+ "\t\tOPTIONAL { ?uri  prv:precededBy        ?precededBy  } \n"
+				+ "\t\tOPTIONAL { ?uri  osp:createdBy         ?createdBy   } \n"
+				+ "\t\tOPTIONAL { ?uri  dcterms:contributor   ?contributor } \n"
+				+ "\t\tOPTIONAL { ?uri  hvgi:valid            ?valid       .\n"
+				+ "\t\t\tOPTIONAL { ?valid     hvgi:validFrom     _:timeFrom .\n"
+				+ "\t		        _:timeFrom time:inXSDDateTime ?validFrom }\n"
+				+ "\t\t\tOPTIONAL { ?valid     hvgi:validTo       _:timeTo   .\n"
+				+ "\t			    _:timeTo   time:inXSDDateTime ?validTo	 }\n"
+				+ "\t\t         }\n"
+				+ "\t\tOPTIONAL { ?uri hvgi:isDeleted        ?isDeleted    } \n"
+				+ "\t\tOPTIONAL { ?uri osp:hasTag            ?hasTag       } \n"
+				+ "\t\tOPTIONAL { ?uri geosparql:hasGeometry _:geom        . \n"
+				+ "\t\t\t         _:geom       geosparql:asWKT    ?wktGeom } \n";
+		
 		if (!graphUri.equals("")) queryString += "\t\t}\n";
+		
+		queryString += ""
+				+ "\t\t  BIND(if( "
+				+ "NOT EXISTS {?valid hvgi:validTo ?timeTo . ?timeTo time:inXSDDateTime ?validTo },\""
+				+ UConfig.getMaxDateTimeAsString() +"\"^^xsd:dateTime,?validTo) AS ?dateTo)";
 		
 		queryString += ""				
 				+ "\t\tFILTER(                                                               \n"
-				+ "\t\t\t \"" + fv_dateFrom + "\"^^xsd:dateTime < ?dateFrom  &&  			 \n"
-				+ "\t\t\t?dateFrom < \"" + dateTo + "\"^^xsd:dateTime    &&               \n"
-				+ "\t\t\tgeof:sfWithin(?wktString, \""+ fv_wkt_buffered +"\"^^sf:wktLiteral) \n"
+				+ "\t\t\t?validFrom < \"" + fv_dateFrom + "\"^^xsd:dateTime  &&  			 \n"
+				+ "\t\t\t?dateTo > \"" + fv_dateFrom + "\"^^xsd:dateTime    &&               \n"
+				+ "\t\t\tgeof:sfWithin(?wktGeom, \""+ fv_wkt_buffered +"\"^^sf:wktLiteral) \n"
 				+ "\t\t\t)                                                                   \n"
 				+ "\t}																         \n"
-				+ "\tORDER BY DESC(?dateFrom) 										         \n"
 				;
 		
-		UDebug.print("Retriving features valid at " + fv_dateFrom +" in "+ fv_wkt_buffered +" \n", dbgLevel+1);
+		UDebug.print("Retriving features valid at " +fv_dateFrom+" in "+ fv_wkt_buffered +" \n", dbgLevel+1);
 		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+2);
 		
 		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
@@ -264,15 +272,86 @@ class FFeatureVersion extends FFoundationAbstract{
 		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+3);
 		queryRawResults.reset();
 		
-		while ( queryRawResults.hasNext() )
-		{
-			QuerySolution generalQueryResults = queryRawResults.next();
-			RDFNode uri = generalQueryResults.getResource("uri");		
-			uris.add(uri.toString());
-		}
+//		while ( queryRawResults.hasNext() )
+//		{
+//			QuerySolution generalQueryResults = queryRawResults.next();
+//			RDFNode uri = generalQueryResults.getResource("uri");		
+//			uris.add(uri.toString());
+//		}
 		
-		return uris;
+//		this.setFVAttributes(queryRawResults, fversionURI, graphUri, lazyDepth);
+		
+		return null;
 	}
+	
+//	public ArrayList<MFeatureVersion> retrieveConfirmers(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
+//		
+//		ArrayList<MFeatureVersion> versions = new ArrayList<MFeatureVersion>();
+//		ArrayList<String> uris = this.retrieveConfirmersUris(featureVersion, dateTo, graphUri, lazyDepth);
+//		
+//		for (String uri : uris) 
+//			versions.add( this.retrieveByURI(uri, graphUri, 1) );
+//		
+//		return versions;
+//	}
+//	
+//	public ArrayList<String> retrieveConfirmersUris(MFeatureVersion featureVersion, String dateTo, String graphUri, int lazyDepth) {
+//		
+//		ArrayList<String> uris = new ArrayList<String>();
+//		double radius = 10.0;
+//		
+//		String fv_dateFrom = featureVersion.getIsValidFromString();
+////		String fv_dateTo = featureVersion.getIsValidToString(); //CHECK su fv_dateTo > fv_dateFrom???
+//		String fv_wkt_buffered = featureVersion.getGeometryBuffer(radius);
+//		
+//		String queryString = ""
+//				+ "\tSELECT ?uri \n"
+//				+ "\tWHERE \n"
+//				+ "\t{ \n";
+//				
+//		if (!graphUri.equals("")) queryString += "\t GRAPH " +graphUri+ "{\n";
+//		
+//		queryString += ""
+//				+ "\t\tOPTIONAL { ?uri      rdf:type             osp:FeatureState } \n"
+//				// Join on TEMPORAL subgraph
+//				+ "\t\tOPTIONAL { ?uri      hvgi:valid           ?valid       . \n"
+//				+ "  			  ?valid     hvgi:validFrom      _:timeFrom   . \n"
+//				+ "	     		  _:timeFrom time:inXSDDateTime  ?dateFrom      \n"		
+//				+ "\t\t\t} \n"
+//				// Join on SPATIAL subgraph
+//				+ "\t\tOPTIONAL { ?uri      geosparql:hasGeometry    _:geom       . \n"
+//				+ "	     		  _:geom    geosparql:asWKT          ?wktString   } \n";
+//				
+//		if (!graphUri.equals("")) queryString += "\t\t}\n";
+//		
+//		queryString += ""				
+//				+ "\t\tFILTER(                                                               \n"
+//				+ "\t\t\t \"" + fv_dateFrom + "\"^^xsd:dateTime < ?dateFrom  &&  			 \n"
+//				+ "\t\t\t?dateFrom < \"" + dateTo + "\"^^xsd:dateTime    &&               \n"
+//				+ "\t\t\tgeof:sfWithin(?wktString, \""+ fv_wkt_buffered +"\"^^sf:wktLiteral) \n"
+//				+ "\t\t\t)                                                                   \n"
+//				+ "\t}																         \n"
+//				+ "\tORDER BY DESC(?dateFrom) 										         \n"
+//				;
+//		
+//		UDebug.print("Retriving features valid at " + fv_dateFrom +" in "+ fv_wkt_buffered +" \n", dbgLevel+1);
+//		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+2);
+//		
+//		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
+//		
+//		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+//		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+3);
+//		queryRawResults.reset();
+//		
+//		while ( queryRawResults.hasNext() )
+//		{
+//			QuerySolution generalQueryResults = queryRawResults.next();
+//			RDFNode uri = generalQueryResults.getResource("uri");		
+//			uris.add(uri.toString());
+//		}
+//		
+//		return uris;
+//	}
 	
 	@SuppressWarnings("unchecked")
 	private MFeatureVersion setFVAttributes(ResultSetRewindable queryRawResults, String fversionURI, String graphUri, int lazyDepth)

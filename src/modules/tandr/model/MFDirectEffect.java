@@ -2,10 +2,10 @@ package modules.tandr.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import utility.UConfig;
 import utility.UDebug;
-import model.MAuthor;
 import model.MFeatureVersion;
 
 public class MFDirectEffect extends MFEffect{
@@ -36,28 +36,55 @@ public class MFDirectEffect extends MFEffect{
 		this.setComputedAt(UConfig.getMinDateTime());
 	}
 	
-	public double calculateTrustworthiness(ArrayList<MFeatureVersion> versions, MFeatureVersion featureVersion) {
+//	public double calculateTrustworthiness(ArrayList<MFeatureVersion> versions, MFeatureVersion featureVersion) {
+//		
+//		super.value = 0.0;
+//		
+//		this.geometricAspect.calculateWeightedAvgs(versions);
+////		this.geometricAspect.calculateAvgs(versions);
+//		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(featureVersion));		
+//		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(versions, featureVersion));
+//		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateTrustworthiness(versions, featureVersion));
+//		
+//		return super.value;
+//	}
+	
+	public double calculateTrustworthiness(ArrayList<MFeatureVersion> versions, ArrayList<MFeatureVersion> neighbors, Map<String,Double> averages, MFeatureVersion featureVersion) {
 		
 		super.value = 0.0;
 		
-		this.geometricAspect.calculateWeightedAvgs(versions);
-		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(featureVersion));		
-		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(versions, featureVersion));
+//		this.geometricAspect.calculateWeightedAvgs(versions);
+//		this.geometricAspect.calculateAvgs(versions);
+		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(averages, featureVersion));		
+		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(neighbors, featureVersion));
 		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateTrustworthiness(versions, featureVersion));
 		
 		return super.value;
 	}
 	
-	public double calculateReputation(MAuthor author, String untilDate) {
-		
-		super.value = 0.0;
-		
-//		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
-//		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
-//		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));
-		
-		return super.value;
-	}
+//	public double calculateTrustworthiness(ArrayList<MFeatureVersion> versions, Map<String,Double> averages, MFeatureVersion featureVersion) {
+//		
+//		super.value = 0.0;
+//		
+////		this.geometricAspect.calculateWeightedAvgs(versions);
+////		this.geometricAspect.calculateAvgs(versions);
+//		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(averages, featureVersion));		
+//		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(versions, featureVersion));
+//		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateTrustworthiness(versions, featureVersion));
+//		
+//		return super.value;
+//	}
+	
+//	public double calculateReputation(MAuthor author, String untilDate) {
+//		
+//		super.value = 0.0;
+//		
+////		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
+////		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
+////		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));
+//		
+//		return super.value;
+//	}
 	
 	public MFDirectGeomAspect getGeometricAspect() {
 		return geometricAspect;

@@ -27,7 +27,7 @@ public class FTag extends FFoundationAbstract{
 		TreeMap<String, String> tags = new TreeMap<String, String>();
 		
 		String queryString = ""
-				+ "SELECT ?key ?value \n"
+				+ "SELECT ?key (REPLACE(STR(?value),\"(\u0015)|(\u0011)\",\"bwi\") AS ?cleanValue) \n"
 				+ "\tWHERE \n"
 				+ "\t{\n";
 				
@@ -54,7 +54,7 @@ public class FTag extends FFoundationAbstract{
 		QuerySolution queryResults = queryRawResults.next();
 		
 		RDFNode tagKey   = queryResults.getLiteral("key");
-		RDFNode tagValue = queryResults.getLiteral("value");
+		RDFNode tagValue = queryResults.getLiteral("cleanValue");
 		
 		if (tagKey != null && tagValue != null)
 			tags.put(

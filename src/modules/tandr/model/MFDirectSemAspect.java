@@ -18,12 +18,10 @@ public class MFDirectSemAspect extends MFDirectAspect {
 		int differences = 0;
 		int fvsNum = featureVersions.size();
 		
-		if (fvsNum > 0)
-		{
+		if (fvsNum > 0)	{
 			for (MFeatureVersion version : featureVersions) 
 				if ( ! featureVersion.getTags().equals( version.getTags()) ) 
-					differences++ ;
-			
+					differences++ ;			
 			t_dir_sem = (fvsNum - differences) / fvsNum;
 		}
 		

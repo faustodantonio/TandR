@@ -6,8 +6,11 @@ import model.MFeature;
 import model.MFeatureVersion;
 import foundation.FFoundationFacade;
 import utility.UConfig;
+import utility.UDebug;
 
 public class CValidation {
+	
+	private int dbgLevel = 1;
 	
 	private FFoundationFacade foundation;
 	private CVAuthority authority;
@@ -119,15 +122,20 @@ public class CValidation {
 		
 		for (MFeature feature : authorityFeatures) {
 			
-			MFeatureVersion fv1 = (MFeatureVersion) foundation.retrieveByUri(feature.generateFeatureVesionUri("1"), lowestTGraph, 0, MFeatureVersion.class);
+			UDebug.print("\t * feature "+ feature.getUriID() +"",dbgLevel+2);
 			
-			MFeatureVersion fv2 = (MFeatureVersion) foundation.retrieveByUri(feature.generateFeatureVesionUri("2"), lowestTGraph, 0, MFeatureVersion.class);
+			String fv1Uri = feature.generateGeneralFeatureVesionUri("1");
+			String fv2Uri = feature.generateGeneralFeatureVesionUri("2");
+			
+			MFeatureVersion fv1 = (MFeatureVersion) foundation.retrieveByUri(fv1Uri, lowestTGraph, 0, MFeatureVersion.class);
+			
+			MFeatureVersion fv2 = (MFeatureVersion) foundation.retrieveByUri(fv2Uri, lowestTGraph, 0, MFeatureVersion.class);
 			validation.validateTrustworthiness(fv1, fv2, lowestTGraph);
 			
-			fv2 = (MFeatureVersion) foundation.retrieveByUri(feature.generateFeatureVesionUri("2"), averageTGraph, 0, MFeatureVersion.class);
+			fv2 = (MFeatureVersion) foundation.retrieveByUri(fv2Uri, averageTGraph, 0, MFeatureVersion.class);
 			validation.validateTrustworthiness(fv1, fv2, averageTGraph);
 			
-			fv2 = (MFeatureVersion) foundation.retrieveByUri(feature.generateFeatureVesionUri("2"), highestTGraph, 0, MFeatureVersion.class);
+			fv2 = (MFeatureVersion) foundation.retrieveByUri(fv2Uri, highestTGraph, 0, MFeatureVersion.class);
 			validation.validateTrustworthiness(fv1, fv2, highestTGraph);
 		}
 	}	

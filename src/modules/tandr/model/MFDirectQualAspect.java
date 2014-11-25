@@ -24,36 +24,34 @@ public class MFDirectQualAspect extends MFDirectAspect {
 //		this.buildRCCDistancesMap();
 	}
 
-	public double calculateTrustworthiness(ArrayList<MFeatureVersion> featureVersions, MFeatureVersion featureVersion) {
+	public double calculateTrustworthiness(ArrayList<MFeatureVersion> neighbors, MFeatureVersion featureVersion) {
 		double t_dir_qual = 0.0;
 		
 		Map<String,IntersectionMatrix> fvRelates = new HashMap<String, IntersectionMatrix> ();
 		Map<String,IntersectionMatrix> fvPrevRelates = new HashMap<String, IntersectionMatrix> ();
 		
-		Map<String,Boolean> matrixDifferences = new HashMap<String, Boolean> ();
+//		Map<String,Boolean> matrixDifferences = new HashMap<String, Boolean> ();
 		
 		int differences = 0;
 		
 		if ( ! featureVersion.isFirst() && featureVersion.getGeometry() != null) {
-		
-			ArrayList<String> neighborsUris = foundation.retrieveFVPreviousesNeighbours(featureVersion, UConfig.getVGIHGraphURI(), featureVersion.getGeometryBuffer(10.0));	
-			for (String uri : neighborsUris)  {
-				MFeatureVersion neighbor = (MFeatureVersion) foundation.retrieveByUri(uri, UConfig.getVGIHGraphURI(), 0, MFeatureVersion.class);
+			for (MFeatureVersion neighbor : neighbors)  {
 				if (neighbor.getGeometry() != null && featureVersion.getPrevFVersion().getGeometry() != null) {
+					String uri = neighbor.getUri();
 					fvRelates.put(uri, featureVersion.getGeometry().relate(neighbor.getGeometry()));
 					fvPrevRelates.put(uri, featureVersion.getPrevFVersion().getGeometry().relate(neighbor.getGeometry()));
-					matrixDifferences.put(uri, fvRelates.get(uri).equals( fvPrevRelates.get(uri) ));
+//					matrixDifferences.put(uri, fvRelates.get(uri).equals( fvPrevRelates.get(uri) ));
 					if ( fvRelates.get(uri).equals( fvPrevRelates.get(uri) ) ) differences++;
 				}
 			}
 			
-			if (neighborsUris.size() == 0)
+			if (neighbors.size() == 0)
 				t_dir_qual = 0.0;
 			else {
 				if (differences == 0)
 					t_dir_qual = 1.0;
 				else
-					t_dir_qual = 1 - (differences / neighborsUris.size());
+					t_dir_qual = 1 - (differences / neighbors.size());
 			}
 		
 		} else { 
@@ -63,6 +61,46 @@ public class MFDirectQualAspect extends MFDirectAspect {
 		super.value = t_dir_qual;
 		return super.value;
 	}
+	
+//	public double calculateTrustworthiness(ArrayList<MFeatureVersion> featureVersions, MFeatureVersion featureVersion) {
+//		double t_dir_qual = 0.0;
+//		
+//		Map<String,IntersectionMatrix> fvRelates = new HashMap<String, IntersectionMatrix> ();
+//		Map<String,IntersectionMatrix> fvPrevRelates = new HashMap<String, IntersectionMatrix> ();
+//		
+//		Map<String,Boolean> matrixDifferences = new HashMap<String, Boolean> ();
+//		
+//		int differences = 0;
+//		
+//		if ( ! featureVersion.isFirst() && featureVersion.getGeometry() != null) {
+//		
+//			ArrayList<String> neighborsUris = foundation.retrieveFVPreviousesNeighbours(featureVersion, UConfig.getVGIHGraphURI(), featureVersion.getGeometryBuffer(UConfig.featureInfluenceRadius));	
+//			for (String uri : neighborsUris)  {
+//				MFeatureVersion neighbor = (MFeatureVersion) foundation.retrieveByUri(uri, UConfig.getVGIHGraphURI(), 0, MFeatureVersion.class);
+//				if (neighbor.getGeometry() != null && featureVersion.getPrevFVersion().getGeometry() != null) {
+//					fvRelates.put(uri, featureVersion.getGeometry().relate(neighbor.getGeometry()));
+//					fvPrevRelates.put(uri, featureVersion.getPrevFVersion().getGeometry().relate(neighbor.getGeometry()));
+//					matrixDifferences.put(uri, fvRelates.get(uri).equals( fvPrevRelates.get(uri) ));
+//					if ( fvRelates.get(uri).equals( fvPrevRelates.get(uri) ) ) differences++;
+//				}
+//			}
+//			
+//			if (neighborsUris.size() == 0)
+//				t_dir_qual = 0.0;
+//			else {
+//				if (differences == 0)
+//					t_dir_qual = 1.0;
+//				else
+//					t_dir_qual = 1 - (differences / neighborsUris.size());
+//			}
+//		
+//		} else { 
+//			t_dir_qual = 0.0;
+//		}
+//		
+//		super.value = t_dir_qual;
+//		return super.value;
+//	}
 
 	@Override
 	public String getEffectName() {
