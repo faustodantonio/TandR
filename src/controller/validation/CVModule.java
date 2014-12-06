@@ -28,6 +28,7 @@ public class CVModule {
 			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);
 			MFeatureVersion version = this.foundation.retrieveLowestTrustworthyFV(feature.getUri(), UConfig.getVGIHGraphURI(), UConfig.getTANDRGraphURI());
 			
+			version.addTag("previousUri", version.getUri());
 			//** Update feature version information			
 			version.setVersionNo("2");
 			version.setPrevFVersionUri(null);
@@ -46,6 +47,7 @@ public class CVModule {
 			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);
 			MFeatureVersion version = this.foundation.retrieveAverageTrustworthyFV(feature.getUri(), UConfig.getVGIHGraphURI(), UConfig.getTANDRGraphURI());
 			
+			version.addTag("previousUri", version.generateUri());
 			version.setVersionNo("2");
 			version.setPrevFVersionUri(null);
 			version.setIsValidFrom(UConfig.getMinDateTime());
@@ -61,6 +63,7 @@ public class CVModule {
 			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);
 			MFeatureVersion version = this.foundation.retrieveHighestTrustworthyFV(feature.getUri(), UConfig.getVGIHGraphURI(), UConfig.getTANDRGraphURI());
 			
+			version.addTag("previousUri", version.generateUri());
 			version.setVersionNo("2");
 			version.setPrevFVersionUri(null);
 			version.setIsValidFrom(UConfig.getMinDateTime());

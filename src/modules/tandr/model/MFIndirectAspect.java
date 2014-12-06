@@ -21,6 +21,7 @@ public abstract class MFIndirectAspect extends MFAspect {
 	@Override
 	public abstract String getAspectName();
 	public abstract MFAspect fetchAspectFromReputation(MReputationTandr repo);
+	public abstract MFAspect fetchDirectAspectFromReputation(MReputationTandr repo);
 
 	public double calculateTrustworthiness(MReputationTandr authorReputation) {
 		
@@ -29,7 +30,9 @@ public abstract class MFIndirectAspect extends MFAspect {
 		// get user reputation wrt indirect geometric aspect at date featureVersion.isValidFrom
 		// assign to t_ind_geom the user reputation obtained 
 		// (this is the first time indirect geometric trustworthiness aspect is calculated.)
-		t_ind_geom = this.fetchAspectFromReputation(authorReputation).getValue();
+//		t_ind_geom = this.fetchAspectFromReputation(authorReputation).getValue();
+		
+		t_ind_geom = this.fetchDirectAspectFromReputation(authorReputation).getValue();
 		
 		super.value = t_ind_geom;
 		
@@ -43,7 +46,8 @@ public abstract class MFIndirectAspect extends MFAspect {
 
 		for (MAuthor confirmer : confirmers) {
 			MReputation repo = confirmer.getReputation();
-			totGeomRepo += this.fetchAspectFromReputation((MReputationTandr) repo).getValue();
+//			totGeomRepo += this.fetchAspectFromReputation((MReputationTandr) repo).getValue();
+			totGeomRepo += this.fetchDirectAspectFromReputation((MReputationTandr) repo).getValue();
 		}
 		
 		// assign to t_ind_geom the avarage user reputation obtained
@@ -54,27 +58,6 @@ public abstract class MFIndirectAspect extends MFAspect {
 		super.value = t_ind_geom;
 		return super.value;
 	}
-	
-//	/**
-//	 * get author's features versions
-//	 * for eache fv
-//	 * 		get the direct effect value
-//	 * calculate the average and assign it to Trustworthiness 
-//	 */
-//	public double calculateReputation(MAuthor author, String untilDate) {
-//
-//		double r_dir_geom = 0.0;
-//		
-//		FTandrFacade foundation = new FTandrFacade();
-//		Map<String, Double> aspectList = foundation.getAspectList( this.getEffectName(), this.getAspectName(), author.getUri(), untilDate, true);
-//		
-//		for (Entry<String, Double> aspect : aspectList.entrySet()) 
-//			r_dir_geom += aspect.getValue();
-//		
-//		r_dir_geom = r_dir_geom / aspectList.entrySet().size();
-//		
-//		return r_dir_geom;
-//	}
 	
 	public String toString()	{
 		return this.getClass().getName();

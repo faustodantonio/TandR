@@ -24,6 +24,10 @@ public class MFIndirectQualAspect extends MFIndirectAspect {
 	public MFAspect fetchAspectFromReputation(MReputationTandr repo) {
 		return repo.getIndirectEffect().getQualitativeAspect();
 	}
+	@Override
+	public MFAspect fetchDirectAspectFromReputation(MReputationTandr repo) {
+		return repo.getDirectEffect().getQualitativeAspect();
+	}
 
 	public double validaterustworthiness(MFeatureVersion fv1, MFeatureVersion fv2) {
 		super.value = 1;

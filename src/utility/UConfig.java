@@ -36,19 +36,22 @@ public class UConfig {
 	 * 3 -> Leave previous dataset, but deletes the computed T and R values *|*
 	 * 4 -> Restore dataset, leaving the computed T and R values            *|*
 	 */
-	public static int installation_mode = 3;
+	public static int installation_mode = 2;
 	
 	/**
 	 * Possible values: 
-	 * **|** Test **|** LAquila **|**  Wien **|**  SingerstrasseWien **|**  StephansdomWien **|** SeestadtWien **|** BreitenleerWien
+	 * **|** Test **|** LAquila **|**  Wien **|**  SingerstrasseWien **|**  StephansdomWien 
+	 * **|** SeestadtWien **|** BreitenleerWien **|** DonaustadtFieldsWien **|** DonaustadtWoodsWien **|** DonaustadtLakesWien
 	 */
-//	public static String dataset_selection = "SingerstrasseWien";
+	public static String dataset_selection = "SingerstrasseWien";
 //	public static String dataset_selection = "StephansdomWien";
 //	public static String dataset_selection = "Wien";
 //	public static String dataset_selection = "LAquila";
 //	public static String dataset_selection = "Test";
-	public static String dataset_selection = "SeestadtWien";
+//	public static String dataset_selection = "SeestadtWien";
 //	public static String dataset_selection = "BreitenleerWien";
+//	public static String dataset_selection = "DonaustadtFieldsWien";
+//	public static String dataset_selection = "DonaustadtLakesWien";
 	
 	/**
 	 * Possible values: 
@@ -156,7 +159,8 @@ public class UConfig {
 	public static String rdf_epsg_crs = "900913";
 	public static String ogd_epsg_crs = "900913";
 	public static double featureInfluenceRadius = 10;
-	public static double temporalCurveSlope = 10000000000.0;
+	public static double temporalCurveSlope = 1000.0;
+//	public static double temporalCurveSlope = 1500.0
 	
 	public static SimpleDateFormat sdf;
 
@@ -329,7 +333,7 @@ public class UConfig {
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
 		
-		validationPath = "input/validation/REALNUT2012OGD_BEZ1_3857.csv";
+		validationPath = "input/validation/3857/stephansdomFromBasemap_3857.csv";
 		
 		generalOutputFilePath = "./output/singerstrasse.txt";
 		logFilePath = "./output/log_singerstrasse_"+ new Date().toGMTString().trim() +".txt";
@@ -351,7 +355,7 @@ public class UConfig {
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
 		
-		validationPath = "input/validation/REALNUT2012OGD_BEZ1_3857.csv";
+		validationPath = "input/validation/3857/stephansdomFromBasemap_3857.csv";
 		
 		generalOutputFilePath = "./output/stephansdom.txt";
 		logFilePath = "./output/log_stephansdom_"+ new Date().toGMTString().trim() +".txt";
@@ -399,6 +403,72 @@ public class UConfig {
 		
 		generalOutputFilePath = "./output/breitenleer.txt";
 		logFilePath = "./output/log_breitenleer_"+ new Date().toGMTString().trim() +".txt";
+	}
+
+	@SuppressWarnings("deprecation")
+	public void initDonaustadtFieldsWienVariables() {
+		
+		/*** Data Graphs		 */
+		hvgiGraph 				= "hvgi_donaustadtFields";
+		tandrGraph 				= "tandr_donaustadtFields";
+		inputRDFfilesDirectory 	= "./input/donaustadtFieldsWien/";
+		
+		/*** Validation Graphs		 */
+		lowerTGraph 	= "lowerT_donaustadtFields";
+		averageTGraph 	= "averegeT_donaustadtFields";
+		higherTGraph 	= "higherT_donaustadtFields";
+		
+		minDateTime = "2005-09-15T21:42:44Z";
+		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
+		
+		validationPath = "input/validation/3857/REALNUT2012OGD_BEZ22_3857.csv";
+		
+		generalOutputFilePath = "./output/donaustadtFields.txt";
+		logFilePath = "./output/log_donaustadtFields_"+ new Date().toGMTString().trim() +".txt";
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void initDonaustadtWoodsWienVariables() {
+		
+		/*** Data Graphs		 */
+		hvgiGraph 				= "hvgi_donaustadtWoods";
+		tandrGraph 				= "tandr_donaustadtWoods";
+		inputRDFfilesDirectory 	= "./input/donaustadtWoodsWien/";
+		
+		/*** Validation Graphs		 */
+		lowerTGraph 	= "lowerT_donaustadtWoods";
+		averageTGraph 	= "averegeT_donaustadtWoods";
+		higherTGraph 	= "higherT_donaustadtWoods";
+		
+		minDateTime = "2005-09-15T21:42:44Z";
+		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
+		
+		validationPath = "input/validation/3857/REALNUT2012OGD_BEZ22_3857.csv";
+		
+		generalOutputFilePath = "./output/donaustadtWoods.txt";
+		logFilePath = "./output/log_donaustadtWoods_"+ new Date().toGMTString().trim() +".txt";
+	}
+	
+	@SuppressWarnings("deprecation")
+	public void initDonaustadtLakesWienVariables() {
+		
+		/*** Data Graphs		 */
+		hvgiGraph 				= "hvgi_donaustadtLakes";
+		tandrGraph 				= "tandr_donaustadtLakes";
+		inputRDFfilesDirectory 	= "./input/donaustadtLakesWien/";
+		
+		/*** Validation Graphs		 */
+		lowerTGraph 	= "lowerT_donaustadtLakes";
+		averageTGraph 	= "averegeT_donaustadtLakes";
+		higherTGraph 	= "higherT_donaustadtLakes";
+		
+		minDateTime = "2005-09-15T21:42:44Z";
+		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
+		
+		validationPath = "input/validation/3857/REALNUT2012OGD_BEZ22_3857.csv";
+		
+		generalOutputFilePath = "./output/donaustadtLakes.txt";
+		logFilePath = "./output/log_donaustadtLakes_"+ new Date().toGMTString().trim() +".txt";
 	}
 	
 	private void initNamespaces()

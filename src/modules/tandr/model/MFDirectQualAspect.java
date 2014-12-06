@@ -3,6 +3,7 @@ package modules.tandr.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.vividsolutions.jts.geom.IntersectionMatrix;
 
@@ -24,41 +25,71 @@ public class MFDirectQualAspect extends MFDirectAspect {
 //		this.buildRCCDistancesMap();
 	}
 
-	public double calculateTrustworthiness(ArrayList<MFeatureVersion> neighbors, MFeatureVersion featureVersion) {
-		double t_dir_qual = 0.0;
+//	public double calculateTrustworthiness(ArrayList<MFeatureVersion> neighbors, MFeatureVersion featureVersion) {
+//		double t_dir_qual = 0.0;
+//		
+//		Map<String,IntersectionMatrix> fvRelates = new HashMap<String, IntersectionMatrix> ();
+//		Map<String,IntersectionMatrix> fvPrevRelates = new HashMap<String, IntersectionMatrix> ();
+//		
+////		Map<String,Boolean> matrixDifferences = new HashMap<String, Boolean> ();
+//		
+//		int differences = 0;
+//		
+//		if ( ! featureVersion.isFirst() && featureVersion.getGeometry() != null) {
+//			for (MFeatureVersion neighbor : neighbors)  {
+//				if (neighbor.getGeometry() != null && featureVersion.getPrevFVersion().getGeometry() != null) {
+//					String uri = neighbor.getUri();
+//					fvRelates.put(uri, featureVersion.getGeometry().relate(neighbor.getGeometry()));
+//					fvPrevRelates.put(uri, featureVersion.getPrevFVersion().getGeometry().relate(neighbor.getGeometry()));
+////					matrixDifferences.put(uri, fvRelates.get(uri).equals( fvPrevRelates.get(uri) ));
+//					if ( fvRelates.get(uri).equals( fvPrevRelates.get(uri) ) ) differences++;
+//				}
+//			}
+//			
+//			if (neighbors.size() == 0)
+//				t_dir_qual = 0.0;
+//			else {
+//				if (differences == 0)
+//					t_dir_qual = 1.0;
+//				else
+//					t_dir_qual = 1 - (differences / neighbors.size());
+//			}
+//		
+//		} else { 
+//			t_dir_qual = 0.0;
+//		}
+//		
+//		super.value = t_dir_qual;
+//		return super.value;
+//	}
+	
+	public double calculateTrustworthiness(ArrayList<MFeatureVersion> neighbors, MFeatureVersion featureVersion, 
+			Map<String, Map<String, Integer>> neighborsRelations, Map<String, Map<String, String>> previousesRelations ) {
 		
-		Map<String,IntersectionMatrix> fvRelates = new HashMap<String, IntersectionMatrix> ();
-		Map<String,IntersectionMatrix> fvPrevRelates = new HashMap<String, IntersectionMatrix> ();
+		int neighborsNumber = neighbors.size();
+		int previousNumber = previousesRelations.size();
+		double sum = 0;
 		
-//		Map<String,Boolean> matrixDifferences = new HashMap<String, Boolean> ();
-		
-		int differences = 0;
-		
-		if ( ! featureVersion.isFirst() && featureVersion.getGeometry() != null) {
-			for (MFeatureVersion neighbor : neighbors)  {
-				if (neighbor.getGeometry() != null && featureVersion.getPrevFVersion().getGeometry() != null) {
-					String uri = neighbor.getUri();
-					fvRelates.put(uri, featureVersion.getGeometry().relate(neighbor.getGeometry()));
-					fvPrevRelates.put(uri, featureVersion.getPrevFVersion().getGeometry().relate(neighbor.getGeometry()));
-//					matrixDifferences.put(uri, fvRelates.get(uri).equals( fvPrevRelates.get(uri) ));
-					if ( fvRelates.get(uri).equals( fvPrevRelates.get(uri) ) ) differences++;
+		if (neighborsNumber != 0 && previousNumber != 0) {
+			for (Entry<String, Map<String, Integer>> relationEntry : neighborsRelations.entrySet()) {
+				
+				String neighborgUri = relationEntry.getKey();
+				String featureVersionUri = featureVersion.getUri();
+				String relationString = "";
+				int count = 0;
+				
+				if (previousesRelations.containsKey(featureVersionUri)) {
+					relationString = previousesRelations.get(featureVersionUri).get(neighborgUri);				
+					count = relationEntry.getValue().get(relationString);
+					sum += count / previousNumber;
+				} else {
+					sum += count / previousNumber;
 				}
 			}
-			
-			if (neighbors.size() == 0)
-				t_dir_qual = 0.0;
-			else {
-				if (differences == 0)
-					t_dir_qual = 1.0;
-				else
-					t_dir_qual = 1 - (differences / neighbors.size());
-			}
+			super.value = sum / neighborsNumber;
+		} 
+		else super.value = 0; 
 		
-		} else { 
-			t_dir_qual = 0.0;
-		}
-		
-		super.value = t_dir_qual;
 		return super.value;
 	}
 	

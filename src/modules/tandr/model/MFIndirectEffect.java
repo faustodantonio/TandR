@@ -18,6 +18,10 @@ public class MFIndirectEffect extends MFEffect{
 	private static double indQualWeight = 0.3333333;
 	private static double indSemWeight  = 0.3333333;
 	
+//	private static double indGeomWeight  = 1/3;
+//	private static double indQualWeight  = 1/3;
+//	private static double indSemWeight   = 1/3;
+	
 	public MFIndirectEffect() {
 		
 		this.geometricAspect   = new MFIndirectGeomAspect();
@@ -67,17 +71,6 @@ public class MFIndirectEffect extends MFEffect{
 		
 		return super.value;
 	}
-	
-//	public double calculateReputation(MAuthor author, String untilDate) {
-//		
-//		super.value = 0.0;
-//		
-////		super.value = super.value + (indGeomWeight * this.geometricAspect.calculateReputation(author,untilDate));
-////		super.value = super.value + (indQualWeight * this.qualitativeAspect.calculateReputation(author,untilDate));
-////		super.value = super.value + (indSemWeight  * this.semanticAspect.calculateReputation(author,untilDate));		
-//
-//		return super.value;
-//	}
 	
 	public MFAspect getGeometricAspect() {
 		return geometricAspect;

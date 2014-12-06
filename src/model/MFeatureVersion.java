@@ -250,21 +250,27 @@ public class MFeatureVersion {
 		this.isDeleted = isDeleted;
 	}
 	public Date getIsValidFrom() {
-		return isValidFrom;
+		if (this.isValidFrom == null)
+			return UConfig.getMinDateTime();
+		else
+			return isValidFrom;
 	}
 	public void setIsValidFrom(Date isValidFrom) {
 		this.isValidFrom = isValidFrom;
 	}
 	public Date getIsValidTo() {
-		return isValidTo;
+		if (this.isValidTo == null)
+			return UConfig.getMaxDateTime();
+		else
+			return isValidTo;
 	}
 	public void setIsValidTo(Date isValidTo) {
 		this.isValidTo = isValidTo;
 	}
 	public String getIsValidFromString(){
 		String date = "";
-		if (this.isValidFrom != null)
-			date = this.sdf.format(this.isValidFrom);
+//		if (this.isValidFrom != null)
+			date = this.sdf.format(this.getIsValidFrom());
 		return date;
 	}
     public void setIsValidFrom(String isValidFrom) {
@@ -276,9 +282,9 @@ public class MFeatureVersion {
     }
 	public String getIsValidToString(){
 		String date = "";
-		if (this.isValidTo != null)
-			date = this.sdf.format(this.isValidTo);
-		else date = UConfig.getMaxDateTimeAsString();
+//		if (this.isValidTo != null)
+			date = this.sdf.format(this.getIsValidTo());
+//		else date = UConfig.getMaxDateTimeAsString();
 		return date;
 	}
     public void setIsValidTo(String isValidTo) {

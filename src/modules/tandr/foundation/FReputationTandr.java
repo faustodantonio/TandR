@@ -142,6 +142,105 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		return reputation;
 	}
 		
+//	public MReputationTandr computeReputationValues(String authorUri,String untilDate,Boolean graphUri) {
+//
+//		MReputationTandr reputation = new MReputationTandr();
+//		
+//		String queryString = ""
+//				+ "\tSELECT \n"
+//				+ "\t#Reputation Info \n"
+//				+ "\t (( <"+ authorUri +">) AS ?author) (STR(AVG(?trustworthinessValue)) AS ?repValue) (STR(MAX(?computedAt)) AS ?timestamp)\n"
+//				+ "\t# Effects Values \n"
+//				+ "\t (STR(AVG(?directEffectValue)) AS ?directRepValue) (STR(AVG(?indirectEffectValue)) AS ?indirectRepValue) (STR(AVG(?temporalEffectValue)) AS ?temporalRepValue)\n"
+//				+ "\t#Direct Aspects Values\n"
+//				+ "\t (STR(AVG(?dirGeomAspectValue)) AS ?DirGeomRepValue) (STR(AVG(?dirQualAspectValue)) AS ?DirQualRepValue) (STR(AVG(?dirSemAspectValue)) AS ?DirSemRepValue)\n"
+//				+ "\t#Indirect Aspect Values\n"
+//				+ "\t (STR(AVG(?indGeomAspectValue)) AS ?IndGeomRepValue) (STR(AVG(?indQualAspectValue)) AS ?IndQualRepValue) (STR(AVG(?indSemAspectValue)) AS ?IndSemRepValue)\n"
+//				+ "\n"
+//				+ "\tWHERE \n"
+//				+ "\t{ \n";
+//		
+//		if (graphUri) queryString += "\t GRAPH " +UConfig.getVGIHGraphURI()+ "\n\t {\n";
+//		
+//		queryString += ""
+//				+ "\t ?fvUri dcterms:contributor <"+ authorUri +"> .\n"
+//				;
+//		if (graphUri) queryString += "\t }\n";
+//		
+//		//***//
+//				
+//		if (graphUri) queryString += "\t GRAPH " +UConfig.getTANDRGraphURI()+ "\n\t {\n";
+//		
+//		queryString += ""
+//				+ "\t  ?tUri  tandr:refersToFeatureVersion  ?fvUri                .\n"
+//				+ "\t  ?tUri  tandr:hasTrustworthinessValue ?value                .\n"
+//				+ "\t  ?value tandr:trustworthinessValueIs  ?trustworthinessValue .\n"
+//				+ "\t  ?value tandr:computedAt              ?computedAt           .\n"
+//				+ "\n" 
+//				;
+//		
+//		queryString += this.getTrustEffectsQueryString();
+//		queryString += this.getDirectTrustAspectsQueryString();
+//		queryString += this.getIndirectTrustAspectsQueryString();
+//		queryString += this.getComputedAtQueryString(untilDate, graphUri);
+//		
+//		queryString += "\t }\n";
+//		
+//		if (graphUri) queryString += "\t  FILTER( ?computedAt <= ?maxComputedAt  )\n";
+//		
+//		queryString += ""
+//				+ "\t} \n"
+//				;
+//	
+//		
+//		UDebug.print("SPARQL query: \n" + queryString + "\n\n", dbgLevel+1);
+//		
+//		ResultSet rawResults = this.triplestore.sparqlSelectHandled(queryString);
+//		
+//		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+//		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+2);
+//		queryRawResults.reset();
+//		
+//		QuerySolution generalQueryResults;
+//		
+//		if (queryRawResults.hasNext()) {
+//			generalQueryResults = queryRawResults.next();
+//			
+//			String computedAt = generalQueryResults.getLiteral("timestamp").toString();
+//			
+//			reputation.setValue( Double.parseDouble(generalQueryResults.getLiteral("repValue").toString()) );
+//			reputation.getDirectEffect().setValue( Double.parseDouble(generalQueryResults.getLiteral("directRepValue").toString()) );
+//			reputation.getIndirectEffect().setValue( Double.parseDouble(generalQueryResults.getLiteral("indirectRepValue").toString()) );
+//			reputation.getTemporalEffect().setValue( Double.parseDouble(generalQueryResults.getLiteral("temporalRepValue").toString()) );
+//			
+//			reputation.getDirectEffect().getGeometricAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("DirGeomRepValue").toString()) );
+//			reputation.getDirectEffect().getQualitativeAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("DirQualRepValue").toString()) );
+//			reputation.getDirectEffect().getSemanticAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("DirSemRepValue").toString()) );
+//			
+//			reputation.getIndirectEffect().getGeometricAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("IndGeomRepValue").toString()) );
+//			reputation.getIndirectEffect().getQualitativeAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("IndQualRepValue").toString()) );
+//			reputation.getIndirectEffect().getSemanticAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("IndSemRepValue").toString()) );
+//			
+//			reputation.setComputedAt(computedAt);
+//			reputation.getDirectEffect().setComputedAt(computedAt);
+//			reputation.getIndirectEffect().setComputedAt(computedAt);
+//			reputation.getTemporalEffect().setComputedAt(computedAt);
+//			
+//			reputation.getDirectEffect().getGeometricAspect().setComputedAt(computedAt);
+//			reputation.getDirectEffect().getQualitativeAspect().setComputedAt(computedAt);
+//			reputation.getDirectEffect().getSemanticAspect().setComputedAt(computedAt);
+//			
+//			reputation.getIndirectEffect().getGeometricAspect().setComputedAt(computedAt);
+//			reputation.getIndirectEffect().getQualitativeAspect().setComputedAt(computedAt);
+//			reputation.getIndirectEffect().getSemanticAspect().setComputedAt(computedAt);
+//			
+//		} else {
+//			reputation = null;
+//		}
+//		
+//		return reputation;
+//	}
+	
 	public MReputationTandr computeReputationValues(String authorUri,String untilDate,Boolean graphUri) {
 
 		MReputationTandr reputation = new MReputationTandr();
@@ -206,20 +305,38 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		if (queryRawResults.hasNext()) {
 			generalQueryResults = queryRawResults.next();
 			
+			double rep, dir, ind, temp, dirGeom, dirQual, dirSem, indGeom, indQual, indSem;
+			double dirWeight = 0.3333333, indWeight = 0.3333333, tempWeight  = 0.3333333;
+			double dirGeomWeight = 0.3333333, dirQualWeight = 0.3333333, dirSemWeight  = 0.3333333;
+			double indGeomWeight = 0.3333333, indQualWeight = 0.3333333, indSemWeight  = 0.3333333;
+			
+//			dirWeight*dirGeomWeight*dirGeom + indWeight*indGeomWeight*indGeom + tempWeight*temp/3;
+			
+			rep = Double.parseDouble(generalQueryResults.getLiteral("repValue").toString());
+			dir =  Double.parseDouble(generalQueryResults.getLiteral("directRepValue").toString());
+			ind = Double.parseDouble(generalQueryResults.getLiteral("indirectRepValue").toString());
+			temp = Double.parseDouble(generalQueryResults.getLiteral("temporalRepValue").toString());
+			dirGeom = Double.parseDouble(generalQueryResults.getLiteral("DirGeomRepValue").toString());
+			dirQual = Double.parseDouble(generalQueryResults.getLiteral("DirQualRepValue").toString());
+			dirSem = Double.parseDouble(generalQueryResults.getLiteral("DirSemRepValue").toString());
+			indGeom = Double.parseDouble(generalQueryResults.getLiteral("IndGeomRepValue").toString());
+			indQual = Double.parseDouble(generalQueryResults.getLiteral("IndQualRepValue").toString());
+			indSem = Double.parseDouble(generalQueryResults.getLiteral("IndSemRepValue").toString());
+			
 			String computedAt = generalQueryResults.getLiteral("timestamp").toString();
 			
-			reputation.setValue( Double.parseDouble(generalQueryResults.getLiteral("repValue").toString()) );
-			reputation.getDirectEffect().setValue( Double.parseDouble(generalQueryResults.getLiteral("directRepValue").toString()) );
-			reputation.getIndirectEffect().setValue( Double.parseDouble(generalQueryResults.getLiteral("indirectRepValue").toString()) );
-			reputation.getTemporalEffect().setValue( Double.parseDouble(generalQueryResults.getLiteral("temporalRepValue").toString()) );
+			reputation.setValue( rep );
+			reputation.getDirectEffect().setValue( dir );
+			reputation.getIndirectEffect().setValue( ind );
+			reputation.getTemporalEffect().setValue( temp );
 			
-			reputation.getDirectEffect().getGeometricAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("DirGeomRepValue").toString()) );
-			reputation.getDirectEffect().getQualitativeAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("DirQualRepValue").toString()) );
-			reputation.getDirectEffect().getSemanticAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("DirSemRepValue").toString()) );
+			reputation.getDirectEffect().getGeometricAspect().setValue( dirGeom );
+			reputation.getDirectEffect().getQualitativeAspect().setValue( dirQual );
+			reputation.getDirectEffect().getSemanticAspect().setValue( dirSem );
 			
-			reputation.getIndirectEffect().getGeometricAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("IndGeomRepValue").toString()) );
-			reputation.getIndirectEffect().getQualitativeAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("IndQualRepValue").toString()) );
-			reputation.getIndirectEffect().getSemanticAspect().setValue( Double.parseDouble(generalQueryResults.getLiteral("IndSemRepValue").toString()) );
+			reputation.getIndirectEffect().getGeometricAspect().setValue( indGeom );
+			reputation.getIndirectEffect().getQualitativeAspect().setValue( indQual );
+			reputation.getIndirectEffect().getSemanticAspect().setValue( indSem );
 			
 			reputation.setComputedAt(computedAt);
 			reputation.getDirectEffect().setComputedAt(computedAt);
@@ -239,7 +356,7 @@ public class FReputationTandr extends FFoundationAbstract implements FReputation
 		}
 		
 		return reputation;
-	}
+	}	
 	
 	//*******************************//
 	

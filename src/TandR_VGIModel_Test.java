@@ -34,11 +34,11 @@ public class TandR_VGIModel_Test {
 //		test.retreiveSuccNeighboursFVs();
 		
 //		test.printTrustworthiness();
-//		test.printQuery_5();
+		test.printQuery_2();
 		
 //		test.printCleanedPreviousVersions();
 		
-		test.printReputationInfos();
+//		test.printReputationInfos();
 		
 //		validation.validate();
 		

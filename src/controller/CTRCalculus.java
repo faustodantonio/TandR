@@ -2,15 +2,10 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import utility.UConfig;
 import utility.UDebug;
 import foundation.FFoundationFacade;
-import model.MFeature;
 import model.MFeatureVersion;
 
 public class CTRCalculus {

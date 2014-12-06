@@ -24,6 +24,10 @@ public class MFIndirectGeomAspect extends MFIndirectAspect {
 	public MFAspect fetchAspectFromReputation(MReputationTandr repo) {
 		return repo.getIndirectEffect().getGeometricAspect();
 	}
+	@Override
+	public MFAspect fetchDirectAspectFromReputation(MReputationTandr repo) {
+		return repo.getDirectEffect().getGeometricAspect();
+	}
 
 	public double validaterustworthiness(MFeatureVersion fv1, MFeatureVersion fv2) {		
 		super.value = 1;

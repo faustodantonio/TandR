@@ -24,6 +24,10 @@ public class MFIndirectSemAspect extends MFIndirectAspect{
 	public MFAspect fetchAspectFromReputation(MReputationTandr repo) {
 		return repo.getIndirectEffect().getSemanticAspect();
 	}
+	@Override
+	public MFAspect fetchDirectAspectFromReputation(MReputationTandr repo) {
+		return repo.getDirectEffect().getSemanticAspect();
+	}
 
 	public double validaterustworthiness(MFeatureVersion fv1, MFeatureVersion fv2) {
 		super.value = 1;

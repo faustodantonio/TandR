@@ -3,6 +3,8 @@ package modules.tandr.model;
 import java.util.ArrayList;
 import java.util.Map;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import model.MFeatureVersion;
 
 public class MFDirectGeomAspect extends MFDirectAspect {
@@ -10,6 +12,10 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 	private double weightDArea       = 0.3333333;
 	private double weightDPerimeter  = 0.3333333;
 	private double weightDNoVertices = 0.3333334;
+	
+//	private double weightDArea       = 1/3;
+//	private double weightDPerimeter  = 1/3;
+//	private double weightDNoVertices = 1/3;
 	
 	private double avgArea       = 0.0;
 	private double avgPerimeter  = 0.0;
@@ -80,39 +86,49 @@ public class MFDirectGeomAspect extends MFDirectAspect {
 	}
 	
 	private double calculateTDirGeom(double dArea, double dPerimeter, double dNoVertices)	{
-		double t_dir_geom;
-		t_dir_geom = this.weightDArea*dArea + this.weightDPerimeter*dPerimeter + this.weightDNoVertices*dNoVertices;
-		return t_dir_geom;
+		return this.weightDArea*dArea + this.weightDPerimeter*dPerimeter + this.weightDNoVertices*dNoVertices;
 	}
 	
 	private double calculateDArea(MFeatureVersion featureVersion, double comparisonArea){
-		double dArea       = 0.0;
-		String geometryType = featureVersion.getGeometry().getGeometryType();
-		
-		if (geometryType.equals("Point") || geometryType.equals("LineString")) 
-			dArea = 1.0;
-		else 
-			dArea = Math.abs(featureVersion.getGeometry().getArea() - comparisonArea      );
+		double dArea = 0.0;
+		Geometry the_geom = featureVersion.getGeometry();
+		if (the_geom != null)
+		{
+			String geometryType = the_geom.getGeometryType();
+			if (geometryType.equals("Point") || geometryType.equals("LineString")) 
+				dArea = 999999999.0;
+			else 
+				dArea = Math.abs(the_geom.getArea() - comparisonArea);
+		}
+		else dArea = 999999999.0;
 		
 		return dArea;
 	}
 	
 	private double calculateDPerimeter(MFeatureVersion featureVersion, double comparisonPerimeter){
 		double dPerimeter  = 0.0;
-		String geometryType = featureVersion.getGeometry().getGeometryType();
 		
-		if (geometryType.equals("Point")) 
-			dPerimeter = 1.0;
-		else 
-			dPerimeter = Math.abs(featureVersion.getGeometry().getLength() - comparisonPerimeter );
-		
+		Geometry the_geom = featureVersion.getGeometry();
+		if (the_geom != null)
+		{
+			String geometryType = the_geom.getGeometryType();
+			if (geometryType.equals("Point")) 
+				dPerimeter = 999999999.0;
+			else 
+				dPerimeter = Math.abs(the_geom.getLength() - comparisonPerimeter );
+		} 
+		else dPerimeter = 999999999.0;
+			
 		return dPerimeter;
 	}
 	
 	private double calculateDNoVertices(MFeatureVersion featureVersion, double comparisonNoVertices){
 		double dNoVertices       = 0.0;
 		
-		dNoVertices = 1 - (Math.abs(featureVersion.getGeometry().getNumPoints() - comparisonNoVertices));
+		Geometry the_geom = featureVersion.getGeometry();
+		if (the_geom != null)
+			dNoVertices = 1 - (Math.abs(the_geom.getNumPoints() - comparisonNoVertices));
+		else dNoVertices = 999999999.0; 
 		
 		return dNoVertices;
 	}

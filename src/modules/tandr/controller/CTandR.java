@@ -2,9 +2,7 @@ package modules.tandr.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import utility.UConfig;
 import utility.UDebug;
@@ -26,6 +24,10 @@ public class CTandR extends CCalculusAbstract{
 	private static double dirEffectWeight  = 0.3333333;
 	private static double indEffectWeight  = 0.3333333;
 	private static double tempEffectWeight = 0.3333333;
+	
+//	private static double dirEffectWeight  = 0.45;
+//	private static double indEffectWeight  = 0.45;
+//	private static double tempEffectWeight = 0.1;
 	
 //	private static double dirEffectWeight  = 0.5;
 //	private static double tempEffectWeight = 0.5;
@@ -49,19 +51,22 @@ public class CTandR extends CCalculusAbstract{
 		MFeature feature = featureVersion.getFeature();
 		ArrayList<MFeatureVersion> neighborVersions = new ArrayList<MFeatureVersion>();
 		ArrayList<MFeatureVersion> prevVersions = new ArrayList<MFeatureVersion>();
-		Map<String,Double> prevAverages = new HashMap<String, Double>();
 		
-		neighborVersions = this.getNeighboursUris(featureVersion, vgihGraphUri);
+		Map<String,Double> prevAverages = new HashMap<String, Double>();
+		Map<String,Map<String,Integer>> countRelations = new HashMap<String, Map<String,Integer>>();
+		Map<String,Map<String,String>> previousesRelations = new HashMap<String, Map<String,String>>();
 		
 		if ( featureVersion.isFirst() ) {
 			trustworthiness = this.calculateFirstVersionTrustworthiness(featureVersion);
-		} else {
-//			prevVersions = feature.getPreviousVersions(featureVersion.getVersionNo(), 0);			
-//			prevAverages = this.calculateWeightedAvgsMap(prevVersions);
-			prevVersions = feature.getCleanedPreviousVersions(featureVersion, 0);
+		} else {			
+			// Retrieving of prevVersions and neighborVersions
+			prevVersions = feature.getCleanedPreviousVersions(featureVersion, 0);//	prevAverages = this.calculateWeightedAvgsMap(prevVersions);
+			neighborVersions = this.getNeighbours(featureVersion, vgihGraphUri);
+			// Retrieving of prevAverages, countRelations and prevNeighRelations
 			prevAverages = this.calculateAvgsMap(prevVersions);
-//			prevNeighRelations = this
-			trustworthiness = this.calculateSuccVersionTrustworthiness(featureVersion, prevAverages, prevVersions, neighborVersions);
+			this.calculateRelationsMap(featureVersion,prevVersions,neighborVersions, countRelations, previousesRelations);			
+			
+			trustworthiness = this.calculateSuccVersionTrustworthiness(featureVersion, prevVersions, neighborVersions, prevAverages, countRelations, previousesRelations);
 		}
 		
 		this.debugTrust(trustworthiness);
@@ -78,39 +83,10 @@ public class CTandR extends CCalculusAbstract{
 		
 		//propagate to dependencies
 		if ( ! featureVersion.isFirst() )
-			this.updatePrevVersionsTrustworthiness(prevVersions, neighborVersions, prevAverages, featureVersion);
+			this.updatePrevVersionsTrustworthiness(prevVersions, neighborVersions, prevAverages, countRelations, previousesRelations, featureVersion);
 		this.confirmNeighbours(neighborVersions, featureVersion, vgihGraphUri);
 		
 		return result;
-	}
-
-	private ArrayList<MFeatureVersion> getNeighboursUris(MFeatureVersion featureVersion, String vgihGraphUri) {
-		Map<String,Map<String,MFeatureVersion>> cleanedMap = new HashMap<String, Map<String,MFeatureVersion>>();
-		ArrayList<MFeatureVersion> neighborVersions = new ArrayList<MFeatureVersion>();
-		ArrayList<String> neighboursUris = ffacade.retrieveFVPreviousesNeighbours(featureVersion, vgihGraphUri, featureVersion.getGeometryBuffer());
-		
-		for ( String neighbourUri : neighboursUris) {
-			MFeatureVersion neighbour = (MFeatureVersion) ffacade.retrieveByUri(neighbourUri, UConfig.getVGIHGraphURI(), 1, MFeatureVersion.class);
-			
-			Map<String,MFeatureVersion> authorFVS = new HashMap<String, MFeatureVersion>();
-			
-			if ( cleanedMap.containsKey(neighbour.getAuthorUri()) )
-				authorFVS = cleanedMap.get(neighbour.getAuthorUri());
-			else cleanedMap.put(neighbour.getAuthorUri(), authorFVS);
-			
-			if ( authorFVS.containsKey(neighbour.getFeatureUri()) ) {
-				if( MFeature.compareVersions( authorFVS.get(neighbour.getFeatureUri()).getVersionNo(), neighbour.getVersionNo()) == -1 ) {
-					neighborVersions.remove( authorFVS.get(neighbour.getFeatureUri()) );
-					authorFVS.put(neighbour.getFeatureUri(), neighbour);
-				}
-			}
-			else authorFVS.put(neighbour.getFeatureUri(), neighbour);
-			
-			if(! featureVersion.getAuthorUri().equals(neighbour.getAuthorUri()))
-				neighborVersions.add( neighbour );			
-			
-		}
-		return neighborVersions;
 	}
 	
 //		Map<String,Map<String,MFeatureVersion>> cleanedMap = new HashMap<String, Map<String,MFeatureVersion>>();
@@ -170,13 +146,16 @@ public class CTandR extends CCalculusAbstract{
 		return trustworthiness;
 	}
 
-	private MTrustworthinessTandr calculateSuccVersionTrustworthiness(MFeatureVersion featureVersion, Map<String,Double> averages, ArrayList<MFeatureVersion> prevVersions, ArrayList<MFeatureVersion> neighbors) {
+	private MTrustworthinessTandr calculateSuccVersionTrustworthiness(MFeatureVersion featureVersion, 
+			ArrayList<MFeatureVersion> prevVersions, ArrayList<MFeatureVersion> neighbors, Map<String,Double> averages, 
+			Map<String, Map<String, Integer>> countRelations, Map<String, Map<String, String>> previousesRelations) {
 		
 		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) featureVersion.getTrustworthiness();
 		
 		double trustValue = 0.0;
 		
-		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().calculateTrustworthiness(prevVersions, neighbors, averages, featureVersion)) ;
+		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().calculateTrustworthiness(prevVersions, neighbors, averages, 
+				countRelations, previousesRelations, featureVersion)) ;
 //		At insertion moment (featureVersion.getIsValidFrom()), featureVersion trustworthiness indirect and temporal values are 0.0
 		trustValue = trustValue + (indEffectWeight  * trustworthiness.getIndirectEffect().calculateTrustworthiness(featureVersion,featureVersion.getIsValidFrom()));
 		trustValue = trustValue + (tempEffectWeight * trustworthiness.getTemporalEffect().calculateTrustworthiness(featureVersion,featureVersion.getIsValidFrom()));
@@ -211,7 +190,9 @@ public class CTandR extends CCalculusAbstract{
 	
 
 	//	save fvs Trustworthiness affected by direct evaluation 
-	private void updatePrevVersionsTrustworthiness(ArrayList<MFeatureVersion> prevVersions, ArrayList<MFeatureVersion> neighbors, Map<String,Double> averages, MFeatureVersion featureVersion) {
+	private void updatePrevVersionsTrustworthiness(ArrayList<MFeatureVersion> prevVersions, ArrayList<MFeatureVersion> neighbors, 
+			Map<String,Double> averages, Map<String, Map<String, Integer>> countRelations, Map<String, Map<String, String>> prevNeighRelations, 
+				MFeatureVersion featureVersion) {
 		
 		int dbgLevel = 1;
 		
@@ -225,7 +206,8 @@ public class CTandR extends CCalculusAbstract{
 				
 				double trustValue = 0.0;		
 				
-				trustValue = trustValue + (dirEffectWeight  * trust.getDirectEffect().calculateTrustworthiness(completeVersions, neighbors, averages,fv));
+				trustValue = trustValue + (dirEffectWeight  * trust.getDirectEffect().calculateTrustworthiness(completeVersions, neighbors, averages, 
+						countRelations, prevNeighRelations, fv));
 				trustValue = trustValue + (indEffectWeight  * trust.getIndirectEffect().getValue());
 				trustValue = trustValue + (tempEffectWeight  * trust.getTemporalEffect().calculateTrustworthiness(fv,featureVersion.getIsValidFrom()));
 	
@@ -252,22 +234,12 @@ public class CTandR extends CCalculusAbstract{
 		for ( MFeatureVersion neighbour : neighbours)
 			this.confirm(neighbour,featureVersion);
 	}
-	
-	//	expand confirmation
-//	private void confirmNeighbours(MFeatureVersion featureVersion, String vgihGraphUri) {
-//		ArrayList<String> neighbours = ffacade.retrieveFVPreviousesNeighbours(featureVersion, vgihGraphUri, featureVersion.getGeometryBuffer());
-//		for ( String neighbour : neighbours)
-//			this.confirm((MFeatureVersion) ffacade.retrieveByUri(neighbour, UConfig.getVGIHGraphURI(), 1, MFeatureVersion.class),featureVersion);
-//	}
 
 	public boolean confirm(MFeatureVersion fvToConfirm, MFeatureVersion fvConfirmer) {
 		boolean result = true;
+		int dbgLevel = 1;
 		
 		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) fvToConfirm.getTrustworthiness();
-//		if (trustworthiness == null)
-////			trustworthiness = new MTrustworthinessTandr(fvToConfirm);
-//			trustworthiness = (MTrustworthinessTandr) ffacade.retrieveByUri(fvToConfirm.generateTrustworthinessUri(), UConfig.getVGIHGraphURI(), 0, MTrustworthinessTandr.class);
-//		double trustValue = trustworthiness.getValue();
 		double trustValue = 0.0;
 		
 		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().getValue()) ;
@@ -277,14 +249,52 @@ public class CTandR extends CCalculusAbstract{
 		trustworthiness.setValue(trustValue);
 		trustworthiness.setComputedAt(fvConfirmer.getIsValidFrom());
 		
+		UDebug.print("\t * (CNF) * feature version "+ fvToConfirm.getUriID() +"",dbgLevel+2);
+		UDebug.print("\t * author "+ fvToConfirm.getAuthor().getAccountName() +" * (CNF)\n",dbgLevel+2);
 		this.debugTrust(trustworthiness);
 		
 		ffacade.create(trustworthiness, UConfig.getTANDRGraphURI());
-		UDebug.log("\nCREATE TRUSTWORTHINESS (cnf): " + trustworthiness.getUri() + " - validity time: " + trustworthiness.getComputedAtString(),4);
-		UDebug.log("\n\t" + TView.getTrustworthinessString(fvToConfirm) + "\n",4);
+		UDebug.log("\nCREATE TRUSTWORTHINESS (cnf): " + trustworthiness.getUri() + " - validity time: " + trustworthiness.getComputedAtString(),dbgLevel+10);
+		UDebug.log("\n\t" + TView.getTrustworthinessString(fvToConfirm) + "\n",dbgLevel+10);
 //		this.updateUserReputation(fvToConfirm);
 		
 		return result;
+	}
+
+	private ArrayList<MFeatureVersion> getNeighbours(MFeatureVersion featureVersion, String vgihGraphUri) {
+		Map<String,Map<String,MFeatureVersion>> cleanedMap = new HashMap<String, Map<String,MFeatureVersion>>();
+		ArrayList<MFeatureVersion> neighborVersions = new ArrayList<MFeatureVersion>();
+		ArrayList<String> neighboursUris = ffacade.retrieveFVPreviousesNeighbours(featureVersion, vgihGraphUri, featureVersion.getGeometryBuffer());
+		
+		for ( String neighbourUri : neighboursUris) {
+			MFeatureVersion neighbour = (MFeatureVersion) ffacade.retrieveByUri(neighbourUri, UConfig.getVGIHGraphURI(), 1, MFeatureVersion.class);
+			
+			Map<String,MFeatureVersion> authorFVS = new HashMap<String, MFeatureVersion>();
+			
+			if ( cleanedMap.containsKey(neighbour.getAuthorUri()) )
+				authorFVS = cleanedMap.get(neighbour.getAuthorUri());
+			else cleanedMap.put(neighbour.getAuthorUri(), authorFVS);
+			
+			if ( authorFVS.containsKey(neighbour.getFeatureUri()) ) {
+				if( MFeature.compareVersions( authorFVS.get(neighbour.getFeatureUri()).getVersionNo(), neighbour.getVersionNo()) == -1 ) {
+					neighborVersions.remove( authorFVS.get(neighbour.getFeatureUri()) );
+					authorFVS.put(neighbour.getFeatureUri(), neighbour);
+				}
+			}
+			else authorFVS.put(neighbour.getFeatureUri(), neighbour);
+			
+			if(! featureVersion.getAuthorUri().equals(neighbour.getAuthorUri()))
+				if (neighbour.getIsValidTo() != null) {
+					if ( featureVersion.getIsValidFrom().after(neighbour.getIsValidFrom()) &&  
+							featureVersion.getIsValidFrom().before(neighbour.getIsValidTo()) )
+						neighborVersions.add( neighbour );
+				} else {
+					if ( featureVersion.getIsValidFrom().after(neighbour.getIsValidFrom()) )
+						neighborVersions.add( neighbour );
+				}
+			
+		}
+		return neighborVersions;
 	}
 
 	private void debugTrust(MTrustworthinessTandr trustworthiness) {
@@ -382,6 +392,64 @@ public class CTandR extends CCalculusAbstract{
 		averages.put("avgPerimeter", avgPerimeter);
 		averages.put("avgNoVertices", avgNoVertices);
 		return averages;		
+	}
+	
+	private void calculateRelationsMap(
+			MFeatureVersion featureVersion,
+			ArrayList<MFeatureVersion> prevVersions, ArrayList<MFeatureVersion> neighborVersions,
+			Map<String, Map<String, Integer>> neighborsRelations, 
+			Map<String, Map<String, String>> previousesRelations) {
+
+//		Map<String, Map<String, Integer>> relations = new HashMap<String, Map<String,Integer>>();
+		
+		for (MFeatureVersion previous : prevVersions) {
+			Map<String, String> previousRelations = new HashMap<String, String>();
+			for (MFeatureVersion neighbor : neighborVersions) {
+				String relation =  previous.getGeometry().relate(neighbor.getGeometry()).toString();
+				Map<String, Integer> neighborRelations;
+				
+				previousRelations.put(neighbor.getUri(), relation);
+				
+				if (neighborsRelations.containsKey(neighbor.getUri())) {
+					neighborRelations = neighborsRelations.get(neighbor.getUri());
+					int count;
+					if (neighborRelations.containsKey(relation))
+						count = neighborRelations.get(relation);
+					else count = 0;
+					neighborRelations.put(relation, count ++);
+				} else {
+					neighborRelations = new HashMap<String, Integer>();
+					neighborRelations.put(relation, 1);
+					neighborsRelations.put(neighbor.getUri(), neighborRelations);
+				}
+			}
+			previousesRelations.put(previous.getUri(), previousRelations);
+		}
+		
+		Map<String, String> featureVersionRelations = new HashMap<String, String>();
+		for (MFeatureVersion neighbor : neighborVersions) {
+			String relation =  featureVersion.getGeometry().relate(neighbor.getGeometry()).toString();
+			Map<String, Integer> neighborRelations;
+			
+			featureVersionRelations.put(neighbor.getUri(), relation);
+			
+			if (neighborsRelations.containsKey(neighbor.getUri())) {
+				neighborRelations = neighborsRelations.get(neighbor.getUri());
+				int count;
+				if (neighborRelations.containsKey(relation))
+					count = neighborRelations.get(relation);
+				else count = 0;
+				neighborRelations.put(relation, count ++);
+			} else {
+				neighborRelations = new HashMap<String, Integer>();
+				neighborRelations.put(relation, 1);
+				neighborsRelations.put(neighbor.getUri(), neighborRelations);
+			}
+		}
+		previousesRelations.put(featureVersion.getUri(), featureVersionRelations);
+		
+		
+//		return relations;
 	}
 	
 }

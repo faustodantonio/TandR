@@ -128,8 +128,8 @@ public class MFTemporalEffect extends MFEffect{
 			else featureTo = untilDate.getTime();
 		}
 		
-		versionLifetime = (double) (versionTo - versionFrom);
-		featureLifetime = (double) (featureTo - featureFrom);
+		versionLifetime = (double) (versionTo - versionFrom)/(1000*60*60*24);// measure unit in days
+		featureLifetime = (double) (featureTo - featureFrom)/(1000*60*60*24);// measure unit in days
 		
 		Double temporalEffectValue = (double) (versionLifetime / (featureLifetime + curveSlopeParameter));
 		

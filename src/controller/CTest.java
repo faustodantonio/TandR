@@ -167,7 +167,9 @@ public class CTest {
 	public void printQuery_2()
 	{
 		FFoundationFacade ffactory = new FFoundationFacade();
-		String id = "http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion14955295_21.10";
+		
+//		String id = "http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion14955295_21.10";
+		String id = "http://semantic.web/data/hvgi/wayVersions.rdf#wayVersion27935560_8.0";
 		MFeatureVersion featureVersion = (MFeatureVersion) ffactory.retrieveByUri(id, UConfig.getVGIHGraphURI(), 0, "MFeatureVersion");
 
 //		String fv_dateFrom = featureVersion.getIsValidFromString();

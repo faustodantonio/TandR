@@ -16,7 +16,7 @@ public class MFDirectEffect extends MFEffect{
 	
 	private static double dirGeomWeight = 0.3333333;
 	private static double dirQualWeight = 0.3333333;
-	private static double dirSemWeight  = 0.3333333;
+	private static double dirSemWeight  = 0.3333333;	
 	
 	public MFDirectEffect() {
 		
@@ -49,14 +49,16 @@ public class MFDirectEffect extends MFEffect{
 //		return super.value;
 //	}
 	
-	public double calculateTrustworthiness(ArrayList<MFeatureVersion> versions, ArrayList<MFeatureVersion> neighbors, Map<String,Double> averages, MFeatureVersion featureVersion) {
+	public double calculateTrustworthiness(ArrayList<MFeatureVersion> versions, ArrayList<MFeatureVersion> neighbors, Map<String,Double> averages, 
+			Map<String, Map<String, Integer>> countRelations, Map<String, Map<String, String>> previousesRelations, MFeatureVersion featureVersion) {
 		
 		super.value = 0.0;
 		
 //		this.geometricAspect.calculateWeightedAvgs(versions);
 //		this.geometricAspect.calculateAvgs(versions);
 		super.value = super.value + (dirGeomWeight * this.geometricAspect.calculateTrustworthiness(averages, featureVersion));		
-		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(neighbors, featureVersion));
+		super.value = super.value + (dirQualWeight * this.qualitativeAspect.calculateTrustworthiness(neighbors, featureVersion, 
+																										countRelations, previousesRelations));
 		super.value = super.value + (dirSemWeight  * this.semanticAspect.calculateTrustworthiness(versions, featureVersion));
 		
 		return super.value;

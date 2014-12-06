@@ -111,6 +111,8 @@ public class MFeature {
 		Iterator<Entry<String, String>> verIterator = versionsByVersion.entrySet().iterator();
 		Entry<String, String> versionEntry;
 		
+//		versions.add(fversion);
+		
 		boolean beforeLimit = true;
 		while ( verIterator.hasNext() && beforeLimit) {
 			versionEntry = verIterator.next();
