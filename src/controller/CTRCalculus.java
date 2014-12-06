@@ -101,12 +101,28 @@ public class CTRCalculus {
 			countDate++;
 			startedDate = endedDate;
 		}
+		
+//		for (String date : dates) {
+//			ArrayList<MFeatureVersion> fvs = ffacade.retrieveFVByDate(date, vgihGraphUri, 1);
+//			for (MFeatureVersion featureVersion : fvs) {
+//				this.cfactor.updateLastFeatureVersion(featureVersion);
+//			}
+//		}
+		
+		ArrayList<MFeatureVersion> nonEndedVersions = ffacade.retrieveNonEndedVersions(UConfig.getVGIHGraphURI());
+		for (MFeatureVersion featureVersion : nonEndedVersions) {
+			this.cfactor.updateLastFeatureVersion(featureVersion);
+		}
 	}
 
 	public void compute(MFeatureVersion featureVersion)	{		
 		cfactor.computeTW(featureVersion);
 	}
 
+	public void updateLast(MFeatureVersion featureVersion)	{		
+		cfactor.updateLastFeatureVersion(featureVersion);
+	}
+	
 	public void debugGeneralInformations(int totalFs, int totalFvs, int totalDates, int dbgLevel) {
 		
 		UDebug.print("Total number of Features: " + totalFs +".\n", dbgLevel);

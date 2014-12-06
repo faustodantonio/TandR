@@ -263,6 +263,11 @@ public class FFoundationFacade {
 	{
 		FFeatureVersion ffoundation = new FFeatureVersion();
 		return ffoundation.retrieveLivingNeighbours_debug(featureVersion.getIsValidFromString(), fv_wkt_buffered, graphUri);
+	}	
+	public ArrayList<MFeatureVersion> retrieveNonEndedVersions(String graphUri)
+	{
+		FFeatureVersion ffoundation = new FFeatureVersion();
+		return ffoundation.retrieveNonEndedVersions(graphUri);
 	}
 //	public String retrieveFirstFVUri()
 //	{

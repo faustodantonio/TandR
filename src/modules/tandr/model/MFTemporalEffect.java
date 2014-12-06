@@ -2,15 +2,12 @@ package modules.tandr.model;
 
 import java.text.ParseException;
 import java.util.Date;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import utility.UConfig;
 import utility.UDebug;
 import model.MAuthor;
 import model.MFeature;
 import model.MFeatureVersion;
-import modules.tandr.foundation.FTandrFacade;
 
 public class MFTemporalEffect extends MFEffect{
 
@@ -86,7 +83,7 @@ public class MFTemporalEffect extends MFEffect{
 		return super.value;
 	}
 	
-	private double calculateTemporalEffect(MFeatureVersion featureVersion,	String untilDate) {
+	public double calculateTemporalEffect(MFeatureVersion featureVersion,	String untilDate) {
 		Date date = null;
 		try {
 			date = UConfig.sdf.parse(untilDate);

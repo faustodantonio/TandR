@@ -144,6 +144,53 @@ class FFeatureVersion extends FFoundationAbstract{
 //		return uri.toString();
 //	}
 	
+	public ArrayList<MFeatureVersion> retrieveNonEndedVersions(String graphUri) {
+		ArrayList<MFeatureVersion> versions = new ArrayList<MFeatureVersion>();	
+		ArrayList<String> uris = new ArrayList<String>();
+		
+		uris = this.retrieveNonEndedVersionsUri(graphUri);
+		for(String uri : uris)
+			versions.add( this.retrieveByURI(uri,graphUri,0) );
+		return versions;
+	}
+	
+	private ArrayList<String> retrieveNonEndedVersionsUri(String graphUri) {
+		ArrayList<String> uris = new ArrayList<String>();		
+		
+		String queryString = ""
+				+ "SELECT ?fvUri \n"
+				+ "WHERE \n"
+				+ "{ \n";
+				
+		if (!graphUri.equals("")) queryString += " GRAPH " +graphUri+ "\n {\n";
+		
+		queryString += ""
+					+ "  ?fvUri hvgi:valid ?valid \n"
+					;
+		
+		if (!graphUri.equals("")) queryString += " }\n";
+		queryString += ""				
+				+ " FILTER NOT EXISTS {?valid hvgi:validTo ?validTo}    \n"
+				+ "}							\n"
+				;
+		
+		UDebug.print("SPARQL query: \n" + queryString + "\n\n",dbgLevel+2);
+		
+		ResultSet rawResults = triplestore.sparqlSelectHandled(queryString);
+		ResultSetRewindable queryRawResults = ResultSetFactory.copyResults(rawResults);
+		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+3);
+		queryRawResults.reset();
+		
+		while ( queryRawResults.hasNext() )
+		{
+			QuerySolution generalQueryResults = queryRawResults.next();
+			RDFNode uri = generalQueryResults.getResource("fvUri");		
+			uris.add(uri.toString());
+		}
+		
+		return uris;
+	}
+
 	public ArrayList<String> retrieveLivingNeighbours(String fv_dateFrom,String fv_wkt_buffered) {
 		return this.retrieveLivingNeighbours_debug(fv_dateFrom, fv_wkt_buffered, "");
 	}

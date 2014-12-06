@@ -452,4 +452,31 @@ public class CTandR extends CCalculusAbstract{
 //		return relations;
 	}
 	
+	@Override
+	public boolean updateLastFeatureVersion(MFeatureVersion fv) {
+		boolean result = true;
+		int dbgLevel = 1;
+		
+		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) fv.getTrustworthiness();
+		double trustValue = 0.0;
+		
+		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().getValue()) ;
+		trustValue = trustValue + (indEffectWeight  * trustworthiness.getIndirectEffect().getValue() );
+		trustValue = trustValue + (tempEffectWeight * trustworthiness.getTemporalEffect().calculateTrustworthiness(fv,UConfig.getMaxDateTime())); 
+		
+		trustworthiness.setValue(trustValue);
+		trustworthiness.setComputedAt(UConfig.getMaxDateTime());
+		
+		UDebug.print("\t * (LST_UPD) * feature version "+ fv.getUriID() +"",dbgLevel+2);
+		UDebug.print("\t * author "+ fv.getAuthor().getAccountName() +" * (LST_UPD)\n",dbgLevel+2);
+		this.debugTrust(trustworthiness);
+		
+		ffacade.create(trustworthiness, UConfig.getTANDRGraphURI());
+		UDebug.log("\nCREATE TRUSTWORTHINESS (cnf): " + trustworthiness.getUri() + " - validity time: " + trustworthiness.getComputedAtString(),dbgLevel+10);
+		UDebug.log("\n\t" + TView.getTrustworthinessString(fv) + "\n",dbgLevel+10);
+//		this.updateUserReputation(fvToConfirm);
+		
+		return result;
+	}
+	
 }

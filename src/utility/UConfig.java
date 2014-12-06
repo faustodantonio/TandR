@@ -43,11 +43,11 @@ public class UConfig {
 	 * **|** Test **|** LAquila **|**  Wien **|**  SingerstrasseWien **|**  StephansdomWien 
 	 * **|** SeestadtWien **|** BreitenleerWien **|** DonaustadtFieldsWien **|** DonaustadtWoodsWien **|** DonaustadtLakesWien
 	 */
-	public static String dataset_selection = "SingerstrasseWien";
+//	public static String dataset_selection = "SingerstrasseWien";
 //	public static String dataset_selection = "StephansdomWien";
 //	public static String dataset_selection = "Wien";
 //	public static String dataset_selection = "LAquila";
-//	public static String dataset_selection = "Test";
+	public static String dataset_selection = "Test";
 //	public static String dataset_selection = "SeestadtWien";
 //	public static String dataset_selection = "BreitenleerWien";
 //	public static String dataset_selection = "DonaustadtFieldsWien";
