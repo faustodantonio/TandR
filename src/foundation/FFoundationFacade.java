@@ -329,11 +329,11 @@ public class FFoundationFacade {
 	 *
 	 *************************/	
 
-	public Map<String,String> getIntersectedFV(String wktAuthority) {
+	public Map<String,Map<String,String>> getIntersectedFV(String wktAuthority) {
 		FValidation fauthority = new FValidation();
 		return fauthority.getIntersectedFV(wktAuthority);
 	}
-	public Map<String,String> getIntersectedFV(String wktAuthority,String graphUri) {
+	public Map<String,Map<String,String>> getIntersectedFV(String wktAuthority,String graphUri) {
 		FValidation fauthority = new FValidation();
 		return fauthority.getIntersectedFV(wktAuthority,graphUri);
 	}

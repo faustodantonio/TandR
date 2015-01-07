@@ -181,8 +181,7 @@ class FFeatureVersion extends FFoundationAbstract{
 		UDebug.print("SPARQL query results: \n" + ResultSetFormatter.asText(queryRawResults) + "\n\n",dbgLevel+3);
 		queryRawResults.reset();
 		
-		while ( queryRawResults.hasNext() )
-		{
+		while ( queryRawResults.hasNext() )		{
 			QuerySolution generalQueryResults = queryRawResults.next();
 			RDFNode uri = generalQueryResults.getResource("fvUri");		
 			uris.add(uri.toString());

@@ -41,7 +41,7 @@ public abstract class MFIndirectAspect extends MFAspect {
 	
 	public double confirmTrustworthiness(MFeatureVersion featureVersion, ArrayList<MAuthor> confirmers) {
 		
-		double t_ind_geom = 1.0;		
+		double t_ind_geom = 0.0;		
 		double totGeomRepo = 0.0;
 
 		for (MAuthor confirmer : confirmers) {

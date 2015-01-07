@@ -27,7 +27,7 @@ public class UConfig {
 	 * 3rd char -> 0:don't validate  *|* 1: validate
 	 * 4th char -> 0:don't visualize *|* 1: visualize
 	 */
-	public static String cmdString = "1110";
+	public static String cmdString = "0010";
 	
 	/**
 	 * 0 -> Never perform installation (DEFAULT)                            *|*  
@@ -47,10 +47,10 @@ public class UConfig {
 //	public static String dataset_selection = "StephansdomWien";
 //	public static String dataset_selection = "Wien";
 //	public static String dataset_selection = "LAquila";
-	public static String dataset_selection = "Test";
+//	public static String dataset_selection = "Test";
 //	public static String dataset_selection = "SeestadtWien";
 //	public static String dataset_selection = "BreitenleerWien";
-//	public static String dataset_selection = "DonaustadtFieldsWien";
+	public static String dataset_selection = "DonaustadtFieldsWien";
 //	public static String dataset_selection = "DonaustadtLakesWien";
 	
 	/**
@@ -124,6 +124,7 @@ public class UConfig {
 	public static String lowerTGraph;
 	public static String averageTGraph;
 	public static String higherTGraph;
+	public static String validationGraph;
 	
 	/*************************
 	 * 
@@ -263,6 +264,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_test";
 		averageTGraph 	= "averegeT_test";
 		higherTGraph 	= "higherT_test";
+		validationGraph = "validation_test";
 		
 		minDateTime = "2012-01-01T00:00:00Z";
 		maxDateTime = "2012-01-01T06:00:00Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -285,6 +287,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_laquila";
 		averageTGraph 	= "averegeT_laquila";
 		higherTGraph 	= "higherT_laquila";
+		validationGraph = "validation_laquila";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -307,6 +310,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_wien";
 		averageTGraph 	= "averegeT_wien";
 		higherTGraph 	= "higherT_wien";
+		validationGraph = "validation_wien";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -323,12 +327,13 @@ public class UConfig {
 		/*** Data Graphs		 */
 		hvgiGraph 				= "hvgi_singerstrasse";
 		tandrGraph 				= "tandr_singerstrasse";
-		inputRDFfilesDirectory 	= "./input/singerstrasseWien/";
+		inputRDFfilesDirectory 	= "./input/singerstrasseWien2014/";
 		
 		/*** Validation Graphs		 */
 		lowerTGraph 	= "lowerT_singerstrasse";
 		averageTGraph 	= "averegeT_singerstrasse";
 		higherTGraph 	= "higherT_singerstrasse";
+		validationGraph = "validation_singerstrasse";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -351,6 +356,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_stephansdom";
 		averageTGraph 	= "averegeT_stephansdom";
 		higherTGraph 	= "higherT_stephansdom";
+		validationGraph = "validation_stephansdom";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -373,6 +379,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_seestadt";
 		averageTGraph 	= "averegeT_seestadt";
 		higherTGraph 	= "higherT_seestadt";
+		validationGraph = "validation_seestadt";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -395,6 +402,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_breitenleer";
 		averageTGraph 	= "averegeT_breitenleer";
 		higherTGraph 	= "higherT_breitenleer";
+		validationGraph = "validation_breitenleer";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -417,11 +425,12 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_donaustadtFields";
 		averageTGraph 	= "averegeT_donaustadtFields";
 		higherTGraph 	= "higherT_donaustadtFields";
+		validationGraph = "validation_donaustadtFields";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
 		
-		validationPath = "input/validation/3857/REALNUT2012OGD_BEZ22_3857.csv";
+		validationPath = "input/validation/3857/REALNUT2012OGD_BEZ22_DonaustadtField_3857.csv";
 		
 		generalOutputFilePath = "./output/donaustadtFields.txt";
 		logFilePath = "./output/log_donaustadtFields_"+ new Date().toGMTString().trim() +".txt";
@@ -439,6 +448,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_donaustadtWoods";
 		averageTGraph 	= "averegeT_donaustadtWoods";
 		higherTGraph 	= "higherT_donaustadtWoods";
+		validationGraph = "validation_donaustadtWoods";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -461,6 +471,7 @@ public class UConfig {
 		lowerTGraph 	= "lowerT_donaustadtLakes";
 		averageTGraph 	= "averegeT_donaustadtLakes";
 		higherTGraph 	= "higherT_donaustadtLakes";
+		validationGraph = "validation_donaustadtLakes";
 		
 		minDateTime = "2005-09-15T21:42:44Z";
 		maxDateTime = "2012-03-31T03:29:56Z"; // the original one is "2012-03-30T03:29:56Z"
@@ -522,6 +533,8 @@ public class UConfig {
 		return "<" + UConfig.graphURI + UConfig.averageTGraph + ">";	}
 	public static String getHIGHESTTGraphURI(){
 		return "<" + UConfig.graphURI + UConfig.higherTGraph + ">";	}
+	public static String getValidationGraphURI(){
+		return "<" + UConfig.graphURI + UConfig.validationGraph + ">";	}
 	
 	public static String getMinDateTimeAsString(){
 		return minDateTime;	}

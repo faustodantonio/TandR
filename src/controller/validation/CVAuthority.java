@@ -126,7 +126,7 @@ public class CVAuthority {
 	private void initFeatures() {
 		
 		Map<String, MFeature> features = new HashMap<String, MFeature>();
-		Map<String,String> intersectedFVs = new HashMap<String,String>();
+		Map<String,Map<String,String>> intersectedFVs = new HashMap<String,Map<String,String>>();
 		
 		int dbgLevel = 1;
 		
@@ -182,7 +182,7 @@ public class CVAuthority {
 			
 			feature.setUri(fUri);
 			
-			version.setVersionNo("1");
+			version.setVersionNo("official");
 			version.setAuthor(authority);
 			version.setFeature(feature);
 			version.setIsDeleted(false);
@@ -191,7 +191,7 @@ public class CVAuthority {
 			version.setIsValidTo(UConfig.getMinDateTime());
 			version.generateUri();
 			
-			feature.addVersion(version.getUri(),"1", version);
+			feature.addVersion(version.getUri(),"official", version);
 			
 			UDebug.print("\nUri Version: " + version.getUri(), dbgLevel+1);
 			
@@ -199,8 +199,8 @@ public class CVAuthority {
 		}
 		
 	}
-
-	private String getHigherIntersects(String wktAuthority,	Map<String, String> intersectedFV) {
+	
+	private String getHigherIntersects(String wktAuthority,	Map<String,Map<String,String>> intersectedFV) {
 		
 		Geometry geomAuthority = null;
 		Geometry geomFV = null;
@@ -211,30 +211,29 @@ public class CVAuthority {
 		try {
 			geomAuthority = new WKTReader().read(wktAuthority);
 			
-			for ( Entry<String, String> fvEntry : intersectedFV.entrySet()) {
-				
-				String fUri = fvEntry.getKey();
-				String fvGeometry = fvEntry.getValue();
-				
-				try {
-					geomFV = new WKTReader().read(fvGeometry);
-				} catch (com.vividsolutions.jts.io.ParseException e1) {
-					UDebug.error("Feature Version wkt geometry badly formatted \n");
-					UDebug.error(e1.getMessage());
-				}
-				
-				if (geomFV != null && geomAuthority != null) {					
-					if (geomAuthority.getGeometryType().equals( geomFV.getGeometryType() ))	{						
-						intersectionArea = geomFV.intersection(geomAuthority).getArea() ;
-						if (intersectionArea >= higherIntersectionArea) {
-							higherIntersectionArea = intersectionArea;
-							bindedFeatureUri = fUri;
+			for (Entry<String, Map<String, String>> featureEntry : intersectedFV.entrySet()) {
+			
+				String featureUri = featureEntry.getKey();
+				for ( Entry<String, String> versionEntry : featureEntry.getValue().entrySet() ) {
+					
+					try {
+						geomFV = new WKTReader().read(versionEntry.getValue());
+					} catch (com.vividsolutions.jts.io.ParseException e1) {
+						UDebug.error("Feature Version wkt geometry badly formatted \n");
+						UDebug.error(e1.getMessage());
+					}
+					
+					if (geomFV != null && geomAuthority != null) {					
+						if (geomAuthority.getGeometryType().equals( geomFV.getGeometryType() ))	{						
+							intersectionArea = geomFV.intersection(geomAuthority).getArea() ;
+							if (intersectionArea >= higherIntersectionArea) {
+								higherIntersectionArea = intersectionArea;
+								bindedFeatureUri = featureUri;
+							}
+						} else {
+							break;
 						}
 					}
-					UDebug.print("\n\t\tOGD Geometry: " + new WKTWriter().write(geomAuthority) + ""
-											+ " original string :" + wktAuthority, 100);
-					UDebug.print("\n\t\tOSH Geometry: " + new WKTWriter().write(geomFV) + ""
-							+ " original string :" + fvGeometry, 100);
 				}
 			}
 		} 
@@ -245,6 +244,52 @@ public class CVAuthority {
 		
 		return bindedFeatureUri;
 	}
+
+//	private String getHigherIntersects(String wktAuthority,	Map<String,Map<String,String>> intersectedFV) {
+//		
+//		Geometry geomAuthority = null;
+//		Geometry geomFV = null;
+//		Double intersectionArea = 0.0;
+//		Double higherIntersectionArea = 0.0;
+//		String bindedFeatureUri = "";
+//		
+//		try {
+//			geomAuthority = new WKTReader().read(wktAuthority);
+//			
+//			for ( Entry<String, String> fvEntry : intersectedFV.entrySet()) {
+//				
+//				String fUri = fvEntry.getKey();
+//				String fvGeometry = fvEntry.getValue();
+//				
+//				try {
+//					geomFV = new WKTReader().read(fvGeometry);
+//				} catch (com.vividsolutions.jts.io.ParseException e1) {
+//					UDebug.error("Feature Version wkt geometry badly formatted \n");
+//					UDebug.error(e1.getMessage());
+//				}
+//				
+//				if (geomFV != null && geomAuthority != null) {					
+//					if (geomAuthority.getGeometryType().equals( geomFV.getGeometryType() ))	{						
+//						intersectionArea = geomFV.intersection(geomAuthority).getArea() ;
+//						if (intersectionArea >= higherIntersectionArea) {
+//							higherIntersectionArea = intersectionArea;
+//							bindedFeatureUri = fUri;
+//						}
+//					}
+//					UDebug.print("\n\t\tOGD Geometry: " + new WKTWriter().write(geomAuthority) + ""
+//											+ " original string :" + wktAuthority, 100);
+//					UDebug.print("\n\t\tOSH Geometry: " + new WKTWriter().write(geomFV) + ""
+//							+ " original string :" + fvGeometry, 100);
+//				}
+//			}
+//		} 
+//		catch (com.vividsolutions.jts.io.ParseException e1) {
+//			UDebug.error("Authority wkt geometry badly formatted \n");
+//			UDebug.error(e1.getMessage());
+//		}
+//		
+//		return bindedFeatureUri;
+//	}
 
 	public MAuthor getAuthoritiesAuthor() {
 		if (this.authority == null)

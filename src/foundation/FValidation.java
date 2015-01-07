@@ -36,13 +36,13 @@ public class FValidation {
 		}	
 	}
 
-	public Map<String,String> getIntersectedFV(String wktAuthority) {
+	public Map<String,Map<String,String>> getIntersectedFV(String wktAuthority) {
 		return this.getIntersectedFV(wktAuthority, "");
 	}
 	
-	public Map<String,String> getIntersectedFV(String wktAuthority, String graphUri) {
+	public Map<String,Map<String,String>> getIntersectedFV(String wktAuthority, String graphUri) {
 		
-		Map<String,String> geometries = new HashMap<String, String>();
+		Map<String,Map<String,String>> geometries = new HashMap<String,Map<String,String>>();
 		
 		String queryString = ""
 				+ "\tSELECT ?featureVersionUri ?featureUri (STR(?wktGeometry) AS ?wktString) \n"
@@ -78,10 +78,18 @@ public class FValidation {
 		while ( queryRawResults.hasNext() )
 		{
 			QuerySolution generalQueryResults = queryRawResults.next();
-			RDFNode uri = generalQueryResults.getResource("featureUri");
+			RDFNode featureUri = generalQueryResults.getResource("featureUri");
+			RDFNode featureVersionUri = generalQueryResults.getResource("featureVersionUri");
 			RDFNode geometry = generalQueryResults.getLiteral("wktString");
 			
-			geometries.put(uri.toString(), geometry.toString());
+			if ( geometries.containsKey(featureUri.toString()) )
+				geometries.get(featureUri.toString()).put(featureVersionUri.toString(), geometry.toString());
+			else {
+				HashMap<String,String> fvMap = new HashMap<String,String>();
+				fvMap.put(featureVersionUri.toString(), geometry.toString());
+				geometries.put(featureUri.toString(), fvMap);
+			}
+//			geometries.put(uri.toString(), geometry.toString());
 		}
 		
 		return geometries;

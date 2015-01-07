@@ -102,56 +102,26 @@ public class MFeature {
 	 */
 	public ArrayList<MFeatureVersion> getCleanedPreviousVersions(MFeatureVersion fversion, int lazyDepth) {
 		
-//		int dbgLevel = 100;
 		String version = fversion.getVersionNo();
+		Map<String,MFeatureVersion> cleanedMap = new HashMap<String, MFeatureVersion>();
+		ArrayList<MFeatureVersion> result_versions = new ArrayList<MFeatureVersion>();
 		
-		Map<String,Map<String,MFeatureVersion>> cleanedMap = new HashMap<String, Map<String,MFeatureVersion>>();
-		
-		ArrayList<MFeatureVersion> versions = new ArrayList<MFeatureVersion>();
-		Iterator<Entry<String, String>> verIterator = versionsByVersion.entrySet().iterator();
-		Entry<String, String> versionEntry;
-		
-//		versions.add(fversion);
-		
-		boolean beforeLimit = true;
-		while ( verIterator.hasNext() && beforeLimit) {
-			versionEntry = verIterator.next();
-			
+		for (Entry<String,String> versionEntry : versionsByVersion.entrySet()) {
 			if (compareVersions(version,versionEntry.getKey()) > 0 ) {
 				MFeatureVersion fvEntry = this.getFeatureVersionByVersion(versionEntry.getKey(), 0);
-				
-				Map<String,MFeatureVersion> authorFVS = new HashMap<String, MFeatureVersion>();
-				
-				if ( cleanedMap.containsKey(fvEntry.getAuthorUri()) )
-					authorFVS = cleanedMap.get(fvEntry.getAuthorUri());
-				else cleanedMap.put(fvEntry.getAuthorUri(), authorFVS);
-				
-				if ( authorFVS.containsKey(fvEntry.getFeatureUri()) ) {
-					if( compareVersions( authorFVS.get(fvEntry.getFeatureUri()).getVersionNo(), fvEntry.getVersionNo()) == -1 ) {
-						versions.remove( authorFVS.get(fvEntry.getFeatureUri()) );
-						authorFVS.put(fvEntry.getFeatureUri(), fvEntry);
-					}
+				if ( cleanedMap.containsKey( fvEntry.getAuthorUri() ) ) {
+					if( compareVersions( cleanedMap.get(fvEntry.getAuthorUri()).getVersionNo(), fvEntry.getVersionNo()) < 0 ) 
+						cleanedMap.put(fvEntry.getAuthorUri(), fvEntry);
+				} else {
+					cleanedMap.put(fvEntry.getAuthorUri(), fvEntry);
 				}
-				else authorFVS.put(fvEntry.getFeatureUri(), fvEntry);
-				
-				if(! fversion.getAuthorUri().equals(fvEntry.getAuthorUri()))
-					versions.add( fvEntry );
 			}
-			else beforeLimit = false;
 		}
 		
-//		ArrayList<MFeatureVersion> versionsAux = new ArrayList<MFeatureVersion>();
-//		UDebug.print("\n\nAuthors in map :",dbgLevel+1);
-//		for ( Entry<String, Map<String, MFeatureVersion>> authorEntry : cleanedMap.entrySet()){
-//			UDebug.print("\n author: " + authorEntry.getKey() +" has features: ",dbgLevel+1);
-//			for (Entry<String, MFeatureVersion> featureEntry : authorEntry.getValue().entrySet()) {
-//				UDebug.print("\n\t feature: " + featureEntry.getKey() + ", with version: " + featureEntry.getValue().getVersionNo(),dbgLevel+1);
-//				versionsAux.add(featureEntry.getValue());
-//			}
-//		}
-//		UDebug.print("\n\n\n\n\n",dbgLevel+1);
+		for ( Entry<String, MFeatureVersion> cleanEntry: cleanedMap.entrySet())
+			result_versions.add(cleanEntry.getValue());
 		
-		return versions;
+		return result_versions;
 	}	
 	
 	/**
@@ -177,11 +147,16 @@ public class MFeature {
 			else
 				leftVer_array.add( "0" );	
 		
-		for ( int i = 0; i < leftVer_array.size() ; i++  )
+		for ( int i = 0; i < leftVer_array.size() ; i++  ) {
+		
+			if (leftVer_array.get(i).equals("official")) return -1;
+			if (rightVer_array.get(i).equals("official")) return 1;
+			
 			if (Integer.parseInt(leftVer_array.get(i)) > Integer.parseInt(rightVer_array.get(i)) )
 				return 1;
 			else if (Integer.parseInt(leftVer_array.get(i)) < Integer.parseInt(rightVer_array.get(i))) 
 				return -1;
+		}
 		
 		return 0;
 	}

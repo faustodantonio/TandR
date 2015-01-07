@@ -17,7 +17,7 @@ public class CValidationTandR extends CValidationAbstract {
 	}
 
 	@Override
-	public boolean validateTrustworthiness(MFeatureVersion fv1,	MFeatureVersion fv2, String graph) {
+	public boolean validateTrustworthiness(MFeatureVersion fv_official,	MFeatureVersion fv2, String graph) {
 //		MTrustworthinessTandr trustworthiness = new MTrustworthinessTandr( fv2 );
 //		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) foundation.retrieveByUri(fv2.generateTrustworthinessUri(), UConfig.getVGIHGraphURI(), 0, MTrustworthinessTandr.class);
 		MTrustworthinessTandr trustworthiness = (MTrustworthinessTandr) fv2.getTrustworthiness();
@@ -31,7 +31,7 @@ public class CValidationTandR extends CValidationAbstract {
 //		double tempEffectWeight = 0.3333333;
 		double trustValue = 0.0;
 			
-		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().validateTrustworthiness(fv1, fv2)) ;
+		trustValue = trustValue + (dirEffectWeight  * trustworthiness.getDirectEffect().validateTrustworthiness(fv_official, fv2)) ;
 //		trustValue = trustValue + (indEffectWeight  * trustworthiness.getIndirectEffect().validateTrustworthiness(fv1, fv2));
 //		trustValue = trustValue + (tempEffectWeight * trustworthiness.getTemporalEffect().validateTrustworthiness(fv1, fv2));
 		

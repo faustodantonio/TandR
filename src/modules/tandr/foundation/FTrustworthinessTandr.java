@@ -99,7 +99,7 @@ public class FTrustworthinessTandr extends FFoundationAbstract implements FTrust
 				+ "#Trustworthiness Info \n"
 				+ " ?tUri ?fvUri (str(?computedAt) AS ?timeStamp) (str(?trustworthinessValue) AS ?TrustValue)\n"
 				+ "# Effects Values \n"
-				+ " (str(?directEffectValue) AS ?DirValue) (str(?inirectEffectValue) AS ?IndValue) (str(?temporalEffectValue) AS ?TempValue)\n"
+				+ " (str(?directEffectValue) AS ?DirValue) (str(?indirectEffectValue) AS ?IndValue) (str(?temporalEffectValue) AS ?TempValue)\n"
 				+ "#Direct Aspects Values\n"
 				+ " (str(?dirGeomAspectValue) AS ?GeomDirValue) (str(?dirQualAspectValue) AS ?QualDirValue) (str(?dirSemAspectValue) AS ?SemDirValue)\n"
 				+ "#Indirect Aspect Values\n"

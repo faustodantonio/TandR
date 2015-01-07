@@ -235,7 +235,7 @@ public class CTandR extends CCalculusAbstract{
 			this.confirm(neighbour,featureVersion);
 	}
 
-	public boolean confirm(MFeatureVersion fvToConfirm, MFeatureVersion fvConfirmer) {
+	private boolean confirm(MFeatureVersion fvToConfirm, MFeatureVersion fvConfirmer) {
 		boolean result = true;
 		int dbgLevel = 1;
 		
@@ -256,7 +256,7 @@ public class CTandR extends CCalculusAbstract{
 		ffacade.create(trustworthiness, UConfig.getTANDRGraphURI());
 		UDebug.log("\nCREATE TRUSTWORTHINESS (cnf): " + trustworthiness.getUri() + " - validity time: " + trustworthiness.getComputedAtString(),dbgLevel+10);
 		UDebug.log("\n\t" + TView.getTrustworthinessString(fvToConfirm) + "\n",dbgLevel+10);
-//		this.updateUserReputation(fvToConfirm);
+//		this.updateUserReputation(fvToConfirm,fvConfirmer.getIsValidFromString());
 		
 		return result;
 	}

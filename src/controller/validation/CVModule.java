@@ -23,6 +23,16 @@ public class CVModule {
 		features = new HashSet<MFeature>();
 	}
 
+	public void featurePopulateGraph(String graph) {
+		for (MFeature feature : features) {
+			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);
+			for (String versionUri : feature.getVersions().keySet()) {
+				MFeatureVersion version = feature.getFeatureVersionByURI(versionUri, 0);				
+				foundation.create(version, graph);
+			}
+		}
+	}
+	
 	public void featurePopulateLowerGraph(String graph) {
 		for (MFeature feature : features) {
 			UDebug.print(foundation.convertToRDFTTL(feature) , dbgLevel);

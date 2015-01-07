@@ -2,9 +2,9 @@ package foundation;
 
 import java.util.ArrayList;
 
-
 import org.jdom2.Document;
 
+import utility.UConfig;
 import utility.UDebug;
 import model.MAuthor;
 import model.MFeatureVersion;
@@ -128,7 +128,7 @@ public class FAuthor extends FFoundationAbstract{
 	public ArrayList<String> retrieveConfirmersUris(MFeatureVersion featureVersion, String dateTo, String graphUri) {
 		
 		ArrayList<String> uris = new ArrayList<String>();
-		double radius = 10.0;
+		double radius = UConfig.featureInfluenceRadius;
 		
 		String fv_dateFrom = featureVersion.getIsValidFromString();
 //		String fv_dateTo = featureVersion.getIsValidToString(); //CHECK su fv_dateTo > fv_dateFrom???
